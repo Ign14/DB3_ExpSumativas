@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.4</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>cl.duoc.bancoxyz</groupId>
+    <artifactId>banco-xyz-batch</artifactId>
+    <version>1.0.0</version>
+    <name>banco-xyz-batch</name>
+    <description>
+        Migracion y modernizacion de procesos batch legacy del Banco XYZ utilizando Spring Batch.
+        Exp1 - Semana 3 - Desarrollo Backend III (PBY2203) - Escalado y procesamiento paralelo.
+    </description>
+
+    <properties>
+        <java.version>21</java.version>
+        <!-- Se fija una versión de Lombok más reciente que la que trae por defecto
+             el BOM de Spring Boot 3.3.4 (1.18.32): versiones antiguas de Lombok
+             parchan internamente clases de javac (com.sun.tools.javac.code.TypeTag,
+             entre otras) y pueden romperse con builds de JDK 21 más nuevos que los
+             que existían cuando esa versión de Lombok salió, con errores como
+             "ExceptionInInitializerError: com.sun.tools.javac.code.TypeTag :: UNKNOWN". -->
+        <lombok.version>1.18.46</lombok.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-batch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- Base de datos de producción: PostgreSQL -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Base de datos embebida H2: perfil "dev" para pruebas rápidas y evidencia de ejecución local -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.batch</groupId>
+            <artifactId>spring-batch-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>banco-xyz-batch</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- Se declara Lombok explícitamente como annotation processor:
+                         en algunos entornos Maven no lo detecta automáticamente por el
+                         solo hecho de estar en el classpath, y sin esto los @Getter,
+                         @Setter, @Slf4j, etc. no generan código y la compilación falla. -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

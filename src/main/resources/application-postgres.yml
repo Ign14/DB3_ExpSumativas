@@ -1,0 +1,10 @@
+# Perfil de producción: PostgreSQL. Levantar la instancia con:
+#   docker compose up -d
+# y luego ejecutar la aplicación con:
+#   java -jar target/banco-xyz-batch.jar --spring.profiles.active=postgres --job=all
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:bancoxyz}
+    username: ${DB_USER:bancoxyz}
+    password: ${DB_PASSWORD:bancoxyz}
+    driver-class-name: org.postgresql.Driver

@@ -1,0 +1,33 @@
+version: "3.8"
+
+# Levanta una instancia de PostgreSQL local para ejecutar el proyecto con el
+# perfil "postgres" (base de datos relacional de producción exigida por el
+# enunciado). Uso:
+#   docker compose up -d
+#   java -jar target/banco-xyz-batch.jar --spring.profiles.active=postgres --job=all --DB_PORT=15432
+#
+# Se expone en el puerto 15432 del host (no el 5432 estándar) para evitar
+# choques con instalaciones nativas de PostgreSQL: es común tener más de
+# una instalación local de Postgres en Windows, y los instaladores suelen
+# asignar automáticamente puertos "típicos" (5432, 5433, 5434, ...) cuando
+# el anterior ya está ocupado. Si el contenedor comparte puerto con un
+# Postgres nativo, el sistema operativo puede enrutar la conexión hacia
+# ese servicio en vez del contenedor, y la app falla con un "password
+# authentication failed" que en realidad no tiene nada que ver con la
+# contraseña configurada. Se usa un puerto claramente no convencional para
+# evitar por completo esa clase de colisión.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bancoxyz-postgres
+    environment:
+      POSTGRES_DB: bancoxyz
+      POSTGRES_USER: bancoxyz
+      POSTGRES_PASSWORD: bancoxyz
+    ports:
+      - "15432:5432"
+    volumes:
+      - bancoxyz-db-data:/var/lib/postgresql/data
+
+volumes:
+  bancoxyz-db-data:

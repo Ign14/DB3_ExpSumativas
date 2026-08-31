@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: banco-xyz-batch
+
+  # Perfil activo por defecto: dev (H2 embebido) para poder ejecutar y validar
+  # el proyecto sin depender de un servidor externo. Para producción se activa
+  # el perfil "postgres" (ver docker-compose.yml y README.md).
+  profiles:
+    active: dev
+
+  batch:
+    job:
+      # Se desactiva el auto-arranque de todos los Jobs al levantar el contexto:
+      # los tres procesos se lanzan explícitamente desde JobLauncherRunner
+      # según el argumento --job=..., lo que permite ejecutarlos de forma
+      # individual y repetible (necesario para las pruebas de escalado).
+      enabled: false
+    jdbc:
+      initialize-schema: always
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+    open-in-view: false
+
+# ---------------------------------------------------------------------------
+# Parámetros propios del proyecto: rutas de entrada y configuración de
+# escalado/tolerancia a fallos. Se definen aquí (y no "hardcodeados" en el
+# código) para poder ajustarlos por línea de comandos, por ejemplo:
+#   java -jar banco-xyz-batch.jar --job=transacciones --batch.partition.grid-size=8
+# ---------------------------------------------------------------------------
+batch:
+  input:
+    transacciones-path: classpath:data/transacciones.csv
+    intereses-path: classpath:data/intereses.csv
+    cuentas-anuales-path: classpath:data/cuentas_anuales.csv
+  partition:
+    # Cantidad de particiones en las que se divide cada archivo de entrada.
+    grid-size: 4
+    # Tamaño del pool de hilos que ejecuta las particiones en paralelo.
+    thread-pool-size: 4
+  fault-tolerance:
+    # Cantidad máxima de registros inválidos que se pueden omitir (skip)
+    # antes de que el Step se marque como fallido.
+    skip-limit: 200
+    retry-limit: 3
+  chunk-size: 50
+  intereses:
+    tasa-ahorro: 0.005
+    tasa-prestamo: 0.018
+    tasa-hipoteca: 0.012
