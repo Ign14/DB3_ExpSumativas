@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>cl.duoc.bancoxyz</groupId>
+        <artifactId>banco-xyz-bff</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>common-model</artifactId>
+    <packaging>jar</packaging>
+    <name>common-model</name>
+    <description>
+        Contratos de datos (DTOs) y clientes HTTP tipados hacia los servicios core,
+        compartidos por los tres BFF para evitar duplicar la logica de integracion.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+    </dependencies>
+</project>

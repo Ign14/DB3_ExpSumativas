@@ -1,0 +1,16 @@
+server:
+  port: 8092
+
+spring:
+  application:
+    name: bff-movil
+
+bff:
+  core:
+    cuentas-url: http://localhost:8081
+    movimientos-url: http://localhost:8082
+
+logging:
+  level:
+    root: INFO
+    cl.duoc.bancoxyz.bff: INFO

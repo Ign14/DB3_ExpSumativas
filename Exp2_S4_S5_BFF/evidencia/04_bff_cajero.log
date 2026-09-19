@@ -1,0 +1,37 @@
+===============================================================
+ BFF Cajero - saldo y retiro (con limite propio del canal +
+ validacion de fondos en el servicio core)
+===============================================================
+
+$ curl http://localhost:8093/cajero/cuentas/103/saldo
+{
+  "cuentaId": 103,
+  "saldoDisponible": 6500
+}
+
+$ curl -X POST .../103/retiro -d '{"monto":500}'   (retiro valido)
+{
+  "cuentaId": 103,
+  "montoSolicitado": 500,
+  "saldoResultante": 6000,
+  "aprobado": true,
+  "motivoRechazo": null
+}
+
+$ curl http://localhost:8093/cajero/cuentas/103/saldo   (saldo actualizado tras el retiro)
+{
+  "cuentaId": 103,
+  "saldoDisponible": 6000
+}
+
+$ curl -X POST .../103/retiro -d '{"monto":600000}'   (excede limite del canal: 500.000)
+{"cuentaId":103,"montoSolicitado":600000,"saldoResultante":null,"aprobado":false,"motivoRechazo":"Excede el limite maximo por operacion en cajero ($500000)"}
+HTTP 422
+
+$ curl -X POST .../103/retiro -d '{"monto":50000}'   (dentro del limite del canal, pero sin fondos suficientes)
+{"cuentaId":103,"montoSolicitado":50000,"saldoResultante":6000,"aprobado":false,"motivoRechazo":"Fondos insuficientes"}
+HTTP 422
+
+$ curl http://localhost:8093/cajero/cuentas/999999/saldo   (cuenta inexistente)
+{"mensaje":"No existe la cuenta 999999"}
+HTTP 404

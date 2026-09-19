@@ -1,0 +1,11 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: core-movimientos-service
+
+logging:
+  level:
+    root: INFO
+    cl.duoc.bancoxyz.bff: INFO

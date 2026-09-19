@@ -1,0 +1,11 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: core-cuentas-service
+
+logging:
+  level:
+    root: INFO
+    cl.duoc.bancoxyz.bff: INFO

@@ -1,0 +1,15 @@
+server:
+  port: 8093
+
+spring:
+  application:
+    name: bff-cajero
+
+bff:
+  core:
+    cuentas-url: http://localhost:8081
+
+logging:
+  level:
+    root: INFO
+    cl.duoc.bancoxyz.bff: INFO
