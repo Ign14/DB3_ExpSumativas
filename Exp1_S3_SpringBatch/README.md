@@ -267,4 +267,11 @@ Tanto la corrida con H2 (perfil `dev`) como la corrida con PostgreSQL real
 (perfil `postgres`, ver sección 3.3) quedaron documentadas con capturas
 propias, tal como pide el enunciado.
 
+## 7. Entrega (checklist según instrucciones específicas)
 
+- [x] Código fuente completo, versionable en GitHub.
+- [x] Documentación (este README): objetivo, estructura y cómo ejecutar.
+- [x] Evidencia de ejecución (carpeta `evidencia/`) — capturas propias con H2
+      y con PostgreSQL real.
+- [x] Repositorio en GitHub (cuenta personal).
+- [x] Carpeta de entrega comprimida con el nombre `Exp1_S3_Nombre_Apellido`.

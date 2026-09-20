@@ -308,5 +308,5 @@ completa, generada por `generar_evidencia.sh`:
 - [x] Código fuente completo, versionable en GitHub.
 - [x] Documentación (este README): objetivo, estructura y cómo ejecutar.
 - [x] Evidencia de ejecución (carpeta `evidencia/`).
-- [ ] Repositorio publicado en GitHub (cuenta personal).
-- [ ] Carpeta de entrega comprimida como `Exp2_S5_Nombre_Apellido`.
+- [x] Repositorio publicado en GitHub (cuenta personal).
+- [x] Carpeta de entrega comprimida como `Exp2_S5_Nombre_Apellido`.
