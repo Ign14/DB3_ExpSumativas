@@ -1,0 +1,40 @@
+================================================================
+ BFF Cajero (:8093) - solo operaciones criticas
+ El retiro integra LOS DOS servicios core: debita el saldo en
+ core-cuentas-service y registra el movimiento en core-movimientos
+================================================================
+
+$ curl 'http://localhost:8093/cajero/cuentas/103/saldo'
+{"cuentaId":103,"saldoDisponible":7000}
+[HTTP 200 | 0.401389s | 39 bytes]
+
+--- Retiro valido: se aprueba, debita y registra el movimiento ---
+$ curl -X POST 'http://localhost:8093/cajero/cuentas/103/retiro' -d '{"monto":500}'
+{"cuentaId":103,"montoSolicitado":500,"saldoResultante":6500,"aprobado":true,"motivoRechazo":null,"fechaMovimiento":"2026-09-20","movimientoRegistrado":true}
+[HTTP 200 | 0.149623s | 157 bytes]
+
+--- Saldo despues del retiro (refleja el debito) ---
+$ curl 'http://localhost:8093/cajero/cuentas/103/saldo'
+{"cuentaId":103,"saldoDisponible":6500}
+[HTTP 200 | 0.011130s | 39 bytes]
+
+--- Rechazo por regla del CANAL: excede el limite por operacion ($500.000) ---
+$ curl -X POST 'http://localhost:8093/cajero/cuentas/103/retiro' -d '{"monto":600000}'
+{"cuentaId":103,"montoSolicitado":600000,"saldoResultante":null,"aprobado":false,"motivoRechazo":"Excede el limite maximo por operacion en cajero ($500000)","fechaMovimiento":null,"movimientoRegistrado":false}
+[HTTP 422 | 0.004187s | 209 bytes]
+
+--- Rechazo por regla del DOMINIO: dentro del limite del canal, pero sin fondos ---
+$ curl -X POST 'http://localhost:8093/cajero/cuentas/103/retiro' -d '{"monto":400000}'
+{"cuentaId":103,"montoSolicitado":400000,"saldoResultante":6500,"aprobado":false,"motivoRechazo":"Fondos insuficientes","fechaMovimiento":null,"movimientoRegistrado":false}
+[HTTP 422 | 0.019860s | 172 bytes]
+
+--- Rechazo por monto invalido ---
+$ curl -X POST 'http://localhost:8093/cajero/cuentas/103/retiro' -d '{"monto":0}'
+{"cuentaId":103,"montoSolicitado":0,"saldoResultante":null,"aprobado":false,"motivoRechazo":"El monto a retirar debe ser mayor que cero","fechaMovimiento":null,"movimientoRegistrado":false}
+[HTTP 400 | 0.005038s | 189 bytes]
+
+--- Cuenta inexistente ---
+$ curl 'http://localhost:8093/cajero/cuentas/999999/saldo'
+{"mensaje":"No existe la cuenta 999999"}
+[HTTP 404 | 0.020128s | 40 bytes]
+

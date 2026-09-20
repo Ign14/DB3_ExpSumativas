@@ -1,0 +1,40 @@
+================================================================
+ Coherencia entre canales
+ Un retiro hecho en el CAJERO queda visible en los canales WEB y
+ MOVIL, porque el BFF de cajero registra el movimiento en el otro
+ servicio core ademas de debitar el saldo.
+================================================================
+
+--- ANTES del retiro ---
+Saldo (cajero):                 {"cuentaId":107,"saldoDisponible":8000}
+Movimientos en historial (web): 37
+Resumen de retiros (web):       {"cantidadMovimientos":37,"totalRetiros":55000}
+
+--- RETIRO de $2.500 por cajero ---
+{
+  "cuentaId": 107,
+  "montoSolicitado": 2500,
+  "saldoResultante": 5500,
+  "aprobado": true,
+  "motivoRechazo": null,
+  "fechaMovimiento": "2026-09-20",
+  "movimientoRegistrado": true
+}
+
+--- DESPUES del retiro ---
+Saldo (cajero):                 {"cuentaId":107,"saldoDisponible":5500}
+Movimientos en historial (web): 38
+Resumen de retiros (web):       {"cantidadMovimientos":38,"totalRetiros":57500}
+
+Ultimo movimiento visto desde el canal MOVIL:
+{
+  "saldo": 5500,
+  "tipoCuenta": "hipoteca",
+  "ultimosMovimientos": [
+    {
+      "fecha": "2026-09-20",
+      "tipo": "retiro",
+      "monto": 2500
+    }
+  ]
+}

@@ -2,11 +2,27 @@ package cl.duoc.bancoxyz.bff.cajero.dto;
 
 import java.math.BigDecimal;
 
+/**
+ * Comprobante de retiro. Cuando el retiro se aprueba incluye el
+ * identificador del movimiento que quedo registrado en el historial, para
+ * que el mismo retiro sea despues visible desde los canales web y movil.
+ */
 public record RetiroResponse(
         Long cuentaId,
         BigDecimal montoSolicitado,
         BigDecimal saldoResultante,
         boolean aprobado,
-        String motivoRechazo
+        String motivoRechazo,
+        String fechaMovimiento,
+        boolean movimientoRegistrado
 ) {
+
+    public static RetiroResponse rechazado(Long cuentaId, BigDecimal monto, String motivo, BigDecimal saldo) {
+        return new RetiroResponse(cuentaId, monto, saldo, false, motivo, null, false);
+    }
+
+    public static RetiroResponse aprobado(Long cuentaId, BigDecimal monto, BigDecimal saldoResultante,
+                                          String fechaMovimiento, boolean movimientoRegistrado) {
+        return new RetiroResponse(cuentaId, monto, saldoResultante, true, null, fechaMovimiento, movimientoRegistrado);
+    }
 }

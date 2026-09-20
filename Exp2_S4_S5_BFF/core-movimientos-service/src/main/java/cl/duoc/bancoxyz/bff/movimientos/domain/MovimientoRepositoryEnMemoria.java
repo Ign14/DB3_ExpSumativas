@@ -17,26 +17,36 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Carga cuentas_anuales.csv (historial de movimientos por cuenta) en
- * memoria. Reutiliza las mismas reglas de correccion/omision que el
+ * memoria y permite registrar movimientos nuevos (los que genera, por
+ * ejemplo, un retiro por cajero).
+ *
+ * <p>Reutiliza las mismas reglas de correccion/omision que el
  * MovimientoItemProcessor de la migracion batch: corrige "depósito" con
  * tilde, completa descripciones vacias, y omite fecha no interpretable o
- * monto <= 0.
+ * monto &lt;= 0.</p>
+ *
+ * <p>Las estructuras son concurrentes porque, a diferencia de la carga
+ * inicial (un solo hilo en el arranque), el registro de movimientos ocurre
+ * en hilos de peticion que pueden solaparse.</p>
  */
 @Repository
 public class MovimientoRepositoryEnMemoria {
 
     private static final Logger log = LoggerFactory.getLogger(MovimientoRepositoryEnMemoria.class);
     private static final Set<String> TIPOS_VALIDOS = Set.of("compra", "deposito", "pago", "retiro");
-    private static final Set<String> TIPOS_DEPOSITO = Set.of("deposito");
+    private static final Set<String> TIPOS_EGRESO = Set.of("retiro", "compra", "pago");
 
-    private final Map<Long, List<MovimientoDTO>> movimientosPorCuenta = new HashMap<>();
+    private final Map<Long, List<MovimientoDTO>> movimientosPorCuenta = new ConcurrentHashMap<>();
 
     @PostConstruct
     void cargarDatos() {
         int leidas = 0;
+        int validas = 0;
         int omitidas = 0;
         Resource recurso = new PathMatchingResourcePatternResolver().getResource("classpath:data/cuentas_anuales.csv");
         try (BufferedReader reader = new BufferedReader(
@@ -49,7 +59,8 @@ public class MovimientoRepositoryEnMemoria {
                 leidas++;
                 MovimientoDTO movimiento = parsear(linea);
                 if (movimiento != null) {
-                    movimientosPorCuenta.computeIfAbsent(movimiento.cuentaId(), id -> new ArrayList<>()).add(movimiento);
+                    validas++;
+                    agregar(movimiento);
                 } else {
                     omitidas++;
                 }
@@ -57,9 +68,16 @@ public class MovimientoRepositoryEnMemoria {
         } catch (Exception ex) {
             throw new IllegalStateException("No se pudo cargar cuentas_anuales.csv", ex);
         }
-        int total = movimientosPorCuenta.values().stream().mapToInt(List::size).sum();
-        log.info(">> core-movimientos-service: {} filas leidas, {} movimientos cargados validos, {} omitidos por datos inconsistentes",
-                leidas, total, omitidas);
+        log.info(">> core-movimientos-service: {} filas leidas = {} movimientos validos + {} omitidos por datos inconsistentes",
+                leidas, validas, omitidas);
+        log.info(">> core-movimientos-service: historial cargado para {} cuentas distintas",
+                movimientosPorCuenta.size());
+    }
+
+    private void agregar(MovimientoDTO movimiento) {
+        movimientosPorCuenta
+                .computeIfAbsent(movimiento.cuentaId(), id -> new CopyOnWriteArrayList<>())
+                .add(movimiento);
     }
 
     private MovimientoDTO parsear(String linea) {
@@ -73,7 +91,7 @@ public class MovimientoRepositoryEnMemoria {
             if (fecha.isEmpty()) {
                 return null;
             }
-            String tipo = normalizar(campos[2].trim().toLowerCase());
+            String tipo = normalizar(campos[2]);
             if (!TIPOS_VALIDOS.contains(tipo)) {
                 return null;
             }
@@ -85,7 +103,7 @@ public class MovimientoRepositoryEnMemoria {
             if (monto.signum() <= 0) {
                 return null;
             }
-            String descripcion = campos.length > 4 ? campos[4].trim() : "";
+            String descripcion = campos[4].trim();
             if (descripcion.isBlank()) {
                 descripcion = "Sin descripción";
             }
@@ -95,18 +113,35 @@ public class MovimientoRepositoryEnMemoria {
         }
     }
 
+    /** Corrige la variante con tilde del dataset legacy ("depósito" -> "deposito"). */
     private String normalizar(String tipo) {
-        return TIPOS_DEPOSITO.contains(tipo.replace("ó", "o")) ? "deposito" : tipo.replace("ó", "o");
+        return tipo.trim().toLowerCase().replace("ó", "o");
     }
 
+    /** Historial completo, de la fecha mas antigua a la mas reciente. */
     public List<MovimientoDTO> obtenerMovimientos(Long cuentaId) {
         return movimientosPorCuenta.getOrDefault(cuentaId, List.of()).stream()
                 .sorted(Comparator.comparing(MovimientoDTO::fecha))
                 .toList();
     }
 
-    public boolean existeCuenta(Long cuentaId) {
-        return movimientosPorCuenta.containsKey(cuentaId);
+    /**
+     * Los {@code limite} movimientos mas recientes, de mas nuevo a mas
+     * antiguo. El recorte ocurre aqui y no en el BFF para que el canal que
+     * solo necesita unos pocos movimientos no obligue al core a serializar
+     * el historial completo.
+     */
+    public List<MovimientoDTO> obtenerUltimos(Long cuentaId, int limite) {
+        return movimientosPorCuenta.getOrDefault(cuentaId, List.of()).stream()
+                .sorted(Comparator.comparing(MovimientoDTO::fecha).reversed())
+                .limit(limite)
+                .toList();
+    }
+
+    /** Registra un movimiento nuevo (por ejemplo, el retiro de un cajero). */
+    public MovimientoDTO registrar(MovimientoDTO movimiento) {
+        agregar(movimiento);
+        return movimiento;
     }
 
     public ResumenMovimientosDTO resumir(Long cuentaId) {
@@ -116,7 +151,7 @@ public class MovimientoRepositoryEnMemoria {
                 .map(MovimientoDTO::monto)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal retiros = movimientos.stream()
-                .filter(m -> Set.of("retiro", "compra", "pago").contains(m.tipoMovimiento()))
+                .filter(m -> TIPOS_EGRESO.contains(m.tipoMovimiento()))
                 .map(MovimientoDTO::monto)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         String ultimaFecha = movimientos.isEmpty() ? null : movimientos.get(movimientos.size() - 1).fecha();

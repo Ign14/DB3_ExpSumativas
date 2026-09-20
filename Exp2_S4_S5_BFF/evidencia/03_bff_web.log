@@ -1,0 +1,80 @@
+================================================================
+ BFF Web (:8091) - payload completo para interfaces complejas
+ Agrega 3 llamadas a 2 servicios core en una sola respuesta
+================================================================
+
+--- Cuenta completa: datos + historial entero + resumen ---
+$ curl 'http://localhost:8091/web/cuentas/103'
+{
+  "cuenta": {
+    "cuentaId": 103,
+    "nombreTitular": "Bob Johnson",
+    "edad": 30,
+    "tipoCuenta": "ahorro",
+    "saldo": 7000
+  },
+  "movimientos_en_historial": 29,
+  "primeros_movimientos": [
+    {
+      "cuentaId": 103,
+      "fecha": "2024-01-27",
+      "tipoMovimiento": "retiro",
+      "monto": 2000,
+      "descripcion": "Ingreso mensual"
+    },
+    {
+      "cuentaId": 103,
+      "fecha": "2024-02-12",
+      "tipoMovimiento": "compra",
+      "monto": 3000,
+      "descripcion": "Compra en tienda"
+    },
+    {
+      "cuentaId": 103,
+      "fecha": "2024-03-08",
+      "tipoMovimiento": "deposito",
+      "monto": 3000,
+      "descripcion": "Retiro parcial"
+    }
+  ],
+  "resumen": {
+    "cuentaId": 103,
+    "cantidadMovimientos": 29,
+    "totalDepositos": 10500,
+    "totalRetiros": 61000,
+    "ultimoMovimientoFecha": "2024-12-23"
+  }
+}
+
+--- Listado de cuentas (se muestra el total y las 2 primeras) ---
+$ curl 'http://localhost:8091/web/cuentas'
+{
+  "total": 50,
+  "primeras": [
+    {
+      "cuentaId": 101,
+      "nombreTitular": "Charlie Green",
+      "edad": 100,
+      "tipoCuenta": "prestamo",
+      "saldo": 7000
+    },
+    {
+      "cuentaId": 102,
+      "nombreTitular": "Diana Prince",
+      "edad": 30,
+      "tipoCuenta": "hipoteca",
+      "saldo": 12000
+    }
+  ]
+}
+
+--- Panel administrativo: resumen diario del banco (exclusivo del canal web) ---
+$ curl 'http://localhost:8091/web/banco/resumen-diario'
+{"cantidadTotal":401,"montoTotal":527000,"cantidadCreditos":199,"cantidadDebitos":202,"montoCreditos":259000,"montoDebitos":268000}
+[HTTP 200 | 0.020914s | 131 bytes]
+
+--- Cuenta inexistente: el 404 del core se propaga como 404 del BFF ---
+$ curl 'http://localhost:8091/web/cuentas/999999'
+{"mensaje":"No existe la cuenta 999999"}
+[HTTP 404 | 0.027394s | 40 bytes]
+

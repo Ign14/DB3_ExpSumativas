@@ -1,0 +1,90 @@
+================================================================
+ APIs de los servicios core (capa de datos del dataset legacy)
+ core-cuentas-service :8081  |  core-movimientos-service :8082
+================================================================
+
+### core-cuentas-service
+
+--- Listado de cuentas (se muestra solo el total y las 2 primeras) ---
+$ curl 'http://localhost:8081/api/cuentas'
+{
+  "total": 50,
+  "primeras": [
+    {
+      "cuentaId": 101,
+      "nombreTitular": "Charlie Green",
+      "edad": 100,
+      "tipoCuenta": "prestamo",
+      "saldo": 8000
+    },
+    {
+      "cuentaId": 102,
+      "nombreTitular": "Diana Prince",
+      "edad": 30,
+      "tipoCuenta": "hipoteca",
+      "saldo": 12000
+    }
+  ]
+}
+
+$ curl 'http://localhost:8081/api/cuentas/103'
+{"cuentaId":103,"nombreTitular":"Bob Johnson","edad":30,"tipoCuenta":"ahorro","saldo":7000}
+[HTTP 200 | 0.017512s | 91 bytes]
+
+$ curl 'http://localhost:8081/api/cuentas/999999'
+{"mensaje":"No existe la cuenta 999999"}
+[HTTP 404 | 0.013221s | 40 bytes]
+
+--- Debito directo sobre el core (cuenta 101, para no interferir con la demo de cajero) ---
+$ curl -X PATCH 'http://localhost:8081/api/cuentas/101/debitar' -d '{"monto":1000}'
+{"cuentaId":101,"montoSolicitado":1000,"saldoResultante":7000,"aprobado":true,"motivoRechazo":null}
+[HTTP 200 | 0.071013s | 99 bytes]
+
+--- Debito rechazado por monto invalido ---
+$ curl -X PATCH 'http://localhost:8081/api/cuentas/101/debitar' -d '{"monto":-5}'
+{"mensaje":"El monto a debitar debe ser mayor que cero"}
+[HTTP 400 | 0.006436s | 56 bytes]
+
+
+### core-movimientos-service
+
+--- Historial completo (se muestra el total y los 2 primeros) ---
+$ curl 'http://localhost:8082/api/movimientos/103'
+{
+  "total": 29,
+  "primeros": [
+    {
+      "cuentaId": 103,
+      "fecha": "2024-01-27",
+      "tipoMovimiento": "retiro",
+      "monto": 2000,
+      "descripcion": "Ingreso mensual"
+    },
+    {
+      "cuentaId": 103,
+      "fecha": "2024-02-12",
+      "tipoMovimiento": "compra",
+      "monto": 3000,
+      "descripcion": "Compra en tienda"
+    }
+  ]
+}
+
+--- Historial recortado en origen (?limite=3) ---
+$ curl 'http://localhost:8082/api/movimientos/103?limite=3'
+[{"cuentaId":103,"fecha":"2024-12-23","tipoMovimiento":"retiro","monto":2500,"descripcion":"Sin descripción"},{"cuentaId":103,"fecha":"2024-12-19","tipoMovimiento":"compra","monto":5000,"descripcion":"Retiro parcial"},{"cuentaId":103,"fecha":"2024-10-29","tipoMovimiento":"compra","monto":2500,"descripcion":"Sin descripción"}]
+[HTTP 200 | 0.009321s | 329 bytes]
+
+--- Limite fuera de rango: se rechaza con 400, no con 500 ---
+$ curl 'http://localhost:8082/api/movimientos/103?limite=-1'
+{"mensaje":"El parametro 'limite' debe estar entre 1 y 100"}
+[HTTP 400 | 0.007497s | 60 bytes]
+
+$ curl 'http://localhost:8082/api/movimientos/103/resumen'
+{"cuentaId":103,"cantidadMovimientos":29,"totalDepositos":10500,"totalRetiros":61000,"ultimoMovimientoFecha":"2024-12-23"}
+[HTTP 200 | 0.013550s | 122 bytes]
+
+$ curl 'http://localhost:8082/api/banco/transacciones-diarias/resumen'
+{"cantidadTotal":401,"montoTotal":527000,"cantidadCreditos":199,"cantidadDebitos":202,"montoCreditos":259000,"montoDebitos":268000}
+[HTTP 200 | 0.009577s | 131 bytes]
+

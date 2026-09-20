@@ -1,4 +1,4 @@
-Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/root/.ccr/java-truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=PKCS12 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=35163 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/root/.ccr/java-truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=PKCS12 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=34405 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -9,17 +9,18 @@ Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/root/.ccr/java-truststo
 
  :: Spring Boot ::                (v3.3.4)
 
-2026-09-19T18:45:58.258Z  INFO 566 --- [core-movimientos-service] [           main] .b.b.m.CoreMovimientosServiceApplication : Starting CoreMovimientosServiceApplication v1.0.0 using Java 21.0.10 with PID 566 (/home/claude/Exp2_S4_S5_BFF/core-movimientos-service/target/core-movimientos-service.jar started by root in /home/claude/Exp2_S4_S5_BFF)
-2026-09-19T18:45:58.281Z  INFO 566 --- [core-movimientos-service] [           main] .b.b.m.CoreMovimientosServiceApplication : No active profile set, falling back to 1 default profile: "default"
-2026-09-19T18:46:03.754Z  INFO 566 --- [core-movimientos-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8082 (http)
-2026-09-19T18:46:03.878Z  INFO 566 --- [core-movimientos-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-09-19T18:46:03.878Z  INFO 566 --- [core-movimientos-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
-2026-09-19T18:46:04.057Z  INFO 566 --- [core-movimientos-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2026-09-19T18:46:04.079Z  INFO 566 --- [core-movimientos-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 5455 ms
-2026-09-19T18:46:04.554Z  INFO 566 --- [core-movimientos-service] [           main] .d.b.b.m.d.MovimientoRepositoryEnMemoria : >> core-movimientos-service: 1000 filas leidas, 686 movimientos cargados validos, 314 omitidos por datos inconsistentes
-2026-09-19T18:46:04.696Z  INFO 566 --- [core-movimientos-service] [           main] m.d.TransaccionDiariaRepositoryEnMemoria : >> core-movimientos-service: 1000 transacciones diarias leidas, 401 validas, 599 omitidas por datos inconsistentes
-2026-09-19T18:46:06.539Z  INFO 566 --- [core-movimientos-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8082 (http) with context path '/'
-2026-09-19T18:46:06.638Z  INFO 566 --- [core-movimientos-service] [           main] .b.b.m.CoreMovimientosServiceApplication : Started CoreMovimientosServiceApplication in 12.33 seconds (process running for 14.468)
-2026-09-19T18:46:52.010Z  INFO 566 --- [core-movimientos-service] [nio-8082-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-09-19T18:46:52.010Z  INFO 566 --- [core-movimientos-service] [nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2026-09-19T18:46:52.011Z  INFO 566 --- [core-movimientos-service] [nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-09-20T15:46:00.830Z  INFO 3349 --- [core-movimientos-service] [           main] .b.b.m.CoreMovimientosServiceApplication : Starting CoreMovimientosServiceApplication v1.0.0 using Java 21.0.10 with PID 3349 (/home/claude/Exp2_S4_S5_BFF/core-movimientos-service/target/core-movimientos-service.jar started by root in /home/claude/Exp2_S4_S5_BFF)
+2026-09-20T15:46:00.846Z  INFO 3349 --- [core-movimientos-service] [           main] .b.b.m.CoreMovimientosServiceApplication : No active profile set, falling back to 1 default profile: "default"
+2026-09-20T15:46:03.624Z  INFO 3349 --- [core-movimientos-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8082 (http)
+2026-09-20T15:46:03.660Z  INFO 3349 --- [core-movimientos-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-09-20T15:46:03.661Z  INFO 3349 --- [core-movimientos-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-09-20T15:46:03.727Z  INFO 3349 --- [core-movimientos-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-09-20T15:46:03.729Z  INFO 3349 --- [core-movimientos-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2645 ms
+2026-09-20T15:46:04.000Z  INFO 3349 --- [core-movimientos-service] [           main] .d.b.b.m.d.MovimientoRepositoryEnMemoria : >> core-movimientos-service: 1000 filas leidas = 686 movimientos validos + 314 omitidos por datos inconsistentes
+2026-09-20T15:46:04.010Z  INFO 3349 --- [core-movimientos-service] [           main] .d.b.b.m.d.MovimientoRepositoryEnMemoria : >> core-movimientos-service: historial cargado para 20 cuentas distintas
+2026-09-20T15:46:04.076Z  INFO 3349 --- [core-movimientos-service] [           main] m.d.TransaccionDiariaRepositoryEnMemoria : >> core-movimientos-service: 1000 transacciones diarias leidas, 401 validas, 599 omitidas por datos inconsistentes
+2026-09-20T15:46:04.832Z  INFO 3349 --- [core-movimientos-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8082 (http) with context path '/'
+2026-09-20T15:46:04.847Z  INFO 3349 --- [core-movimientos-service] [           main] .b.b.m.CoreMovimientosServiceApplication : Started CoreMovimientosServiceApplication in 5.39 seconds (process running for 6.661)
+2026-09-20T15:46:30.595Z  INFO 3349 --- [core-movimientos-service] [nio-8082-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-09-20T15:46:30.596Z  INFO 3349 --- [core-movimientos-service] [nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-09-20T15:46:30.598Z  INFO 3349 --- [core-movimientos-service] [nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms

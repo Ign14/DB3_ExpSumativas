@@ -1,5 +1,14 @@
 server:
   port: 8093
+  # Compresion DESACTIVADA a proposito en este canal. Las respuestas del
+  # cajero son diminutas (39 bytes el saldo, ~150 el comprobante de retiro)
+  # y el encabezado fijo de gzip agrega mas bytes de los que ahorra: medido,
+  # la respuesta de saldo pasa de 39 a 65 bytes al comprimirla. Ademas, al
+  # emitirse con Transfer-Encoding: chunked, Tomcat no puede aplicar el
+  # umbral min-response-size, asi que no basta con subir el umbral: hay que
+  # apagar la compresion para este canal.
+  compression:
+    enabled: false
 
 spring:
   application:
@@ -8,6 +17,10 @@ spring:
 bff:
   core:
     cuentas-url: http://localhost:8081
+    movimientos-url: http://localhost:8082
+  cajero:
+    # Regla propia del canal cajero: monto maximo por operacion.
+    limite-retiro-por-operacion: 500000
 
 logging:
   level:

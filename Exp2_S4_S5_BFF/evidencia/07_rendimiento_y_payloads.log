@@ -1,0 +1,49 @@
+================================================================
+ Rendimiento y consumo de recursos por canal
+ Cuenta de prueba: 103 | promedio de 30 peticiones
+ (se descarta una peticion previa de calentamiento de JVM)
+================================================================
+
+### 1. Tiempo de respuesta y tamano por canal (endpoint principal)
+
+Canal      Endpoint                                 Tiempo(ms)        Bytes   Bytes gzip
+---------- -------------------------------------- ------------ ------------ ------------
+Web        /web/cuentas/103                              27.90         3552          566
+Movil      /movil/cuentas/103                            19.36          318          158
+Cajero     /cajero/cuentas/103/saldo                      9.68           39           39
+
+Reduccion de payload movil respecto de web:  91.1%
+Reduccion de payload cajero respecto de web: 99.0%
+
+Efecto de la compresion:
+  Web:   3552 -> 566 bytes (84.1% menos)
+  Movil: 318 -> 158 bytes (50.4% menos)
+  Cajero: compresion DESACTIVADA a proposito en este canal.
+    A 39 bytes, el encabezado fijo de gzip agrega mas bytes de los que
+    ahorra (medido: 39 -> 65 bytes comprimido). Como las respuestas se
+    emiten con Transfer-Encoding: chunked, Tomcat no puede aplicar el
+    umbral min-response-size, asi que no basta con subirlo: la decision
+    correcta para este canal es apagar la compresion.
+
+### 2. Trafico interno BFF -> core (el recorte ocurre en el core)
+
+Peticion del BFF al servicio core                           Bytes
+---------------------------------------------------- ------------
+GET /api/movimientos/103          (canal web)                3296
+GET /api/movimientos/103?limite=5 (canal movil)               562
+
+El canal movil ahorra 83.0% tambien en el trafico interno,
+no solo en el payload que ve la app: el servicio core nunca llega a
+serializar el historial completo para una peticion movil.
+
+### 3. Tiempo de respuesta de los servicios core (referencia)
+
+Endpoint core                                          Tiempo(ms)
+---------------------------------------------------- ------------
+GET /api/cuentas/103                                         2.51
+GET /api/movimientos/103                                     2.47
+GET /api/movimientos/103/resumen                             2.11
+
+Los tiempos del BFF incluyen sus llamadas a los servicios core; la
+diferencia entre el tiempo de un BFF y el de los core que consume es
+el costo de la agregacion y transformacion que agrega el patron.

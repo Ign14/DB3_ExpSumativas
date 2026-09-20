@@ -1,0 +1,28 @@
+================================================================
+ BFF Movil (:8092) - payload liviano para ahorrar ancho de banda
+ Sin nombre del titular, sin descripciones, solo los ultimos N
+================================================================
+
+$ curl 'http://localhost:8092/movil/cuentas/103'
+{"saldo":7000,"tipoCuenta":"ahorro","ultimosMovimientos":[{"fecha":"2024-12-23","tipo":"retiro","monto":2500},{"fecha":"2024-12-19","tipo":"compra","monto":5000},{"fecha":"2024-10-29","tipo":"compra","monto":2500},{"fecha":"2024-10-29","tipo":"compra","monto":2500},{"fecha":"2024-10-26","tipo":"compra","monto":2000}]}
+[HTTP 200 | 0.425649s | 319 bytes]
+
+--- Con limite explicito (?limite=3): el recorte lo hace el core, no el BFF ---
+$ curl 'http://localhost:8092/movil/cuentas/103?limite=3'
+{"saldo":7000,"tipoCuenta":"ahorro","ultimosMovimientos":[{"fecha":"2024-12-23","tipo":"retiro","monto":2500},{"fecha":"2024-12-19","tipo":"compra","monto":5000},{"fecha":"2024-10-29","tipo":"compra","monto":2500}]}
+[HTTP 200 | 0.032465s | 215 bytes]
+
+--- Limite fuera de rango: 400 con mensaje claro (antes esto era un 500) ---
+$ curl 'http://localhost:8092/movil/cuentas/103?limite=-1'
+{"mensaje":"El parametro 'limite' debe estar entre 1 y 20"}
+[HTTP 400 | 0.016585s | 59 bytes]
+
+$ curl 'http://localhost:8092/movil/cuentas/103?limite=999'
+{"mensaje":"El parametro 'limite' debe estar entre 1 y 20"}
+[HTTP 400 | 0.004999s | 59 bytes]
+
+--- Cuenta inexistente ---
+$ curl 'http://localhost:8092/movil/cuentas/999999'
+{"mensaje":"No existe la cuenta 999999"}
+[HTTP 404 | 0.018796s | 40 bytes]
+

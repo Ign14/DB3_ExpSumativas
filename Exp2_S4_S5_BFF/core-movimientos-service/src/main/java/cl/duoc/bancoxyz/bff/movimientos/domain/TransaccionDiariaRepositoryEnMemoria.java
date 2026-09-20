@@ -56,7 +56,7 @@ public class TransaccionDiariaRepositoryEnMemoria {
         } catch (Exception ex) {
             throw new IllegalStateException("No se pudo cargar transacciones.csv", ex);
         }
-        log.info(">> core-movimientos-service: {} transacciones diarias leidas, {} validas, {} omitidas por datos inconsistentes",
+        log.info(">> core-movimientos-service: {} transacciones diarias leidas = {} validas + {} omitidas por datos inconsistentes",
                 leidas, cantidadTotal, omitidas);
     }
 

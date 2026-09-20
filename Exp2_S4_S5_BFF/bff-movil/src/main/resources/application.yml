@@ -1,5 +1,11 @@
 server:
   port: 8092
+  # En movil la compresion se activa desde una respuesta mas chica: el
+  # objetivo del canal es gastar el minimo de ancho de banda posible.
+  compression:
+    enabled: true
+    mime-types: application/json
+    min-response-size: 256
 
 spring:
   application:

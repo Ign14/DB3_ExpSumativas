@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Carga intereses.csv (dataset legacy) en memoria al arrancar y expone las
@@ -38,6 +39,7 @@ public class CuentaRepositoryEnMemoria {
     @PostConstruct
     void cargarDatos() {
         int leidas = 0;
+        int validas = 0;
         int omitidas = 0;
         Resource recurso = new PathMatchingResourcePatternResolver().getResource("classpath:data/intereses.csv");
         try (BufferedReader reader = new BufferedReader(
@@ -50,6 +52,9 @@ public class CuentaRepositoryEnMemoria {
                 leidas++;
                 Optional<CuentaRegistro> registro = parsear(linea);
                 if (registro.isPresent()) {
+                    validas++;
+                    // El dataset legacy repite la misma cuenta en varias filas y no
+                    // trae fecha para desempatar: se conserva la ultima fila valida.
                     cuentas.put(registro.get().cuentaId(), registro.get());
                 } else {
                     omitidas++;
@@ -58,8 +63,10 @@ public class CuentaRepositoryEnMemoria {
         } catch (Exception ex) {
             throw new IllegalStateException("No se pudo cargar intereses.csv", ex);
         }
-        log.info(">> core-cuentas-service: {} filas leidas, {} cargadas validas, {} omitidas por datos inconsistentes",
-                leidas, cuentas.size(), omitidas);
+        log.info(">> core-cuentas-service: {} filas leidas = {} validas + {} omitidas por datos inconsistentes",
+                leidas, validas, omitidas);
+        log.info(">> core-cuentas-service: {} cuentas distintas cargadas (el dataset repite la misma cuenta en varias filas; se conserva la ultima valida de cada una)",
+                cuentas.size());
     }
 
     private Optional<CuentaRegistro> parsear(String linea) {
@@ -112,20 +119,35 @@ public class CuentaRepositoryEnMemoria {
      * Aplica un debito de forma atomica sobre el registro en memoria.
      * Devuelve empty si la cuenta no existe; si existe, siempre devuelve un
      * resultado (aprobado o no segun haya o no fondos suficientes).
+     *
+     * <p>Se usa {@link ConcurrentHashMap#compute} y no un bloque
+     * {@code synchronized} sobre el valor leido previamente: el registro es
+     * inmutable y cada debito lo reemplaza por una instancia nueva, asi que
+     * un lock tomado sobre la instancia vieja no impide que dos retiros
+     * simultaneos lean el mismo saldo de partida y se pise uno al otro
+     * (lost update). {@code compute} garantiza que la lectura del saldo, la
+     * validacion de fondos y la escritura del nuevo saldo ocurran como una
+     * sola operacion atomica sobre la clave.</p>
      */
     public Optional<ResultadoDebito> debitar(Long cuentaId, BigDecimal monto) {
-        CuentaRegistro registro = cuentas.get(cuentaId);
-        if (registro == null) {
-            return Optional.empty();
-        }
-        synchronized (registro) {
+        // El resultado se publica desde dentro de compute(), que es donde se
+        // decide si el debito se aplica o se rechaza.
+        AtomicReference<ResultadoDebito> resultado = new AtomicReference<>();
+
+        cuentas.compute(cuentaId, (id, registro) -> {
+            if (registro == null) {
+                return null; // cuenta inexistente: no se crea nada
+            }
             if (registro.saldo().compareTo(monto) < 0) {
-                return Optional.of(new ResultadoDebito(false, "Fondos insuficientes", registro.saldo()));
+                resultado.set(new ResultadoDebito(false, "Fondos insuficientes", registro.saldo()));
+                return registro; // se deja el registro intacto
             }
             CuentaRegistro actualizado = registro.conSaldo(registro.saldo().subtract(monto));
-            cuentas.put(cuentaId, actualizado);
-            return Optional.of(new ResultadoDebito(true, null, actualizado.saldo()));
-        }
+            resultado.set(new ResultadoDebito(true, null, actualizado.saldo()));
+            return actualizado;
+        });
+
+        return Optional.ofNullable(resultado.get());
     }
 
     public record ResultadoDebito(boolean aprobado, String motivoRechazo, BigDecimal saldoResultante) {
