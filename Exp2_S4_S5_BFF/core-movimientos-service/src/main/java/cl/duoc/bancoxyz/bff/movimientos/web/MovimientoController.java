@@ -8,10 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * API de dominio de movimientos por cuenta. La ausencia de movimientos no es
- * un error: una cuenta nueva o sin actividad simplemente devuelve una lista
- * vacia y un resumen en cero (la existencia de la cuenta en si la valida
- * core-cuentas-service).
+ * API de dominio de movimientos. Que una cuenta no tenga movimientos no es un
+ * error: devuelve lista vacía y resumen en cero. La existencia de la cuenta la
+ * valida core-cuentas-service.
  */
 @RestController
 @RequestMapping("/api/movimientos")
@@ -25,11 +24,7 @@ public class MovimientoController {
         this.repositorio = repositorio;
     }
 
-    /**
-     * Sin {@code limite} devuelve el historial completo (canal web); con
-     * {@code limite} devuelve solo los N mas recientes, recortados aca y no
-     * en el BFF (canales movil y cajero).
-     */
+    /** Sin {@code limite} devuelve el historial completo; con él, solo los N más recientes. */
     @GetMapping("/{cuentaId}")
     public ResponseEntity<?> obtener(@PathVariable Long cuentaId,
                                      @RequestParam(required = false) Integer limite) {
@@ -38,7 +33,7 @@ public class MovimientoController {
         }
         if (limite < 1 || limite > LIMITE_MAXIMO) {
             return ResponseEntity.badRequest().body(new ErrorResponse(
-                    "El parametro 'limite' debe estar entre 1 y " + LIMITE_MAXIMO));
+                    "El parámetro 'limite' debe estar entre 1 y " + LIMITE_MAXIMO));
         }
         return ResponseEntity.ok(repositorio.obtenerUltimos(cuentaId, limite));
     }
@@ -48,12 +43,7 @@ public class MovimientoController {
         return repositorio.resumir(cuentaId);
     }
 
-    /**
-     * Registra un movimiento nuevo en el historial. Lo usa el BFF de cajero
-     * para dejar constancia del retiro recien aplicado sobre el saldo, de
-     * modo que la operacion hecha en el cajero sea visible despues desde
-     * los canales web y movil.
-     */
+    /** Lo usa el BFF de cajero para dejar constancia de un retiro. */
     @PostMapping
     public ResponseEntity<?> registrar(@RequestBody MovimientoDTO movimiento) {
         if (movimiento.cuentaId() == null
@@ -66,7 +56,6 @@ public class MovimientoController {
             return ResponseEntity.badRequest()
                     .body(new ErrorResponse("El monto del movimiento debe ser mayor que cero"));
         }
-        MovimientoDTO registrado = repositorio.registrar(movimiento);
-        return ResponseEntity.status(201).body(registrado);
+        return ResponseEntity.status(201).body(repositorio.registrar(movimiento));
     }
 }

@@ -8,11 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * El cajero integra los dos servicios core, pero por motivos distintos que
- * los otros canales: a core-cuentas-service le pide el saldo y le aplica el
- * debito, y a core-movimientos-service le registra el retiro y le pide solo
- * el ultimo movimiento para el comprobante. En ningun caso expone el
- * historial completo ni los datos del titular.
+ * Clientes hacia los dos servicios core: a cuentas le pide el saldo y le aplica
+ * el débito, y a movimientos le registra el retiro.
  */
 @Configuration
 public class CoreClientsConfig {

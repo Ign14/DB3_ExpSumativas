@@ -27,7 +27,7 @@ class CuentaRepositoryEnMemoriaTest {
     }
 
     @Test
-    @DisplayName("Carga solo las cuentas que cumplen las reglas de validacion del dataset legacy")
+    @DisplayName("Carga solo las cuentas que cumplen las reglas de validación")
     void cargaSoloCuentasValidas() {
         List<CuentaDTO> cuentas = repositorio.listar();
 
@@ -41,7 +41,7 @@ class CuentaRepositoryEnMemoriaTest {
     }
 
     @Test
-    @DisplayName("Un debito con fondos suficientes descuenta exactamente el monto")
+    @DisplayName("Un débito con fondos suficientes descuenta exactamente el monto")
     void debitoConFondosSuficientes() {
         CuentaDTO cuenta = repositorio.listar().get(0);
         BigDecimal saldoInicial = cuenta.saldo();
@@ -58,7 +58,7 @@ class CuentaRepositoryEnMemoriaTest {
     }
 
     @Test
-    @DisplayName("Un debito sin fondos suficientes se rechaza y deja el saldo intacto")
+    @DisplayName("Un débito sin fondos suficientes se rechaza y deja el saldo intacto")
     void debitoSinFondosSuficientes() {
         CuentaDTO cuenta = repositorio.listar().get(0);
         BigDecimal saldoInicial = cuenta.saldo();
@@ -73,19 +73,15 @@ class CuentaRepositoryEnMemoriaTest {
     }
 
     @Test
-    @DisplayName("Debitar una cuenta inexistente devuelve vacio y no crea la cuenta")
+    @DisplayName("Debitar una cuenta inexistente devuelve vacío y no crea la cuenta")
     void debitoSobreCuentaInexistente() {
         assertTrue(repositorio.debitar(999_999L, new BigDecimal("100")).isEmpty());
         assertTrue(repositorio.buscar(999_999L).isEmpty());
     }
 
     @Test
-    @DisplayName("Retiros concurrentes no se pisan entre si: el saldo final refleja todos los debitos aprobados")
+    @DisplayName("Retiros concurrentes no se pisan entre sí: el saldo final refleja todos los débitos aprobados")
     void debitosConcurrentesNoPierdenActualizaciones() throws InterruptedException {
-        // Este test existe por un bug real: la primera version sincronizaba
-        // sobre el registro leido del mapa y releia el saldo desde esa
-        // referencia ya obsoleta, de modo que dos retiros simultaneos podian
-        // partir del mismo saldo y perderse uno (lost update).
         CuentaDTO cuenta = repositorio.listar().stream()
                 .max((a, b) -> a.saldo().compareTo(b.saldo()))
                 .orElseThrow();

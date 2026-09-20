@@ -1,49 +1,43 @@
 ================================================================
  Rendimiento y consumo de recursos por canal
- Cuenta de prueba: 103 | promedio de 30 peticiones
- (se descarta una peticion previa de calentamiento de JVM)
+ Cuenta 110 | promedio de 30 peticiones
 ================================================================
 
-### 1. Tiempo de respuesta y tamano por canal (endpoint principal)
+### 1. Tiempo de respuesta y tamano por canal
 
-Canal      Endpoint                                 Tiempo(ms)        Bytes   Bytes gzip
----------- -------------------------------------- ------------ ------------ ------------
-Web        /web/cuentas/103                              27.90         3552          566
-Movil      /movil/cuentas/103                            19.36          318          158
-Cajero     /cajero/cuentas/103/saldo                      9.68           39           39
+Canal      Endpoint                             Tiempo(ms)        Bytes   Bytes gzip
+---------- ---------------------------------- ------------ ------------ ------------
+Web        /web/cuentas/110                          28.33         3332          545
+Movil      /movil/cuentas/110                        20.19          324          165
+Cajero     /cajero/cuentas/110/saldo                 10.55           40           40
 
-Reduccion de payload movil respecto de web:  91.1%
-Reduccion de payload cajero respecto de web: 99.0%
+Reduccion de payload movil respecto de web:  90.3%
+Reduccion de payload cajero respecto de web: 98.8%
 
-Efecto de la compresion:
-  Web:   3552 -> 566 bytes (84.1% menos)
-  Movil: 318 -> 158 bytes (50.4% menos)
-  Cajero: compresion DESACTIVADA a proposito en este canal.
-    A 39 bytes, el encabezado fijo de gzip agrega mas bytes de los que
-    ahorra (medido: 39 -> 65 bytes comprimido). Como las respuestas se
-    emiten con Transfer-Encoding: chunked, Tomcat no puede aplicar el
-    umbral min-response-size, asi que no basta con subirlo: la decision
-    correcta para este canal es apagar la compresion.
+Compresion:
+  Web:    3332 -> 545 bytes (83.7% menos)
+  Movil:  324 -> 165 bytes (49.1% menos)
+  Cajero: desactivada. A este tamano de respuesta el encabezado de gzip
+          agrega mas bytes de los que ahorra.
 
-### 2. Trafico interno BFF -> core (el recorte ocurre en el core)
+### 2. Trafico interno BFF -> core
 
-Peticion del BFF al servicio core                           Bytes
----------------------------------------------------- ------------
-GET /api/movimientos/103          (canal web)                3296
-GET /api/movimientos/103?limite=5 (canal movil)               562
+Peticion del BFF al servicio core                         Bytes
+-------------------------------------------------- ------------
+GET /api/movimientos/110 (canal web)                       3071
+GET /api/movimientos/110?limite=5 (canal movil)             544
 
-El canal movil ahorra 83.0% tambien en el trafico interno,
-no solo en el payload que ve la app: el servicio core nunca llega a
-serializar el historial completo para una peticion movil.
+El canal movil ahorra 82.3% tambien en el trafico interno:
+el servicio core nunca serializa el historial completo para una
+peticion movil.
 
 ### 3. Tiempo de respuesta de los servicios core (referencia)
 
-Endpoint core                                          Tiempo(ms)
----------------------------------------------------- ------------
-GET /api/cuentas/103                                         2.51
-GET /api/movimientos/103                                     2.47
-GET /api/movimientos/103/resumen                             2.11
+Endpoint core                                        Tiempo(ms)
+-------------------------------------------------- ------------
+GET /api/cuentas/110                                       2.68
+GET /api/movimientos/110                                   3.61
+GET /api/movimientos/110/resumen                           2.34
 
-Los tiempos del BFF incluyen sus llamadas a los servicios core; la
-diferencia entre el tiempo de un BFF y el de los core que consume es
-el costo de la agregacion y transformacion que agrega el patron.
+La diferencia entre el tiempo de un BFF y el de los servicios core que
+consume es el costo de la agregacion y transformacion por canal.

@@ -7,12 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Arma los clientes de common-model apuntando a las URLs de los dos
- * servicios core. Las URLs son configurables (application.yml /
- * variables de entorno) para poder mover cada servicio de host sin tocar
- * codigo, y los timeouts los fija {@link CoreRestClientFactory}.
- */
+/** Clientes hacia los dos servicios core, con las URLs tomadas de la configuración. */
 @Configuration
 public class CoreClientsConfig {
 

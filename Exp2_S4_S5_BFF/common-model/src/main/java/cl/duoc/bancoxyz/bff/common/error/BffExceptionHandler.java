@@ -8,15 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 /**
- * Manejo de errores compartido por los tres BFF: una cuenta inexistente
- * responde 404, un parametro invalido 400, y un servicio core caido o con
- * error responde 502 (el fallo es del backend, no del cliente del BFF).
- *
- * <p>Vive en common-model y no duplicado en cada canal; cada aplicacion BFF
- * lo incorpora incluyendo el paquete {@code cl.duoc.bancoxyz.bff.common} en
- * su {@code scanBasePackages}.</p>
+ * Manejo de errores compartido por los tres BFF. Cada aplicación lo incorpora
+ * agregando el paquete {@code cl.duoc.bancoxyz.bff.common} a su
+ * {@code scanBasePackages}.
  */
 @RestControllerAdvice
 public class BffExceptionHandler {
@@ -29,6 +26,13 @@ public class BffExceptionHandler {
     @ExceptionHandler(ParametroInvalidoException.class)
     public ResponseEntity<ErrorResponse> parametroInvalido(ParametroInvalidoException ex) {
         return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
+    }
+
+    /** Un parámetro con tipo incorrecto (por ejemplo ?limite=abc) también es un 400. */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> tipoInvalido(MethodArgumentTypeMismatchException ex) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(
+                "El parámetro '" + ex.getName() + "' tiene un valor inválido: " + ex.getValue()));
     }
 
     @ExceptionHandler(ServicioCoreNoDisponibleException.class)

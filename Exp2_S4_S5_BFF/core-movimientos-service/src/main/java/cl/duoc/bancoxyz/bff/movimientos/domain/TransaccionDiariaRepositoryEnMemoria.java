@@ -16,10 +16,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 /**
- * Carga transacciones.csv: el log de transacciones diarias del banco, que a
- * diferencia de cuentas_anuales.csv no esta asociado a una cuenta especifica.
- * Se expone como un agregado unico (no por cuenta) que alimenta, por
- * ejemplo, un panel administrativo del BFF Web.
+ * Log de transacciones diarias del banco (transacciones.csv). A diferencia de
+ * cuentas_anuales.csv, estas filas no tienen cuenta asociada, así que se
+ * exponen solo como un agregado global.
  */
 @Repository
 public class TransaccionDiariaRepositoryEnMemoria {
@@ -56,7 +55,7 @@ public class TransaccionDiariaRepositoryEnMemoria {
         } catch (Exception ex) {
             throw new IllegalStateException("No se pudo cargar transacciones.csv", ex);
         }
-        log.info(">> core-movimientos-service: {} transacciones diarias leidas = {} validas + {} omitidas por datos inconsistentes",
+        log.info(">> core-movimientos-service: {} transacciones diarias leídas = {} válidas + {} omitidas por datos inconsistentes",
                 leidas, cantidadTotal, omitidas);
     }
 

@@ -3,15 +3,18 @@ package cl.duoc.bancoxyz.bff.common.dto;
 import java.math.BigDecimal;
 
 /**
- * Agregado del historial de movimientos de una cuenta. Se calcula una sola
- * vez en core-movimientos-service para que ningun BFF tenga que recorrer el
- * historial completo solo para mostrar totales.
+ * Totales del historial de una cuenta, calculados en core-movimientos-service
+ * para que ningún BFF tenga que recorrer el historial completo solo para
+ * mostrar sumas.
+ *
+ * {@code totalEgresos} agrupa retiros, compras y pagos: los tres sacan dinero
+ * de la cuenta.
  */
 public record ResumenMovimientosDTO(
         Long cuentaId,
         int cantidadMovimientos,
         BigDecimal totalDepositos,
-        BigDecimal totalRetiros,
+        BigDecimal totalEgresos,
         String ultimoMovimientoFecha
 ) {
 }

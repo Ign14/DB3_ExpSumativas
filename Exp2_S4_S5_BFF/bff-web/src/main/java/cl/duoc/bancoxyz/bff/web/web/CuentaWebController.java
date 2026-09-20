@@ -1,11 +1,8 @@
 package cl.duoc.bancoxyz.bff.web.web;
 
-import cl.duoc.bancoxyz.bff.common.client.CuentasApiClient;
-import cl.duoc.bancoxyz.bff.common.client.MovimientosApiClient;
 import cl.duoc.bancoxyz.bff.common.dto.CuentaDTO;
-import cl.duoc.bancoxyz.bff.common.dto.MovimientoDTO;
-import cl.duoc.bancoxyz.bff.common.dto.ResumenMovimientosDTO;
 import cl.duoc.bancoxyz.bff.web.dto.CuentaWebResponse;
+import cl.duoc.bancoxyz.bff.web.service.CuentaWebService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,29 +14,19 @@ import java.util.List;
 @RequestMapping("/web/cuentas")
 public class CuentaWebController {
 
-    private final CuentasApiClient cuentasApiClient;
-    private final MovimientosApiClient movimientosApiClient;
+    private final CuentaWebService servicio;
 
-    public CuentaWebController(CuentasApiClient cuentasApiClient, MovimientosApiClient movimientosApiClient) {
-        this.cuentasApiClient = cuentasApiClient;
-        this.movimientosApiClient = movimientosApiClient;
+    public CuentaWebController(CuentaWebService servicio) {
+        this.servicio = servicio;
     }
 
-    /**
-     * Un unico llamado del cliente web dispara, hacia adentro, tres
-     * llamadas a dos servicios core distintos: esa agregacion es
-     * exactamente el trabajo que el patron BFF le quita al frontend.
-     */
     @GetMapping("/{cuentaId}")
     public CuentaWebResponse obtenerCuentaCompleta(@PathVariable Long cuentaId) {
-        CuentaDTO cuenta = cuentasApiClient.obtenerCuenta(cuentaId);
-        List<MovimientoDTO> historial = movimientosApiClient.obtenerMovimientos(cuentaId);
-        ResumenMovimientosDTO resumen = movimientosApiClient.obtenerResumen(cuentaId);
-        return new CuentaWebResponse(cuenta, historial, resumen);
+        return servicio.obtenerCuentaCompleta(cuentaId);
     }
 
     @GetMapping
     public List<CuentaDTO> listarCuentas() {
-        return cuentasApiClient.listarCuentas();
+        return servicio.listarCuentas();
     }
 }

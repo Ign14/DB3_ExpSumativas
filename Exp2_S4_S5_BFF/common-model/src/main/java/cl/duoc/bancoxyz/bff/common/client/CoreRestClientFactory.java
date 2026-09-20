@@ -7,33 +7,28 @@ import java.net.http.HttpClient;
 import java.time.Duration;
 
 /**
- * Construye los {@link RestClient} hacia los servicios core con timeouts
- * explicitos.
+ * Crea los clientes HTTP hacia los servicios core con timeouts explícitos, para
+ * que un core que no responde haga fallar la llamada rápido en vez de dejar
+ * hilos del BFF bloqueados.
  *
- * <p>Sin timeout, un servicio core colgado (no caido: colgado) deja hilos
- * del BFF bloqueados indefinidamente y termina agotando el pool de Tomcat,
- * que es una forma silenciosa de consumir recursos. Con timeout, la llamada
- * falla rapido y el BFF responde 502 en vez de quedarse esperando.</p>
- *
- * <p>Se usa {@link JdkClientHttpRequestFactory} (sobre
- * {@link java.net.http.HttpClient}) y no {@code SimpleClientHttpRequestFactory}:
- * este ultimo se apoya en {@code HttpURLConnection}, que no soporta el
- * metodo PATCH y hace fallar el debito de saldo del canal cajero.</p>
+ * Se usa {@link JdkClientHttpRequestFactory} porque
+ * {@code SimpleClientHttpRequestFactory} se apoya en {@code HttpURLConnection},
+ * que no soporta PATCH (el método que usa el débito de saldo).
  */
 public final class CoreRestClientFactory {
 
-    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(2);
-    private static final Duration READ_TIMEOUT = Duration.ofSeconds(5);
+    private static final Duration TIMEOUT_CONEXION = Duration.ofSeconds(2);
+    private static final Duration TIMEOUT_LECTURA = Duration.ofSeconds(5);
 
     private CoreRestClientFactory() {
     }
 
     public static RestClient crear(String baseUrl) {
         HttpClient httpClient = HttpClient.newBuilder()
-                .connectTimeout(CONNECT_TIMEOUT)
+                .connectTimeout(TIMEOUT_CONEXION)
                 .build();
         JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(httpClient);
-        factory.setReadTimeout(READ_TIMEOUT);
+        factory.setReadTimeout(TIMEOUT_LECTURA);
         return RestClient.builder()
                 .baseUrl(baseUrl)
                 .requestFactory(factory)

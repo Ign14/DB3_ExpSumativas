@@ -20,13 +20,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Carga intereses.csv (dataset legacy) en memoria al arrancar y expone las
- * operaciones de lectura y debito sobre el saldo de cada cuenta.
+ * Almacén en memoria de las cuentas, cargado desde intereses.csv al arrancar.
  *
- * <p>Reutiliza las mismas reglas de validacion que ya se aplicaron en la
- * migracion batch de la semana 3 (saldo &gt;= 0, edad en [18,120], tipo en
- * {ahorro, prestamo, hipoteca}): una fila que no las cumple queda fuera del
- * servicio, igual que quedaba fuera del batch como anomalia.</p>
+ * Las reglas de validación son las mismas que se aplicaron en la migración
+ * batch de la semana 3: saldo ≥ 0, edad entre 18 y 120, y tipo dentro del
+ * dominio conocido. Una fila que no las cumple queda fuera del servicio.
  */
 @Repository
 public class CuentaRepositoryEnMemoria {
@@ -53,8 +51,6 @@ public class CuentaRepositoryEnMemoria {
                 Optional<CuentaRegistro> registro = parsear(linea);
                 if (registro.isPresent()) {
                     validas++;
-                    // El dataset legacy repite la misma cuenta en varias filas y no
-                    // trae fecha para desempatar: se conserva la ultima fila valida.
                     cuentas.put(registro.get().cuentaId(), registro.get());
                 } else {
                     omitidas++;
@@ -63,12 +59,16 @@ public class CuentaRepositoryEnMemoria {
         } catch (Exception ex) {
             throw new IllegalStateException("No se pudo cargar intereses.csv", ex);
         }
-        log.info(">> core-cuentas-service: {} filas leidas = {} validas + {} omitidas por datos inconsistentes",
+        log.info(">> core-cuentas-service: {} filas leídas = {} válidas + {} omitidas por datos inconsistentes",
                 leidas, validas, omitidas);
-        log.info(">> core-cuentas-service: {} cuentas distintas cargadas (el dataset repite la misma cuenta en varias filas; se conserva la ultima valida de cada una)",
-                cuentas.size());
+        log.info(">> core-cuentas-service: {} cuentas distintas cargadas", cuentas.size());
     }
 
+    /**
+     * El dataset repite la misma cuenta en varias filas con valores que no
+     * siempre coinciden, y no trae fecha para desempatar: se conserva la última
+     * fila válida de cada cuenta.
+     */
     private Optional<CuentaRegistro> parsear(String linea) {
         String[] campos = linea.split(",", -1);
         if (campos.length < 5) {
@@ -89,13 +89,7 @@ public class CuentaRepositoryEnMemoria {
             }
             BigDecimal saldo = new BigDecimal(saldoTexto);
             int edad = Integer.parseInt(edadTexto);
-            if (saldo.signum() < 0) {
-                return Optional.empty();
-            }
-            if (edad < 18 || edad > 120) {
-                return Optional.empty();
-            }
-            if (!TIPOS_VALIDOS.contains(tipo)) {
+            if (saldo.signum() < 0 || edad < 18 || edad > 120 || !TIPOS_VALIDOS.contains(tipo)) {
                 return Optional.empty();
             }
             return Optional.of(new CuentaRegistro(cuentaId, nombre, edad, tipo, saldo));
@@ -116,31 +110,25 @@ public class CuentaRepositoryEnMemoria {
     }
 
     /**
-     * Aplica un debito de forma atomica sobre el registro en memoria.
-     * Devuelve empty si la cuenta no existe; si existe, siempre devuelve un
-     * resultado (aprobado o no segun haya o no fondos suficientes).
+     * Aplica un débito. Devuelve vacío si la cuenta no existe; si existe,
+     * devuelve el resultado aprobado o rechazado según haya fondos.
      *
-     * <p>Se usa {@link ConcurrentHashMap#compute} y no un bloque
-     * {@code synchronized} sobre el valor leido previamente: el registro es
-     * inmutable y cada debito lo reemplaza por una instancia nueva, asi que
-     * un lock tomado sobre la instancia vieja no impide que dos retiros
-     * simultaneos lean el mismo saldo de partida y se pise uno al otro
-     * (lost update). {@code compute} garantiza que la lectura del saldo, la
-     * validacion de fondos y la escritura del nuevo saldo ocurran como una
-     * sola operacion atomica sobre la clave.</p>
+     * Se usa {@code compute} para que leer el saldo, validar los fondos y
+     * escribir el nuevo saldo sean una sola operación atómica sobre la clave.
+     * Sincronizar sobre el registro leído antes no sirve: el registro es
+     * inmutable y cada débito lo reemplaza por otra instancia, así que dos
+     * retiros simultáneos pueden partir del mismo saldo y perderse uno.
      */
     public Optional<ResultadoDebito> debitar(Long cuentaId, BigDecimal monto) {
-        // El resultado se publica desde dentro de compute(), que es donde se
-        // decide si el debito se aplica o se rechaza.
         AtomicReference<ResultadoDebito> resultado = new AtomicReference<>();
 
         cuentas.compute(cuentaId, (id, registro) -> {
             if (registro == null) {
-                return null; // cuenta inexistente: no se crea nada
+                return null;
             }
             if (registro.saldo().compareTo(monto) < 0) {
                 resultado.set(new ResultadoDebito(false, "Fondos insuficientes", registro.saldo()));
-                return registro; // se deja el registro intacto
+                return registro;
             }
             CuentaRegistro actualizado = registro.conSaldo(registro.saldo().subtract(monto));
             resultado.set(new ResultadoDebito(true, null, actualizado.saldo()));

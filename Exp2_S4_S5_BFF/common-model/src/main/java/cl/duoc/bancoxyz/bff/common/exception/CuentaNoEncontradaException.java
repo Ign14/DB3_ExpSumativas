@@ -1,10 +1,6 @@
 package cl.duoc.bancoxyz.bff.common.exception;
 
-/**
- * Se lanza cuando un servicio core responde 404 para una cuenta. Cada BFF
- * la traduce a la respuesta de error propia de su canal (ver
- * GlobalExceptionHandler en cada modulo bff-*).
- */
+/** La cuenta solicitada no existe en core-cuentas-service. Se traduce a HTTP 404. */
 public class CuentaNoEncontradaException extends RuntimeException {
 
     private final Long cuentaId;

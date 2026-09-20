@@ -1,40 +1,40 @@
 ================================================================
  BFF Cajero (:8093) - solo operaciones criticas
- El retiro integra LOS DOS servicios core: debita el saldo en
- core-cuentas-service y registra el movimiento en core-movimientos
+ El retiro integra los dos servicios core: debita el saldo y
+ registra el movimiento resultante
 ================================================================
 
 $ curl 'http://localhost:8093/cajero/cuentas/103/saldo'
 {"cuentaId":103,"saldoDisponible":7000}
-[HTTP 200 | 0.401389s | 39 bytes]
+[HTTP 200 | 0.054947s | 39 bytes]
 
---- Retiro valido: se aprueba, debita y registra el movimiento ---
+--- Retiro valido ---
 $ curl -X POST 'http://localhost:8093/cajero/cuentas/103/retiro' -d '{"monto":500}'
 {"cuentaId":103,"montoSolicitado":500,"saldoResultante":6500,"aprobado":true,"motivoRechazo":null,"fechaMovimiento":"2026-09-20","movimientoRegistrado":true}
-[HTTP 200 | 0.149623s | 157 bytes]
+[HTTP 200 | 0.147494s | 157 bytes]
 
---- Saldo despues del retiro (refleja el debito) ---
+--- Saldo despues del retiro ---
 $ curl 'http://localhost:8093/cajero/cuentas/103/saldo'
 {"cuentaId":103,"saldoDisponible":6500}
-[HTTP 200 | 0.011130s | 39 bytes]
+[HTTP 200 | 0.021547s | 39 bytes]
 
---- Rechazo por regla del CANAL: excede el limite por operacion ($500.000) ---
+--- Rechazo por regla del CANAL: excede el limite por operacion ---
 $ curl -X POST 'http://localhost:8093/cajero/cuentas/103/retiro' -d '{"monto":600000}'
-{"cuentaId":103,"montoSolicitado":600000,"saldoResultante":null,"aprobado":false,"motivoRechazo":"Excede el limite maximo por operacion en cajero ($500000)","fechaMovimiento":null,"movimientoRegistrado":false}
-[HTTP 422 | 0.004187s | 209 bytes]
+{"cuentaId":103,"montoSolicitado":600000,"saldoResultante":null,"aprobado":false,"motivoRechazo":"Excede el límite máximo por operación en cajero ($500000)","fechaMovimiento":null,"movimientoRegistrado":false}
+[HTTP 422 | 0.004526s | 212 bytes]
 
---- Rechazo por regla del DOMINIO: dentro del limite del canal, pero sin fondos ---
+--- Rechazo por regla del DOMINIO: dentro del limite, pero sin fondos ---
 $ curl -X POST 'http://localhost:8093/cajero/cuentas/103/retiro' -d '{"monto":400000}'
 {"cuentaId":103,"montoSolicitado":400000,"saldoResultante":6500,"aprobado":false,"motivoRechazo":"Fondos insuficientes","fechaMovimiento":null,"movimientoRegistrado":false}
-[HTTP 422 | 0.019860s | 172 bytes]
+[HTTP 422 | 0.021479s | 172 bytes]
 
 --- Rechazo por monto invalido ---
 $ curl -X POST 'http://localhost:8093/cajero/cuentas/103/retiro' -d '{"monto":0}'
 {"cuentaId":103,"montoSolicitado":0,"saldoResultante":null,"aprobado":false,"motivoRechazo":"El monto a retirar debe ser mayor que cero","fechaMovimiento":null,"movimientoRegistrado":false}
-[HTTP 400 | 0.005038s | 189 bytes]
+[HTTP 400 | 0.003837s | 189 bytes]
 
 --- Cuenta inexistente ---
 $ curl 'http://localhost:8093/cajero/cuentas/999999/saldo'
 {"mensaje":"No existe la cuenta 999999"}
-[HTTP 404 | 0.020128s | 40 bytes]
+[HTTP 404 | 0.018858s | 40 bytes]
 

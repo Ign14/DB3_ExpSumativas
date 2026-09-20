@@ -10,9 +10,12 @@ import org.springframework.web.client.RestClient;
 import java.util.List;
 
 /**
- * Cliente tipado hacia core-movimientos-service, compartido por los tres BFF.
+ * Cliente hacia core-movimientos-service, compartido por los tres BFF para no
+ * repetir la integración en cada canal.
  */
 public class MovimientosApiClient {
+
+    private static final String SERVICIO = "core-movimientos-service";
 
     private final RestClient restClient;
 
@@ -20,7 +23,7 @@ public class MovimientosApiClient {
         this.restClient = restClient;
     }
 
-    /** Historial completo de la cuenta. Lo usa el canal web. */
+    /** Historial completo de la cuenta. */
     public List<MovimientoDTO> obtenerMovimientos(Long cuentaId) {
         try {
             return restClient.get()
@@ -29,15 +32,14 @@ public class MovimientosApiClient {
                     .body(new ParameterizedTypeReference<List<MovimientoDTO>>() {
                     });
         } catch (Exception ex) {
-            throw new ServicioCoreNoDisponibleException("core-movimientos-service", ex);
+            throw new ServicioCoreNoDisponibleException(SERVICIO, ex);
         }
     }
 
     /**
-     * Solo los ultimos {@code limite} movimientos, recortados <b>en el
-     * servicio core</b>. Lo usan los canales que no necesitan el historial
-     * completo (movil y cajero): asi el ahorro no es solo en el payload que
-     * ve el cliente, sino tambien en lo que viaja entre el BFF y el core.
+     * Los movimientos más recientes, recortados por el servicio core. Los
+     * canales que solo necesitan unos pocos evitan así que viaje el historial
+     * completo entre el core y el BFF.
      */
     public List<MovimientoDTO> obtenerUltimosMovimientos(Long cuentaId, int limite) {
         try {
@@ -50,7 +52,7 @@ public class MovimientosApiClient {
                     .body(new ParameterizedTypeReference<List<MovimientoDTO>>() {
                     });
         } catch (Exception ex) {
-            throw new ServicioCoreNoDisponibleException("core-movimientos-service", ex);
+            throw new ServicioCoreNoDisponibleException(SERVICIO, ex);
         }
     }
 
@@ -61,15 +63,11 @@ public class MovimientosApiClient {
                     .retrieve()
                     .body(ResumenMovimientosDTO.class);
         } catch (Exception ex) {
-            throw new ServicioCoreNoDisponibleException("core-movimientos-service", ex);
+            throw new ServicioCoreNoDisponibleException(SERVICIO, ex);
         }
     }
 
-    /**
-     * Registra un movimiento nuevo en el historial de la cuenta. Lo usa el
-     * canal cajero para dejar constancia del retiro que acaba de aplicar
-     * sobre el saldo.
-     */
+    /** Registra un movimiento nuevo, como el que genera un retiro por cajero. */
     public MovimientoDTO registrarMovimiento(MovimientoDTO movimiento) {
         try {
             return restClient.post()
@@ -78,7 +76,7 @@ public class MovimientosApiClient {
                     .retrieve()
                     .body(MovimientoDTO.class);
         } catch (Exception ex) {
-            throw new ServicioCoreNoDisponibleException("core-movimientos-service", ex);
+            throw new ServicioCoreNoDisponibleException(SERVICIO, ex);
         }
     }
 
@@ -89,7 +87,7 @@ public class MovimientosApiClient {
                     .retrieve()
                     .body(TransaccionDiariaResumenDTO.class);
         } catch (Exception ex) {
-            throw new ServicioCoreNoDisponibleException("core-movimientos-service", ex);
+            throw new ServicioCoreNoDisponibleException(SERVICIO, ex);
         }
     }
 }

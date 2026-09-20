@@ -12,9 +12,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * API de dominio de cuentas. No sabe nada de "web", "movil" o "cajero": esa
- * adaptacion por canal es responsabilidad exclusiva de los BFF que la
- * consumen.
+ * API de dominio de cuentas. No distingue canales: esa adaptación es
+ * responsabilidad de los BFF que la consumen.
  */
 @RestController
 @RequestMapping("/api/cuentas")

@@ -4,7 +4,7 @@ import cl.duoc.bancoxyz.bff.common.dto.CuentaDTO;
 
 import java.math.BigDecimal;
 
-/** Registro interno (inmutable) de una cuenta cargada en memoria. */
+/** Registro interno de una cuenta. Inmutable: un débito produce una instancia nueva. */
 public record CuentaRegistro(Long cuentaId, String nombreTitular, int edad, String tipoCuenta, BigDecimal saldo) {
 
     CuentaRegistro conSaldo(BigDecimal nuevoSaldo) {

@@ -1,11 +1,8 @@
 server:
   port: 8091
-  # El canal web es el que devuelve el payload mas grande, asi que es el que
-  # mas gana con compresion: el historial completo comprime muy bien.
   compression:
     enabled: true
     mime-types: application/json
-    min-response-size: 512
 
 spring:
   application:

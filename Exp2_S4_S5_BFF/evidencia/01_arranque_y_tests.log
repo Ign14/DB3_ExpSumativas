@@ -1,0 +1,58 @@
+================================================================
+ Arranque de los 5 servicios (2 core + 3 BFF)
+================================================================
+
+--- core-cuentas-service ---
+2026-09-20T16:11:42.411Z  INFO 2156 --- [core-cuentas-service] [           main] c.d.b.b.c.CoreCuentasServiceApplication  : Starting CoreCuentasServiceApplication v1.0.0 using Java 21.0.10 with PID 2156 (/home/claude/Exp2_S4_S5_BFF/core-cuentas-service/target/core-cuentas-service.jar started by root in /home/claude/Exp2_S4_S5_BFF)
+2026-09-20T16:11:45.312Z  INFO 2156 --- [core-cuentas-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-09-20T16:11:45.563Z  INFO 2156 --- [core-cuentas-service] [           main] c.d.b.b.c.d.CuentaRepositoryEnMemoria    : >> core-cuentas-service: 1000 filas leídas = 399 válidas + 601 omitidas por datos inconsistentes
+2026-09-20T16:11:45.565Z  INFO 2156 --- [core-cuentas-service] [           main] c.d.b.b.c.d.CuentaRepositoryEnMemoria    : >> core-cuentas-service: 50 cuentas distintas cargadas
+2026-09-20T16:11:46.479Z  INFO 2156 --- [core-cuentas-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path '/'
+2026-09-20T16:11:46.522Z  INFO 2156 --- [core-cuentas-service] [           main] c.d.b.b.c.CoreCuentasServiceApplication  : Started CoreCuentasServiceApplication in 5.491 seconds (process running for 6.682)
+
+--- core-movimientos-service ---
+2026-09-20T16:11:42.416Z  INFO 2157 --- [core-movimientos-service] [           main] .b.b.m.CoreMovimientosServiceApplication : Starting CoreMovimientosServiceApplication v1.0.0 using Java 21.0.10 with PID 2157 (/home/claude/Exp2_S4_S5_BFF/core-movimientos-service/target/core-movimientos-service.jar started by root in /home/claude/Exp2_S4_S5_BFF)
+2026-09-20T16:11:45.318Z  INFO 2157 --- [core-movimientos-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-09-20T16:11:45.674Z  INFO 2157 --- [core-movimientos-service] [           main] .d.b.b.m.d.MovimientoRepositoryEnMemoria : >> core-movimientos-service: 1000 filas leídas = 686 movimientos válidos + 314 omitidos por datos inconsistentes
+2026-09-20T16:11:45.680Z  INFO 2157 --- [core-movimientos-service] [           main] .d.b.b.m.d.MovimientoRepositoryEnMemoria : >> core-movimientos-service: historial cargado para 20 cuentas distintas
+2026-09-20T16:11:45.735Z  INFO 2157 --- [core-movimientos-service] [           main] m.d.TransaccionDiariaRepositoryEnMemoria : >> core-movimientos-service: 1000 transacciones diarias leídas = 401 válidas + 599 omitidas por datos inconsistentes
+2026-09-20T16:11:46.569Z  INFO 2157 --- [core-movimientos-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8082 (http) with context path '/'
+2026-09-20T16:11:46.602Z  INFO 2157 --- [core-movimientos-service] [           main] .b.b.m.CoreMovimientosServiceApplication : Started CoreMovimientosServiceApplication in 5.534 seconds (process running for 6.757)
+
+--- bff-web ---
+2026-09-20T16:11:51.752Z  INFO 2248 --- [bff-web] [           main] c.d.bancoxyz.bff.web.BffWebApplication   : Starting BffWebApplication v1.0.0 using Java 21.0.10 with PID 2248 (/home/claude/Exp2_S4_S5_BFF/bff-web/target/bff-web.jar started by root in /home/claude/Exp2_S4_S5_BFF)
+2026-09-20T16:11:56.005Z  INFO 2248 --- [bff-web] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-09-20T16:11:58.581Z  INFO 2248 --- [bff-web] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8091 (http) with context path '/'
+2026-09-20T16:11:58.618Z  INFO 2248 --- [bff-web] [           main] c.d.bancoxyz.bff.web.BffWebApplication   : Started BffWebApplication in 9.111 seconds (process running for 11.067)
+
+--- bff-movil ---
+2026-09-20T16:11:51.200Z  INFO 2249 --- [bff-movil] [           main] c.d.b.bff.movil.BffMovilApplication      : Starting BffMovilApplication v1.0.0 using Java 21.0.10 with PID 2249 (/home/claude/Exp2_S4_S5_BFF/bff-movil/target/bff-movil.jar started by root in /home/claude/Exp2_S4_S5_BFF)
+2026-09-20T16:11:55.762Z  INFO 2249 --- [bff-movil] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-09-20T16:11:58.416Z  INFO 2249 --- [bff-movil] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8092 (http) with context path '/'
+2026-09-20T16:11:58.474Z  INFO 2249 --- [bff-movil] [           main] c.d.b.bff.movil.BffMovilApplication      : Started BffMovilApplication in 9.255 seconds (process running for 10.92)
+
+--- bff-cajero ---
+2026-09-20T16:11:51.229Z  INFO 2250 --- [bff-cajero] [           main] c.d.b.bff.cajero.BffCajeroApplication    : Starting BffCajeroApplication v1.0.0 using Java 21.0.10 with PID 2250 (/home/claude/Exp2_S4_S5_BFF/bff-cajero/target/bff-cajero.jar started by root in /home/claude/Exp2_S4_S5_BFF)
+2026-09-20T16:11:55.586Z  INFO 2250 --- [bff-cajero] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-09-20T16:11:58.392Z  INFO 2250 --- [bff-cajero] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8093 (http) with context path '/'
+2026-09-20T16:11:58.431Z  INFO 2250 --- [bff-cajero] [           main] c.d.b.bff.cajero.BffCajeroApplication    : Started BffCajeroApplication in 9.36 seconds (process running for 10.876)
+
+================================================================
+ Suite de tests automatizados (mvn test)
+================================================================
+
+[INFO] Running cl.duoc.bancoxyz.bff.cuentas.domain.CuentaRepositoryEnMemoriaTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.340 s -- in cl.duoc.bancoxyz.bff.cuentas.domain.CuentaRepositoryEnMemoriaTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Running cl.duoc.bancoxyz.bff.movimientos.util.FechaLegacyParserTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.163 s -- in cl.duoc.bancoxyz.bff.movimientos.util.FechaLegacyParserTest
+[INFO] Running cl.duoc.bancoxyz.bff.movimientos.domain.MovimientoRepositoryEnMemoriaTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.363 s -- in cl.duoc.bancoxyz.bff.movimientos.domain.MovimientoRepositoryEnMemoriaTest
+[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Running cl.duoc.bancoxyz.bff.movil.service.CuentaMovilServiceTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.363 s -- in cl.duoc.bancoxyz.bff.movil.service.CuentaMovilServiceTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Running cl.duoc.bancoxyz.bff.cajero.service.RetiroServiceTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.265 s -- in cl.duoc.bancoxyz.bff.cajero.service.RetiroServiceTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
