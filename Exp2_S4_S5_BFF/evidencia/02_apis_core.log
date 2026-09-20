@@ -29,21 +29,21 @@ $ curl 'http://localhost:8081/api/cuentas'
 
 $ curl 'http://localhost:8081/api/cuentas/103'
 {"cuentaId":103,"nombreTitular":"Bob Johnson","edad":30,"tipoCuenta":"ahorro","saldo":7000}
-[HTTP 200 | 0.003988s | 91 bytes]
+[HTTP 200 | 0.003816s | 91 bytes]
 
 $ curl 'http://localhost:8081/api/cuentas/999999'
 {"mensaje":"No existe la cuenta 999999"}
-[HTTP 404 | 0.006882s | 40 bytes]
+[HTTP 404 | 0.006113s | 40 bytes]
 
 --- Débito directo sobre el core (cuenta 101) ---
 $ curl -X PATCH 'http://localhost:8081/api/cuentas/101/debitar' -d '{"monto":1000}'
 {"cuentaId":101,"montoSolicitado":1000,"saldoResultante":7000,"aprobado":true,"motivoRechazo":null}
-[HTTP 200 | 0.067989s | 99 bytes]
+[HTTP 200 | 0.063072s | 99 bytes]
 
 --- Débito con monto inválido ---
 $ curl -X PATCH 'http://localhost:8081/api/cuentas/101/debitar' -d '{"monto":-5}'
 {"mensaje":"El monto a debitar debe ser mayor que cero"}
-[HTTP 400 | 0.005611s | 56 bytes]
+[HTTP 400 | 0.003980s | 56 bytes]
 
 
 ### core-movimientos-service
@@ -73,28 +73,43 @@ $ curl 'http://localhost:8082/api/movimientos/103'
 --- Historial recortado en origen (?limite=3) ---
 $ curl 'http://localhost:8082/api/movimientos/103?limite=3'
 [{"cuentaId":103,"fecha":"2024-12-23","tipoMovimiento":"retiro","monto":2500,"descripcion":"Sin descripción"},{"cuentaId":103,"fecha":"2024-12-19","tipoMovimiento":"compra","monto":5000,"descripcion":"Retiro parcial"},{"cuentaId":103,"fecha":"2024-10-29","tipoMovimiento":"compra","monto":2500,"descripcion":"Sin descripción"}]
-[HTTP 200 | 0.003377s | 329 bytes]
+[HTTP 200 | 0.005410s | 329 bytes]
 
 --- Limite fuera de rango ---
 $ curl 'http://localhost:8082/api/movimientos/103?limite=-1'
 {"mensaje":"El parámetro 'limite' debe estar entre 1 y 100"}
-[HTTP 400 | 0.009884s | 61 bytes]
+[HTTP 400 | 0.009874s | 61 bytes]
 
 $ curl 'http://localhost:8082/api/movimientos/103/resumen'
 {"cuentaId":103,"cantidadMovimientos":29,"totalDepositos":10500,"totalEgresos":61000,"ultimoMovimientoFecha":"2024-12-23"}
-[HTTP 200 | 0.004355s | 122 bytes]
+[HTTP 200 | 0.003792s | 122 bytes]
 
 $ curl 'http://localhost:8082/api/banco/transacciones-diarias/resumen'
 {"cantidadTotal":401,"montoTotal":527000,"cantidadCreditos":199,"cantidadDebitos":202,"montoCreditos":259000,"montoDebitos":268000}
-[HTTP 200 | 0.006759s | 131 bytes]
+[HTTP 200 | 0.011392s | 131 bytes]
 
 --- Registro de un movimiento nuevo ---
 $ curl -X POST 'http://localhost:8082/api/movimientos' -d '{"cuentaId":103,"fecha":"2025-02-01","tipoMovimiento":"deposito","monto":1000,"descripcion":"Prueba de registro"}'
 {"cuentaId":103,"fecha":"2025-02-01","tipoMovimiento":"deposito","monto":1000,"descripcion":"Prueba de registro"}
-[HTTP 201 | 0.056693s | 113 bytes]
+[HTTP 201 | 0.094968s | 113 bytes]
 
---- Registro con datos incompletos ---
+--- Registro rechazado: datos incompletos ---
 $ curl -X POST 'http://localhost:8082/api/movimientos' -d '{"cuentaId":103,"monto":1000}'
-{"mensaje":"cuentaId, fecha y tipoMovimiento son obligatorios"}
-[HTTP 400 | 0.003225s | 63 bytes]
+{"mensaje":"El movimiento no cumple las reglas de validación: requiere cuentaId, una fecha interpretable, un tipo en {compra, deposito, pago, retiro} y un monto mayor que cero"}
+[HTTP 400 | 0.007416s | 178 bytes]
+
+--- Registro rechazado: fecha no interpretable ---
+$ curl -X POST 'http://localhost:8082/api/movimientos' -d '{"cuentaId":103,"fecha":"no-es-una-fecha","tipoMovimiento":"retiro","monto":1000,"descripcion":"x"}'
+{"mensaje":"El movimiento no cumple las reglas de validación: requiere cuentaId, una fecha interpretable, un tipo en {compra, deposito, pago, retiro} y un monto mayor que cero"}
+[HTTP 400 | 0.003609s | 178 bytes]
+
+--- Registro rechazado: tipo fuera de dominio ---
+$ curl -X POST 'http://localhost:8082/api/movimientos' -d '{"cuentaId":103,"fecha":"2025-02-01","tipoMovimiento":"transferencia","monto":1000,"descripcion":"x"}'
+{"mensaje":"El movimiento no cumple las reglas de validación: requiere cuentaId, una fecha interpretable, un tipo en {compra, deposito, pago, retiro} y un monto mayor que cero"}
+[HTTP 400 | 0.005522s | 178 bytes]
+
+--- Registro normalizado: tipo con tilde y fecha dd/MM/yyyy se guardan normalizados ---
+$ curl -X POST 'http://localhost:8082/api/movimientos' -d '{"cuentaId":103,"fecha":"01/02/2025","tipoMovimiento":"Dep\u00f3sito","monto":1000,"descripcion":"  "}'
+{"cuentaId":103,"fecha":"2025-02-01","tipoMovimiento":"deposito","monto":1000,"descripcion":"Sin descripción"}
+[HTTP 201 | 0.004120s | 111 bytes]
 

@@ -13,7 +13,7 @@ $ curl 'http://localhost:8091/web/cuentas/103'
     "tipoCuenta": "ahorro",
     "saldo": 7000
   },
-  "movimientos_en_historial": 30,
+  "movimientos_en_historial": 31,
   "primeros_movimientos": [
     {
       "cuentaId": 103,
@@ -39,8 +39,8 @@ $ curl 'http://localhost:8091/web/cuentas/103'
   ],
   "resumen": {
     "cuentaId": 103,
-    "cantidadMovimientos": 30,
-    "totalDepositos": 11500,
+    "cantidadMovimientos": 31,
+    "totalDepositos": 12500,
     "totalEgresos": 61000,
     "ultimoMovimientoFecha": "2025-02-01"
   }
@@ -71,10 +71,10 @@ $ curl 'http://localhost:8091/web/cuentas'
 --- Panel administrativo, exclusivo de este canal ---
 $ curl 'http://localhost:8091/web/banco/resumen-diario'
 {"cantidadTotal":401,"montoTotal":527000,"cantidadCreditos":199,"cantidadDebitos":202,"montoCreditos":259000,"montoDebitos":268000}
-[HTTP 200 | 0.028977s | 131 bytes]
+[HTTP 200 | 0.026600s | 131 bytes]
 
 --- Cuenta inexistente: el 404 del core se propaga como 404 del BFF ---
 $ curl 'http://localhost:8091/web/cuentas/999999'
 {"mensaje":"No existe la cuenta 999999"}
-[HTTP 404 | 0.030319s | 40 bytes]
+[HTTP 404 | 0.027462s | 40 bytes]
 

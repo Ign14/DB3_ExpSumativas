@@ -84,35 +84,42 @@ public class MovimientoRepositoryEnMemoria {
         }
         try {
             Long cuentaId = Long.parseLong(campos[0].trim());
-            Optional<LocalDate> fecha = FechaLegacyParser.parsear(campos[1]);
-            if (fecha.isEmpty()) {
-                return null;
-            }
-            String tipo = normalizar(campos[2]);
-            if (!TIPOS_VALIDOS.contains(tipo)) {
-                return null;
-            }
             String montoTexto = campos[3].trim();
-            if (montoTexto.isBlank()) {
-                return null;
-            }
-            BigDecimal monto = new BigDecimal(montoTexto);
-            if (monto.signum() <= 0) {
-                return null;
-            }
-            String descripcion = campos[4].trim();
-            if (descripcion.isBlank()) {
-                descripcion = "Sin descripción";
-            }
-            return new MovimientoDTO(cuentaId, fecha.get().format(DateTimeFormatter.ISO_LOCAL_DATE), tipo, monto, descripcion);
+            BigDecimal monto = montoTexto.isBlank() ? null : new BigDecimal(montoTexto);
+            return construir(cuentaId, campos[1], campos[2], monto, campos[4]).orElse(null);
         } catch (NumberFormatException ex) {
             return null;
         }
     }
 
+    /**
+     * Punto único donde se normaliza y valida un movimiento, venga del CSV o
+     * de la API. Devuelve vacío si no cumple las reglas del dominio: fecha
+     * interpretable, tipo dentro del dominio y monto mayor que cero.
+     */
+    private Optional<MovimientoDTO> construir(Long cuentaId, String fechaTexto, String tipoTexto,
+                                              BigDecimal monto, String descripcion) {
+        if (cuentaId == null || monto == null || monto.signum() <= 0) {
+            return Optional.empty();
+        }
+        Optional<LocalDate> fecha = FechaLegacyParser.parsear(fechaTexto);
+        if (fecha.isEmpty()) {
+            return Optional.empty();
+        }
+        String tipo = normalizar(tipoTexto);
+        if (!TIPOS_VALIDOS.contains(tipo)) {
+            return Optional.empty();
+        }
+        String descripcionFinal = (descripcion == null || descripcion.isBlank())
+                ? "Sin descripción"
+                : descripcion.trim();
+        return Optional.of(new MovimientoDTO(
+                cuentaId, fecha.get().format(DateTimeFormatter.ISO_LOCAL_DATE), tipo, monto, descripcionFinal));
+    }
+
     /** El dataset trae "depósito" y "deposito" como el mismo tipo. */
     private String normalizar(String tipo) {
-        return tipo.trim().toLowerCase().replace("ó", "o");
+        return tipo == null ? "" : tipo.trim().toLowerCase().replace("ó", "o");
     }
 
     /** Historial completo, de la fecha más antigua a la más reciente. */
@@ -134,9 +141,20 @@ public class MovimientoRepositoryEnMemoria {
                 .toList();
     }
 
-    public MovimientoDTO registrar(MovimientoDTO movimiento) {
-        agregar(movimiento);
-        return movimiento;
+    /**
+     * Registra un movimiento nuevo aplicando las mismas reglas que la carga
+     * del CSV. Devuelve el movimiento ya normalizado, o vacío si no cumple
+     * las reglas.
+     */
+    public Optional<MovimientoDTO> registrar(MovimientoDTO movimiento) {
+        if (movimiento == null) {
+            return Optional.empty();
+        }
+        Optional<MovimientoDTO> valido = construir(
+                movimiento.cuentaId(), movimiento.fecha(), movimiento.tipoMovimiento(),
+                movimiento.monto(), movimiento.descripcion());
+        valido.ifPresent(this::agregar);
+        return valido;
     }
 
     public ResumenMovimientosDTO resumir(Long cuentaId) {

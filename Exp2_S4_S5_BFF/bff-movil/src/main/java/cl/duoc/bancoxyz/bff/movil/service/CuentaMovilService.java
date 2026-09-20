@@ -27,12 +27,10 @@ public class CuentaMovilService {
     }
 
     /**
-     * Misma agregación que el canal web, pero devolviendo bastante menos: sin
-     * nombre del titular (la app ya lo tiene de la sesión), sin descripciones,
-     * y solo los últimos movimientos.
-     *
-     * El recorte se le pide al servicio core para que el historial completo
-     * tampoco viaje entre el core y este BFF.
+     * Agrega los mismos dos servicios core que el canal web, pero pidiéndoles
+     * menos: no necesita los totales, y en vez del historial completo pide
+     * solo los últimos movimientos, para que tampoco viaje entre el core y
+     * este BFF. Devuelve además menos campos que el canal web.
      */
     public CuentaMovilResponse obtenerResumenLiviano(Long cuentaId, int limite) {
         if (limite < 1 || limite > LIMITE_MAXIMO) {

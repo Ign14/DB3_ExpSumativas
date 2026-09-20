@@ -92,13 +92,50 @@ class MovimientoRepositoryEnMemoriaTest {
         ResumenMovimientosDTO antes = repositorio.resumir(CUENTA_CON_MOVIMIENTOS);
         BigDecimal monto = new BigDecimal("777");
 
-        repositorio.registrar(new MovimientoDTO(
-                CUENTA_CON_MOVIMIENTOS, "2025-01-15", "retiro", monto, "Retiro por cajero automático"));
+        assertTrue(repositorio.registrar(new MovimientoDTO(
+                CUENTA_CON_MOVIMIENTOS, "2025-01-15", "retiro", monto, "Retiro por cajero automático")).isPresent());
 
         ResumenMovimientosDTO despues = repositorio.resumir(CUENTA_CON_MOVIMIENTOS);
         assertEquals(antes.cantidadMovimientos() + 1, despues.cantidadMovimientos());
         assertEquals(0, antes.totalEgresos().add(monto).compareTo(despues.totalEgresos()));
         assertEquals("2025-01-15", despues.ultimoMovimientoFecha());
         assertEquals("2025-01-15", repositorio.obtenerUltimos(CUENTA_CON_MOVIMIENTOS, 1).get(0).fecha());
+    }
+
+    @Test
+    @DisplayName("Al registrar se aplican las mismas reglas que al cargar el CSV")
+    void registrarValidaIgualQueLaCarga() {
+        ResumenMovimientosDTO antes = repositorio.resumir(CUENTA_CON_MOVIMIENTOS);
+
+        // Fecha no interpretable, tipo fuera de dominio, monto <= 0 y cuenta nula.
+        assertTrue(repositorio.registrar(new MovimientoDTO(
+                CUENTA_CON_MOVIMIENTOS, "no-es-fecha", "retiro", BigDecimal.TEN, "x")).isEmpty());
+        assertTrue(repositorio.registrar(new MovimientoDTO(
+                CUENTA_CON_MOVIMIENTOS, "2025-01-15", "transferencia", BigDecimal.TEN, "x")).isEmpty());
+        assertTrue(repositorio.registrar(new MovimientoDTO(
+                CUENTA_CON_MOVIMIENTOS, "2025-01-15", "retiro", BigDecimal.ZERO, "x")).isEmpty());
+        assertTrue(repositorio.registrar(new MovimientoDTO(
+                null, "2025-01-15", "retiro", BigDecimal.TEN, "x")).isEmpty());
+
+        assertEquals(antes.cantidadMovimientos(), repositorio.resumir(CUENTA_CON_MOVIMIENTOS).cantidadMovimientos(),
+                "ningún movimiento inválido debe quedar en el historial");
+    }
+
+    @Test
+    @DisplayName("Al registrar se normaliza el tipo con tilde y se completa la descripción vacía")
+    void registrarNormalizaComoLaCarga() {
+        BigDecimal monto = new BigDecimal("5000");
+        ResumenMovimientosDTO antes = repositorio.resumir(CUENTA_CON_MOVIMIENTOS);
+
+        MovimientoDTO registrado = repositorio.registrar(new MovimientoDTO(
+                CUENTA_CON_MOVIMIENTOS, "15/01/2025", "Depósito", monto, "  ")).orElseThrow();
+
+        assertEquals("deposito", registrado.tipoMovimiento(), "el tipo debe quedar normalizado");
+        assertEquals("2025-01-15", registrado.fecha(), "la fecha debe quedar en formato ISO");
+        assertEquals("Sin descripción", registrado.descripcion());
+
+        // Al quedar normalizado, el monto sí entra en los totales del resumen.
+        ResumenMovimientosDTO despues = repositorio.resumir(CUENTA_CON_MOVIMIENTOS);
+        assertEquals(0, antes.totalDepositos().add(monto).compareTo(despues.totalDepositos()));
     }
 }

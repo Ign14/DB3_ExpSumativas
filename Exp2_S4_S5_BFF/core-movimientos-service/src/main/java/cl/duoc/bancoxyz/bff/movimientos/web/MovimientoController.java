@@ -43,19 +43,18 @@ public class MovimientoController {
         return repositorio.resumir(cuentaId);
     }
 
-    /** Lo usa el BFF de cajero para dejar constancia de un retiro. */
+    /**
+     * Lo usa el BFF de cajero para dejar constancia de un retiro. El
+     * movimiento pasa por las mismas reglas de validación que se aplican al
+     * cargar el CSV, y se devuelve ya normalizado.
+     */
     @PostMapping
     public ResponseEntity<?> registrar(@RequestBody MovimientoDTO movimiento) {
-        if (movimiento.cuentaId() == null
-                || movimiento.fecha() == null || movimiento.fecha().isBlank()
-                || movimiento.tipoMovimiento() == null || movimiento.tipoMovimiento().isBlank()) {
-            return ResponseEntity.badRequest()
-                    .body(new ErrorResponse("cuentaId, fecha y tipoMovimiento son obligatorios"));
-        }
-        if (movimiento.monto() == null || movimiento.monto().signum() <= 0) {
-            return ResponseEntity.badRequest()
-                    .body(new ErrorResponse("El monto del movimiento debe ser mayor que cero"));
-        }
-        return ResponseEntity.status(201).body(repositorio.registrar(movimiento));
+        return repositorio.registrar(movimiento)
+                .<ResponseEntity<?>>map(registrado -> ResponseEntity.status(201).body(registrado))
+                .orElseGet(() -> ResponseEntity.badRequest().body(new ErrorResponse(
+                        "El movimiento no cumple las reglas de validación: requiere cuentaId, "
+                                + "una fecha interpretable, un tipo en {compra, deposito, pago, retiro} "
+                                + "y un monto mayor que cero")));
     }
 }

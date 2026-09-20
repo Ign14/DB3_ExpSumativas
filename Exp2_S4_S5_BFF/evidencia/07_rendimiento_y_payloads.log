@@ -7,9 +7,9 @@
 
 Canal      Endpoint                             Tiempo(ms)        Bytes   Bytes gzip
 ---------- ---------------------------------- ------------ ------------ ------------
-Web        /web/cuentas/110                          29.66         3332          545
-Movil      /movil/cuentas/110                        17.66          324          165
-Cajero     /cajero/cuentas/110/saldo                  9.95           40           40
+Web        /web/cuentas/110                          30.87         3332          545
+Movil      /movil/cuentas/110                        21.99          324          165
+Cajero     /cajero/cuentas/110/saldo                 12.59           40           40
 
 Reduccion de payload movil respecto de web:  90.3%
 Reduccion de payload cajero respecto de web: 98.8%
@@ -35,9 +35,9 @@ peticion movil.
 
 Endpoint core                                        Tiempo(ms)
 -------------------------------------------------- ------------
-GET /api/cuentas/110                                       1.97
-GET /api/movimientos/110                                   2.72
-GET /api/movimientos/110/resumen                           2.76
+GET /api/cuentas/110                                       3.52
+GET /api/movimientos/110                                   3.73
+GET /api/movimientos/110/resumen                           3.80
 
 La diferencia entre el tiempo de un BFF y el de los servicios core que
 consume es el costo de la agregacion y transformacion por canal.

@@ -139,8 +139,14 @@ req GET "$CORE_MOV/api/movimientos/$CUENTA/resumen"
 req GET "$CORE_MOV/api/banco/transacciones-diarias/resumen"
 echo "--- Registro de un movimiento nuevo ---"
 req POST "$CORE_MOV/api/movimientos" '{"cuentaId":103,"fecha":"2025-02-01","tipoMovimiento":"deposito","monto":1000,"descripcion":"Prueba de registro"}'
-echo "--- Registro con datos incompletos ---"
+echo "--- Registro rechazado: datos incompletos ---"
 req POST "$CORE_MOV/api/movimientos" '{"cuentaId":103,"monto":1000}'
+echo "--- Registro rechazado: fecha no interpretable ---"
+req POST "$CORE_MOV/api/movimientos" '{"cuentaId":103,"fecha":"no-es-una-fecha","tipoMovimiento":"retiro","monto":1000,"descripcion":"x"}'
+echo "--- Registro rechazado: tipo fuera de dominio ---"
+req POST "$CORE_MOV/api/movimientos" '{"cuentaId":103,"fecha":"2025-02-01","tipoMovimiento":"transferencia","monto":1000,"descripcion":"x"}'
+echo "--- Registro normalizado: tipo con tilde y fecha dd/MM/yyyy se guardan normalizados ---"
+req POST "$CORE_MOV/api/movimientos" '{"cuentaId":103,"fecha":"01/02/2025","tipoMovimiento":"Dep\u00f3sito","monto":1000,"descripcion":"  "}'
 } > "$DIR/02_apis_core.log" 2>&1
 
 # --- 03. BFF Web ----------------------------------------------------------

@@ -6,35 +6,35 @@
 
 $ curl 'http://localhost:8093/cajero/cuentas/103/saldo'
 {"cuentaId":103,"saldoDisponible":7000}
-[HTTP 200 | 0.027546s | 39 bytes]
+[HTTP 200 | 0.041248s | 39 bytes]
 
 --- Retiro valido ---
 $ curl -X POST 'http://localhost:8093/cajero/cuentas/103/retiro' -d '{"monto":500}'
 {"cuentaId":103,"montoSolicitado":500,"saldoResultante":6500,"aprobado":true,"motivoRechazo":null,"fechaMovimiento":"2026-09-20","movimientoRegistrado":true}
-[HTTP 200 | 0.083444s | 157 bytes]
+[HTTP 200 | 0.097823s | 157 bytes]
 
 --- Saldo despues del retiro ---
 $ curl 'http://localhost:8093/cajero/cuentas/103/saldo'
 {"cuentaId":103,"saldoDisponible":6500}
-[HTTP 200 | 0.014042s | 39 bytes]
+[HTTP 200 | 0.017212s | 39 bytes]
 
 --- Rechazo por regla del CANAL: excede el limite por operacion ---
 $ curl -X POST 'http://localhost:8093/cajero/cuentas/103/retiro' -d '{"monto":600000}'
 {"cuentaId":103,"montoSolicitado":600000,"saldoResultante":null,"aprobado":false,"motivoRechazo":"Excede el límite máximo por operación en cajero ($500000)","fechaMovimiento":null,"movimientoRegistrado":false}
-[HTTP 422 | 0.003824s | 212 bytes]
+[HTTP 422 | 0.005495s | 212 bytes]
 
 --- Rechazo por regla del DOMINIO: dentro del limite, pero sin fondos ---
 $ curl -X POST 'http://localhost:8093/cajero/cuentas/103/retiro' -d '{"monto":400000}'
 {"cuentaId":103,"montoSolicitado":400000,"saldoResultante":6500,"aprobado":false,"motivoRechazo":"Fondos insuficientes","fechaMovimiento":null,"movimientoRegistrado":false}
-[HTTP 422 | 0.012724s | 172 bytes]
+[HTTP 422 | 0.026112s | 172 bytes]
 
 --- Rechazo por monto invalido ---
 $ curl -X POST 'http://localhost:8093/cajero/cuentas/103/retiro' -d '{"monto":0}'
 {"cuentaId":103,"montoSolicitado":0,"saldoResultante":null,"aprobado":false,"motivoRechazo":"El monto a retirar debe ser mayor que cero","fechaMovimiento":null,"movimientoRegistrado":false}
-[HTTP 400 | 0.003232s | 189 bytes]
+[HTTP 400 | 0.004410s | 189 bytes]
 
 --- Cuenta inexistente ---
 $ curl 'http://localhost:8093/cajero/cuentas/999999/saldo'
 {"mensaje":"No existe la cuenta 999999"}
-[HTTP 404 | 0.017763s | 40 bytes]
+[HTTP 404 | 0.021955s | 40 bytes]
 

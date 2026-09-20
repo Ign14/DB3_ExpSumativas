@@ -38,10 +38,11 @@ Este proyecto usa la **primera estrategia**, por tres razones:
 - El enunciado pide un backend personalizado para cada tipo de cliente, que
   calza con servicios independientes más que con un servicio único lleno de
   lógica condicional.
-- Los canales tienen necesidades de seguridad distintas. Con servicios
-  separados, el canal cajero no solo no devuelve el historial ni los datos del
-  titular: no tiene forma de pedirlos, porque ese código no está en su
-  despliegue.
+- Los canales tienen necesidades de seguridad distintas. El cajero expone dos
+  endpoints y ninguno devuelve el historial ni los datos del titular; con un
+  servicio propio, esa superficie es pequeña y se audita de una mirada, en vez
+  de depender de que un `if` acierte el canal dentro de un servicio que
+  atiende a los tres.
 - Permite ajustar cada canal por separado. Un ejemplo concreto del proyecto: la
   compresión HTTP está activada en web y móvil y desactivada en cajero, porque
   a 40 bytes por respuesta el gzip agrega más de lo que ahorra (sección 7). Con
@@ -139,10 +140,11 @@ estructura, reutilizando `common-model`, sin tocar los existentes.
 
 ### 5.2 BFF Móvil (`/movil/...`, puerto 8092)
 
-- `GET /movil/cuentas/{cuentaId}?limite=5`: la misma agregación que hace el
-  canal web, transformada a un payload más chico: sin nombre del titular (la
-  app ya lo tiene de la sesión), sin descripciones y solo los últimos N
-  movimientos.
+- `GET /movil/cuentas/{cuentaId}?limite=5`: agrega los mismos dos servicios
+  core que el canal web, pero pidiéndole menos a cada uno (dos llamadas en vez
+  de tres: no necesita los totales) y devolviendo un payload más chico: sin
+  nombre del titular (la app ya lo tiene de la sesión), sin descripciones y
+  solo los últimos N movimientos.
 - El recorte se le pide al servicio core, así que el historial completo
   tampoco viaja entre el core y el BFF (sección 7).
 - `limite` se valida entre 1 y 20; fuera de rango o con un valor no numérico
@@ -187,7 +189,7 @@ En macOS/Linux:
 ./mvnw clean package
 ```
 
-Compila los 6 módulos y ejecuta los 34 tests automatizados.
+Compila los 6 módulos y ejecuta los 36 tests automatizados.
 
 ### 6.3 Levantar los 5 servicios
 
@@ -230,7 +232,7 @@ Medido sobre la cuenta 110, promediando 30 peticiones por endpoint
 Los tamaños son estables entre ejecuciones; los tiempos varían unos pocos
 milisegundos según la carga de la máquina.
 
-- El payload móvil es **90% más chico** que el web; el del cajero, **99%**.
+- El payload móvil es **90,3% más chico** que el web; el del cajero, **98,8%**.
 - Los tiempos siguen la misma lógica: el cajero hace una llamada al core, el
   móvil dos con historial recortado y el web tres con historial completo. Los
   servicios core responden entre 2 y 4 ms, así que la diferencia es el costo
@@ -258,7 +260,10 @@ milisegundos según la carga de la máquina.
 - **Reglas de validación heredadas de Exp1**: las de cuentas (saldo ≥ 0, edad
   entre 18 y 120, tipo dentro del dominio) y las de movimientos (fecha
   interpretable, monto > 0, corrección de "depósito" con tilde, descripción
-  vacía completada) son las mismas de la migración batch de la semana 3.
+  vacía completada) son las mismas de la migración batch de la semana 3. En
+  movimientos, esas reglas están en un solo punto del repositorio y se
+  aplican tanto al cargar el CSV como al registrar un movimiento por API, de
+  modo que no haya una puerta de entrada más permisiva que la otra.
 - **Fechas en modo estricto**: el parser usa `ResolverStyle.STRICT`. En el modo
   por defecto, una fecha imposible como `31/02/2024` no falla: se ajusta en
   silencio al 29 de febrero. Al validar datos sucios, eso es peor que
@@ -287,7 +292,7 @@ La carpeta `evidencia/` contiene la salida de consola de una ejecución
 completa, generada por `generar_evidencia.sh`:
 
 - `01_arranque_y_tests.log`: arranque de los 5 servicios, con cuántas filas de
-  cada CSV se cargaron y cuántas se omitieron, y el resultado de los 34 tests.
+  cada CSV se cargaron y cuántas se omitieron, y el resultado de los 36 tests.
 - `02_apis_core.log`: los 7 endpoints de los dos servicios core, incluidos los
   casos de error.
 - `03_bff_web.log`: agregación completa, listado, panel administrativo y
