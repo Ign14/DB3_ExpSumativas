@@ -1,4 +1,4 @@
-Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/root/.ccr/java-truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=PKCS12 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=35289 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/root/.ccr/java-truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=PKCS12 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=34551 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -9,17 +9,17 @@ Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/root/.ccr/java-truststo
 
  :: Spring Boot ::                (v3.3.4)
 
-2026-09-20T16:11:42.411Z  INFO 2156 --- [core-cuentas-service] [           main] c.d.b.b.c.CoreCuentasServiceApplication  : Starting CoreCuentasServiceApplication v1.0.0 using Java 21.0.10 with PID 2156 (/home/claude/Exp2_S4_S5_BFF/core-cuentas-service/target/core-cuentas-service.jar started by root in /home/claude/Exp2_S4_S5_BFF)
-2026-09-20T16:11:42.414Z  INFO 2156 --- [core-cuentas-service] [           main] c.d.b.b.c.CoreCuentasServiceApplication  : No active profile set, falling back to 1 default profile: "default"
-2026-09-20T16:11:45.273Z  INFO 2156 --- [core-cuentas-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8081 (http)
-2026-09-20T16:11:45.312Z  INFO 2156 --- [core-cuentas-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-09-20T16:11:45.312Z  INFO 2156 --- [core-cuentas-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
-2026-09-20T16:11:45.394Z  INFO 2156 --- [core-cuentas-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2026-09-20T16:11:45.400Z  INFO 2156 --- [core-cuentas-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2727 ms
-2026-09-20T16:11:45.563Z  INFO 2156 --- [core-cuentas-service] [           main] c.d.b.b.c.d.CuentaRepositoryEnMemoria    : >> core-cuentas-service: 1000 filas leídas = 399 válidas + 601 omitidas por datos inconsistentes
-2026-09-20T16:11:45.565Z  INFO 2156 --- [core-cuentas-service] [           main] c.d.b.b.c.d.CuentaRepositoryEnMemoria    : >> core-cuentas-service: 50 cuentas distintas cargadas
-2026-09-20T16:11:46.479Z  INFO 2156 --- [core-cuentas-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path '/'
-2026-09-20T16:11:46.522Z  INFO 2156 --- [core-cuentas-service] [           main] c.d.b.b.c.CoreCuentasServiceApplication  : Started CoreCuentasServiceApplication in 5.491 seconds (process running for 6.682)
-2026-09-20T16:11:47.159Z  INFO 2156 --- [core-cuentas-service] [nio-8081-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-09-20T16:11:47.160Z  INFO 2156 --- [core-cuentas-service] [nio-8081-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2026-09-20T16:11:47.162Z  INFO 2156 --- [core-cuentas-service] [nio-8081-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-09-20T16:37:47.451Z  INFO 816 --- [core-cuentas-service] [           main] c.d.b.b.c.CoreCuentasServiceApplication  : Starting CoreCuentasServiceApplication v1.0.0 using Java 21.0.10 with PID 816 (/home/claude/Exp2_S4_S5_BFF/core-cuentas-service/target/core-cuentas-service.jar started by root in /home/claude/Exp2_S4_S5_BFF)
+2026-09-20T16:37:47.457Z  INFO 816 --- [core-cuentas-service] [           main] c.d.b.b.c.CoreCuentasServiceApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-09-20T16:37:50.245Z  INFO 816 --- [core-cuentas-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8081 (http)
+2026-09-20T16:37:50.279Z  INFO 816 --- [core-cuentas-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-09-20T16:37:50.279Z  INFO 816 --- [core-cuentas-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-09-20T16:37:50.383Z  INFO 816 --- [core-cuentas-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-09-20T16:37:50.385Z  INFO 816 --- [core-cuentas-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2625 ms
+2026-09-20T16:37:50.534Z  INFO 816 --- [core-cuentas-service] [           main] c.d.b.b.c.d.CuentaRepositoryEnMemoria    : >> core-cuentas-service: 1000 filas leídas = 399 válidas + 601 omitidas por datos inconsistentes
+2026-09-20T16:37:50.543Z  INFO 816 --- [core-cuentas-service] [           main] c.d.b.b.c.d.CuentaRepositoryEnMemoria    : >> core-cuentas-service: 50 cuentas distintas cargadas
+2026-09-20T16:37:51.366Z  INFO 816 --- [core-cuentas-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path '/'
+2026-09-20T16:37:51.401Z  INFO 816 --- [core-cuentas-service] [           main] c.d.b.b.c.CoreCuentasServiceApplication  : Started CoreCuentasServiceApplication in 5.411 seconds (process running for 6.505)
+2026-09-20T16:37:52.221Z  INFO 816 --- [core-cuentas-service] [nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-09-20T16:37:52.221Z  INFO 816 --- [core-cuentas-service] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-09-20T16:37:52.222Z  INFO 816 --- [core-cuentas-service] [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms

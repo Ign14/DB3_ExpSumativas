@@ -5,29 +5,29 @@
 
 $ curl 'http://localhost:8092/movil/cuentas/103'
 {"saldo":7000,"tipoCuenta":"ahorro","ultimosMovimientos":[{"fecha":"2025-02-01","tipo":"deposito","monto":1000},{"fecha":"2024-12-23","tipo":"retiro","monto":2500},{"fecha":"2024-12-19","tipo":"compra","monto":5000},{"fecha":"2024-10-29","tipo":"compra","monto":2500},{"fecha":"2024-10-29","tipo":"compra","monto":2500}]}
-[HTTP 200 | 0.025360s | 321 bytes]
+[HTTP 200 | 0.046898s | 321 bytes]
 
 --- Con limite explicito: el recorte lo hace el servicio core ---
 $ curl 'http://localhost:8092/movil/cuentas/103?limite=3'
 {"saldo":7000,"tipoCuenta":"ahorro","ultimosMovimientos":[{"fecha":"2025-02-01","tipo":"deposito","monto":1000},{"fecha":"2024-12-23","tipo":"retiro","monto":2500},{"fecha":"2024-12-19","tipo":"compra","monto":5000}]}
-[HTTP 200 | 0.023645s | 217 bytes]
+[HTTP 200 | 0.020278s | 217 bytes]
 
 --- Limite fuera de rango ---
 $ curl 'http://localhost:8092/movil/cuentas/103?limite=-1'
 {"mensaje":"El parámetro 'limite' debe estar entre 1 y 20"}
-[HTTP 400 | 0.015673s | 60 bytes]
+[HTTP 400 | 0.017464s | 60 bytes]
 
 $ curl 'http://localhost:8092/movil/cuentas/103?limite=999'
 {"mensaje":"El parámetro 'limite' debe estar entre 1 y 20"}
-[HTTP 400 | 0.004276s | 60 bytes]
+[HTTP 400 | 0.003646s | 60 bytes]
 
 --- Limite con tipo incorrecto ---
 $ curl 'http://localhost:8092/movil/cuentas/103?limite=abc'
 {"mensaje":"El parámetro 'limite' tiene un valor inválido: abc"}
-[HTTP 400 | 0.008583s | 66 bytes]
+[HTTP 400 | 0.005661s | 66 bytes]
 
 --- Cuenta inexistente ---
 $ curl 'http://localhost:8092/movil/cuentas/999999'
 {"mensaje":"No existe la cuenta 999999"}
-[HTTP 404 | 0.019409s | 40 bytes]
+[HTTP 404 | 0.012150s | 40 bytes]
 

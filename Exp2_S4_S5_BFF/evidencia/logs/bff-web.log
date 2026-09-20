@@ -1,4 +1,4 @@
-Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/root/.ccr/java-truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=PKCS12 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=35289 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/root/.ccr/java-truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=PKCS12 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=34551 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -9,15 +9,15 @@ Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/root/.ccr/java-truststo
 
  :: Spring Boot ::                (v3.3.4)
 
-2026-09-20T16:11:51.752Z  INFO 2248 --- [bff-web] [           main] c.d.bancoxyz.bff.web.BffWebApplication   : Starting BffWebApplication v1.0.0 using Java 21.0.10 with PID 2248 (/home/claude/Exp2_S4_S5_BFF/bff-web/target/bff-web.jar started by root in /home/claude/Exp2_S4_S5_BFF)
-2026-09-20T16:11:51.769Z  INFO 2248 --- [bff-web] [           main] c.d.bancoxyz.bff.web.BffWebApplication   : No active profile set, falling back to 1 default profile: "default"
-2026-09-20T16:11:55.921Z  INFO 2248 --- [bff-web] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8091 (http)
-2026-09-20T16:11:56.005Z  INFO 2248 --- [bff-web] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-09-20T16:11:56.005Z  INFO 2248 --- [bff-web] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
-2026-09-20T16:11:56.118Z  INFO 2248 --- [bff-web] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2026-09-20T16:11:56.127Z  INFO 2248 --- [bff-web] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4000 ms
-2026-09-20T16:11:58.581Z  INFO 2248 --- [bff-web] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8091 (http) with context path '/'
-2026-09-20T16:11:58.618Z  INFO 2248 --- [bff-web] [           main] c.d.bancoxyz.bff.web.BffWebApplication   : Started BffWebApplication in 9.111 seconds (process running for 11.067)
-2026-09-20T16:11:59.108Z  INFO 2248 --- [bff-web] [nio-8091-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-09-20T16:11:59.108Z  INFO 2248 --- [bff-web] [nio-8091-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2026-09-20T16:11:59.110Z  INFO 2248 --- [bff-web] [nio-8091-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-09-20T16:37:56.722Z  INFO 908 --- [bff-web] [           main] c.d.bancoxyz.bff.web.BffWebApplication   : Starting BffWebApplication v1.0.0 using Java 21.0.10 with PID 908 (/home/claude/Exp2_S4_S5_BFF/bff-web/target/bff-web.jar started by root in /home/claude/Exp2_S4_S5_BFF)
+2026-09-20T16:37:56.734Z  INFO 908 --- [bff-web] [           main] c.d.bancoxyz.bff.web.BffWebApplication   : No active profile set, falling back to 1 default profile: "default"
+2026-09-20T16:38:01.389Z  INFO 908 --- [bff-web] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8091 (http)
+2026-09-20T16:38:01.445Z  INFO 908 --- [bff-web] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-09-20T16:38:01.446Z  INFO 908 --- [bff-web] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-09-20T16:38:01.575Z  INFO 908 --- [bff-web] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-09-20T16:38:01.576Z  INFO 908 --- [bff-web] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4478 ms
+2026-09-20T16:38:04.137Z  INFO 908 --- [bff-web] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8091 (http) with context path '/'
+2026-09-20T16:38:04.193Z  INFO 908 --- [bff-web] [           main] c.d.bancoxyz.bff.web.BffWebApplication   : Started BffWebApplication in 9.774 seconds (process running for 11.57)
+2026-09-20T16:38:04.322Z  INFO 908 --- [bff-web] [nio-8091-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-09-20T16:38:04.323Z  INFO 908 --- [bff-web] [nio-8091-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-09-20T16:38:04.324Z  INFO 908 --- [bff-web] [nio-8091-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms

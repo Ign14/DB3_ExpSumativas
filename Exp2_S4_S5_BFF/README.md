@@ -168,7 +168,10 @@ estructura, reutilizando `common-model`, sin tocar los existentes.
 
 ### 6.1 Requisitos
 
-Java 21 (JDK) y el Maven Wrapper incluido.
+Java 21 o superior (JDK) y el Maven Wrapper incluido. El proyecto compila con
+`release 21` y se verificó con JDK 21 y JDK 24. Los tests no usan librerías de
+mocks, que son las que suelen romperse al cambiar de versión del JDK: los
+dobles de prueba están escritos a mano.
 
 ### 6.2 Compilar y ejecutar los tests
 
@@ -184,7 +187,7 @@ En macOS/Linux:
 ./mvnw clean package
 ```
 
-Compila los 6 módulos y ejecuta los 33 tests automatizados.
+Compila los 6 módulos y ejecuta los 34 tests automatizados.
 
 ### 6.3 Levantar los 5 servicios
 
@@ -220,9 +223,12 @@ Medido sobre la cuenta 110, promediando 30 peticiones por endpoint
 
 | Canal | Endpoint | Tiempo | Bytes | Con gzip |
 |---|---|---:|---:|---:|
-| Web | `/web/cuentas/110` | 28,3 ms | 3.332 | 545 |
-| Móvil | `/movil/cuentas/110` | 20,2 ms | 324 | 165 |
-| Cajero | `/cajero/cuentas/110/saldo` | 10,6 ms | 40 | — |
+| Web | `/web/cuentas/110` | 29,7 ms | 3.332 | 545 |
+| Móvil | `/movil/cuentas/110` | 17,7 ms | 324 | 165 |
+| Cajero | `/cajero/cuentas/110/saldo` | 10,0 ms | 40 | — |
+
+Los tamaños son estables entre ejecuciones; los tiempos varían unos pocos
+milisegundos según la carga de la máquina.
 
 - El payload móvil es **90% más chico** que el web; el del cajero, **99%**.
 - Los tiempos siguen la misma lógica: el cajero hace una llamada al core, el
@@ -281,7 +287,7 @@ La carpeta `evidencia/` contiene la salida de consola de una ejecución
 completa, generada por `generar_evidencia.sh`:
 
 - `01_arranque_y_tests.log`: arranque de los 5 servicios, con cuántas filas de
-  cada CSV se cargaron y cuántas se omitieron, y el resultado de los 33 tests.
+  cada CSV se cargaron y cuántas se omitieron, y el resultado de los 34 tests.
 - `02_apis_core.log`: los 7 endpoints de los dos servicios core, incluidos los
   casos de error.
 - `03_bff_web.log`: agregación completa, listado, panel administrativo y
