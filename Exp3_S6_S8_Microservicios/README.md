@@ -59,20 +59,19 @@ hay una llamada HTTP de vuelta.
 
 ### 2.3 Lo que agrega la semana 8
 
-Sobre esa base, la actividad sumativa pide tres cosas concretas: implementar
-OAuth 2.0, crear imágenes Docker de los microservicios y orquestarlas con
-`docker-compose`. Las tres están en las secciones 5 y 8.
+Sobre esa base, la semana 8 agrega tres cosas concretas: implementar OAuth 2.0,
+crear imágenes Docker de los microservicios y orquestarlas con `docker-compose`. Las tres están en las secciones 5 y 8.
 
-## 3. Cómo se cubre cada criterio de la evaluación
+## 3. Qué implementa el proyecto, y dónde
 
-| Criterio | Dónde está | Evidencia |
+| Capacidad | Dónde está | Evidencia |
 |---|---|---|
-| Implementa OAuth 2.0 con flujo funcional que asegura la protección de datos y servicios | `auth-server` emite JWT por `client_credentials`; gateway y ambos microservicios validan firma, issuer y scopes | `evidencia/03_oauth2_y_control_de_acceso.log` |
-| Crea imágenes Docker funcionales para todos los microservicios | `Dockerfile` multi-etapa parametrizado por módulo; una imagen por cada uno de los 7 componentes | sección 8.2 |
-| Configura `docker-compose.yaml` orquestando todos los componentes | `docker-compose.yml`: 7 servicios, red propia, healthchecks y orden de arranque por dependencias | sección 8.2 |
-| Configura mecanismos de tolerancia a fallos con Resilience4j | `CuentasClienteResiliente` con circuit breaker, retry y time limiter, y respuesta degradada | `evidencia/06_tolerancia_a_fallos.log` |
-| Integra mensajería asíncrona con Kafka o JMS | JMS sobre Artemis: productor en `cuentas-service`, consumidor en `movimientos-service` | `evidencia/05_mensajeria_asincrona.log` y `07_cola_retiene_eventos.log` |
-| Entrega código fuente, documentación y evidencia de ejecución | Este repositorio, este README y la carpeta `evidencia/` | sección 11 |
+| OAuth 2.0 con un flujo funcional que protege los datos y los servicios | `auth-server` emite JWT por `client_credentials`; gateway y ambos microservicios validan firma, issuer y scopes | `evidencia/03_oauth2_y_control_de_acceso.log` |
+| Imágenes Docker funcionales para todos los componentes | `Dockerfile` multi-etapa parametrizado por módulo; una imagen por cada uno de los 7 componentes | sección 8.2 |
+| Orquestación de todos los componentes con `docker-compose` | `docker-compose.yml`: 7 servicios, red propia, healthchecks y orden de arranque por dependencias | sección 8.2 |
+| Tolerancia a fallos con Resilience4j | `CuentasClienteResiliente` con circuit breaker, retry y time limiter, y respuesta degradada | `evidencia/06_tolerancia_a_fallos.log` |
+| Mensajería asíncrona con JMS | JMS sobre Artemis: productor en `cuentas-service`, consumidor en `movimientos-service` | `evidencia/05_mensajeria_asincrona.log` y `07_cola_retiene_eventos.log` |
+| Código fuente, documentación y evidencia de ejecución | Este repositorio, este README y la carpeta `evidencia/` | sección 11 |
 
 ## 4. Arquitectura
 
@@ -226,8 +225,8 @@ carácter alterado tampoco pasa.
 
 ### 5.4 La infraestructura también pide credenciales
 
-Las dos barreras de arriba hablan del tráfico de negocio. Auditando el proyecto
-contra la pauta me encontré con que había una tercera puerta, y esa sí estaba
+Las dos barreras de arriba hablan del tráfico de negocio. Revisando el proyecto
+terminado me encontré con que había una tercera puerta, y esa sí estaba
 abierta: los tres componentes de infraestructura no pedían nada.
 
 El caso más grave era el **Config Server**. Devuelve la configuración completa de
@@ -824,7 +823,7 @@ demonio de Docker. La evidencia de la ejecución **sobre contenedores** está en
 de las siete imágenes, los siete contenedores en `healthy`, la resolución por
 nombre dentro de la red, y los mismos escenarios de OAuth 2.0, mensajería y
 circuit breaker ejecutados contra la orquestación. El `LEEME.md` de esa carpeta
-dice qué criterio de la pauta cubre cada log.
+dice qué demuestra cada log.
 
 Una advertencia sobre los logs incluidos: contienen la URL de Eureka con su
 contraseña en claro (sección 5.6). Con los valores por defecto del repositorio es
@@ -833,17 +832,16 @@ publican tal cual.
 
 ## 11. Entrega
 
-- [x] Código fuente completo, versionable en GitHub.
-- [x] Documentación (este README): objetivo, estructura del código e
-      instrucciones para ejecutar el proyecto.
-- [x] Evidencia de ejecución (carpeta `evidencia/`).
-- [x] Imágenes Docker de los 7 componentes (`Dockerfile`).
-- [x] Orquestación completa (`docker-compose.yml`).
-- [x] Repositorio publicado en GitHub (cuenta personal).
-- [x] Carpeta de entrega comprimida como `Exp3_S8_Nombre_Apellido`.
-- [x] 68 pruebas automatizadas, sin librerías de mocks.
-- [x] Auditoría del proyecto contra la pauta, con los hallazgos corregidos
-      (secciones 5.4, 6.1 y 6.3).
+La entrega es este repositorio completo, publicado en GitHub en una cuenta
+personal, y la misma carpeta comprimida como `Exp3_S8_Nombre_Apellido`. Contiene
+el código fuente de los siete componentes, este README —con el objetivo, la
+estructura del código y las instrucciones para ejecutar el proyecto—, la
+evidencia de ejecución en `evidencia/`, el `Dockerfile` que construye las siete
+imágenes, el `docker-compose.yml` que las orquesta y 68 pruebas automatizadas
+que corren sin librerías de mocks.
+
+Las secciones 5.4, 6.1 y 6.3 cuentan los tres problemas que aparecieron al
+revisar el proyecto cuando ya lo creía terminado, y cómo quedaron corregidos.
 
 ## 12. Resumen de las ocho semanas
 

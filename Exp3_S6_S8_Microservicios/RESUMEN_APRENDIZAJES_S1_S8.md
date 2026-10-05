@@ -277,7 +277,7 @@ estaba corrompiendo datos. `ResolverStyle.STRICT` lo rechaza. Cuando el trabajo
 es validar datos sucios, un framework que arregla la basura por su cuenta es
 peor que uno que falla.
 
-**Auditar lo propio contra la pauta, no contra la intención.** Lo hice en Exp2 y
+**Revisar lo propio contra lo que exige el sistema, no contra la intención con que se escribió.** Lo hice en Exp2 y
 lo repetí en Exp3, y las dos veces encontré cosas que no habría visto leyendo el
 código con la cabeza de quien lo escribió. En Exp3 el hallazgo que más me
 sorprendió fue este: tenía OAuth 2.0 bien implementado, con scopes por cliente y

@@ -20,14 +20,14 @@ control de acceso, APIs por el gateway, un retiro que viaja por la cola, la caí
 de `cuentas-service` con el circuito abriéndose y cerrándose solo— y baja todo al
 terminar. Deja seis logs en esta carpeta:
 
-| Archivo | Qué demuestra | Criterio de la pauta |
-|---|---|---|
-| `01_construccion_de_imagenes.log` | Las siete imágenes se construyen y existen | 2 |
-| `02_orquestacion.log` | Los siete contenedores en `healthy`, la red propia, la resolución por nombre dentro de la red y el registro de Eureka | 3 |
-| `03_oauth2.log` | Token por `client_credentials`, claims, clave pública, y los rechazos (sin token, token alterado, scope no registrado, mínimo privilegio del cajero) | 1 |
-| `04_apis_y_mensajeria.log` | Los endpoints por el gateway y un retiro que baja el saldo en un microservicio y aparece en el historial del otro por la cola | 5 |
-| `05_tolerancia_a_fallos.log` | El ciclo completo del circuit breaker sobre contenedores: `CLOSED → OPEN → HALF_OPEN → CLOSED`, con respuesta degradada | 4 |
-| `06_estado_final.log` | Salud final de los siete contenedores y registro de Eureka | 3 |
+| Archivo | Qué demuestra |
+|---|---|
+| `01_construccion_de_imagenes.log` | Las siete imágenes se construyen y existen |
+| `02_orquestacion.log` | Los siete contenedores en `healthy`, la red propia, la resolución por nombre dentro de la red y el registro de Eureka |
+| `03_oauth2.log` | Token por `client_credentials`, claims, clave pública, y los rechazos (sin token, token alterado, scope no registrado, mínimo privilegio del cajero) |
+| `04_apis_y_mensajeria.log` | Los endpoints por el gateway y un retiro que baja el saldo en un microservicio y aparece en el historial del otro por la cola |
+| `05_tolerancia_a_fallos.log` | El ciclo completo del circuit breaker sobre contenedores: `CLOSED → OPEN → HALF_OPEN → CLOSED`, con respuesta degradada |
+| `06_estado_final.log` | Salud final de los siete contenedores y registro de Eureka |
 
 La primera ejecución tarda varios minutos porque la construcción descarga las
 dependencias de Maven dentro de la imagen.
@@ -52,8 +52,8 @@ tubería. El contenido es el que devolvió el servicio.
 
 ## Capturas de pantalla
 
-Los logs prueban el comportamiento, pero conviene acompañarlos con capturas, que
-es lo que el enunciado pide explícitamente. Las cuatro que más valen:
+Los logs prueban el comportamiento, pero conviene acompañarlos con capturas de
+pantalla. Las cuatro que más valen:
 
 1. `docker compose ps` con los siete contenedores en `healthy`.
 2. `docker images` con las siete imágenes `banco-xyz/*`.

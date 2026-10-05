@@ -3,7 +3,7 @@
 # caidas, dejando la salida en evidencia/docker/.
 #
 # Es el equivalente de generar_evidencia.sh, que hace lo mismo con los jar
-# directamente. Los dos existen porque cubren criterios distintos de la pauta:
+# directamente. Los dos existen porque demuestran cosas distintas:
 # aquel demuestra la logica del sistema sin depender de Docker, y este demuestra
 # que las imagenes y la orquestacion funcionan.
 #
