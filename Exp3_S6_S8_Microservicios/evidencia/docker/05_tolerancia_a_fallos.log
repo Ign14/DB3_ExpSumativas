@@ -1,0 +1,347 @@
+
+========== Ficha completa, con cuentas-service arriba ==========
+{
+    "cuentaId":  110,
+    "cuenta":  {
+                   "cuentaId":  110,
+                   "nombreTitular":  "Charlie Green",
+                   "edad":  25,
+                   "tipoCuenta":  "prestamo",
+                   "saldo":  9500
+               },
+    "origenDatosCuenta":  "SERVICIO",
+    "resumen":  {
+                    "cuentaId":  110,
+                    "totalMovimientos":  29,
+                    "totalDepositos":  18500,
+                    "totalEgresos":  41000,
+                    "ultimaFecha":  "2026-10-05"
+                },
+    "movimientos":  [
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-01-14",
+                            "tipoMovimiento":  "pago",
+                            "monto":  1500,
+                            "descripcion":  "Retiro parcial"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-02-14",
+                            "tipoMovimiento":  "deposito",
+                            "monto":  2500,
+                            "descripcion":  "Ingreso navide├▒o"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-02-17",
+                            "tipoMovimiento":  "compra",
+                            "monto":  2500,
+                            "descripcion":  "Ingreso extra"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-02-23",
+                            "tipoMovimiento":  "deposito",
+                            "monto":  1000,
+                            "descripcion":  "Retiro parcial"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-03-02",
+                            "tipoMovimiento":  "deposito",
+                            "monto":  2000,
+                            "descripcion":  "Compra en tienda"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-04-12",
+                            "tipoMovimiento":  "deposito",
+                            "monto":  3000,
+                            "descripcion":  "Compra en tienda"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-04-17",
+                            "tipoMovimiento":  "compra",
+                            "monto":  3000,
+                            "descripcion":  "Ingreso navide├▒o"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-04-26",
+                            "tipoMovimiento":  "compra",
+                            "monto":  3000,
+                            "descripcion":  "Ingreso mensual"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-05-01",
+                            "tipoMovimiento":  "retiro",
+                            "monto":  2500,
+                            "descripcion":  "Compra en tienda"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-05-26",
+                            "tipoMovimiento":  "retiro",
+                            "monto":  3000,
+                            "descripcion":  "Sin descripcion"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-05-30",
+                            "tipoMovimiento":  "compra",
+                            "monto":  2500,
+                            "descripcion":  "Ingreso mensual"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-06-22",
+                            "tipoMovimiento":  "pago",
+                            "monto":  2000,
+                            "descripcion":  "Sin descripcion"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-07-02",
+                            "tipoMovimiento":  "pago",
+                            "monto":  2500,
+                            "descripcion":  "Compra en tienda"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-07-08",
+                            "tipoMovimiento":  "retiro",
+                            "monto":  2000,
+                            "descripcion":  "Sin descripcion"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-07-08",
+                            "tipoMovimiento":  "deposito",
+                            "monto":  1500,
+                            "descripcion":  "Ingreso navide├▒o"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-07-13",
+                            "tipoMovimiento":  "deposito",
+                            "monto":  3000,
+                            "descripcion":  "Ingreso extra"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-07-24",
+                            "tipoMovimiento":  "retiro",
+                            "monto":  1500,
+                            "descripcion":  "Sin descripcion"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-08-03",
+                            "tipoMovimiento":  "compra",
+                            "monto":  1000,
+                            "descripcion":  "Sin descripcion"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-08-05",
+                            "tipoMovimiento":  "deposito",
+                            "monto":  1000,
+                            "descripcion":  "Sin descripcion"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-08-19",
+                            "tipoMovimiento":  "retiro",
+                            "monto":  2500,
+                            "descripcion":  "Retiro parcial"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-09-10",
+                            "tipoMovimiento":  "deposito",
+                            "monto":  2500,
+                            "descripcion":  "Sin descripcion"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-09-11",
+                            "tipoMovimiento":  "deposito",
+                            "monto":  1000,
+                            "descripcion":  "Retiro parcial"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-11-13",
+                            "tipoMovimiento":  "compra",
+                            "monto":  2500,
+                            "descripcion":  "Retiro parcial"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-11-23",
+                            "tipoMovimiento":  "compra",
+                            "monto":  1500,
+                            "descripcion":  "Ingreso mensual"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-11-25",
+                            "tipoMovimiento":  "compra",
+                            "monto":  2000,
+                            "descripcion":  "Ingreso mensual"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-11-27",
+                            "tipoMovimiento":  "retiro",
+                            "monto":  2000,
+                            "descripcion":  "Retiro parcial"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-12-13",
+                            "tipoMovimiento":  "deposito",
+                            "monto":  1000,
+                            "descripcion":  "Ingreso extra"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2024-12-24",
+                            "tipoMovimiento":  "retiro",
+                            "monto":  3000,
+                            "descripcion":  "Retiro parcial"
+                        },
+                        {
+                            "cuentaId":  110,
+                            "fecha":  "2026-10-05",
+                            "tipoMovimiento":  "retiro",
+                            "monto":  500,
+                            "descripcion":  "Retiro por canal cajero"
+                        }
+                    ]
+}
+
+========== Estado inicial del circuito ==========
+{
+    "circuitBreakers":  {
+                            "cuentas":  {
+                                            "failureRate":  "-1.0%",
+                                            "slowCallRate":  "-1.0%",
+                                            "failureRateThreshold":  "50.0%",
+                                            "slowCallRateThreshold":  "100.0%",
+                                            "bufferedCalls":  1,
+                                            "failedCalls":  0,
+                                            "slowCalls":  0,
+                                            "slowFailedCalls":  0,
+                                            "notPermittedCalls":  0,
+                                            "state":  "CLOSED"
+                                        }
+                        }
+}
+
+========== Se detiene el contenedor de cuentas-service ==========
+$ docker compose stop cuentas-service
+docker :  Container cuentas-service Stopping 
+En C:\Users\ignac\Documents\Portafolio_Profesional\Estudios_y_Cursos\AAnalista_Programador\DESARROLLO DE BACKEND 
+lll\banco-xyz-batch\banco-xyz-batch\Exp3_S6_S8_Microservicios\evidencia\generar_evidencia_docker.ps1: 313 Carácter: 48
++ ... compose stop cuentas-service' { docker compose stop cuentas-service }
++                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( Container cuentas-service Stopping :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ Container cuentas-service Stopped
+$ docker ps --all (estado de cada contenedor)
+api-gateway  Up 20 seconds (healthy)
+movimientos-service  Up 36 seconds (healthy)
+auth-server  Up 36 seconds (healthy)
+cuentas-service  Exited (143) Less than a second ago
+config-server  Up 47 seconds (healthy)
+broker-artemis  Up 47 seconds (healthy)
+discovery-server  Up 47 seconds (healthy)
+
+========== Siete consultas a la ficha con la dependencia caida ==========
+Se entrega el historial completo con los datos de cuenta vacios y el campo
+origenDatosCuenta en DEGRADADO: el cliente puede notar que la respuesta no
+trae datos reales de cuenta, en vez de recibir un error o un dato inventado.
+intento 1 : origen = DEGRADADO | movimientos en el historial = 29
+intento 2 : origen = DEGRADADO | movimientos en el historial = 29
+intento 3 : origen = DEGRADADO | movimientos en el historial = 29
+intento 4 : origen = DEGRADADO | movimientos en el historial = 29
+intento 5 : origen = DEGRADADO | movimientos en el historial = 29
+intento 6 : origen = DEGRADADO | movimientos en el historial = 29
+intento 7 : origen = DEGRADADO | movimientos en el historial = 29
+
+========== El circuito quedo abierto y las llamadas ya no salen a la red ==========
+{
+    "circuitBreakers":  {
+                            "cuentas":  {
+                                            "failureRate":  "75.0%",
+                                            "slowCallRate":  "0.0%",
+                                            "failureRateThreshold":  "50.0%",
+                                            "slowCallRateThreshold":  "100.0%",
+                                            "bufferedCalls":  4,
+                                            "failedCalls":  3,
+                                            "slowCalls":  0,
+                                            "slowFailedCalls":  0,
+                                            "notPermittedCalls":  6,
+                                            "state":  "OPEN"
+                                        }
+                        }
+}
+
+========== El historial propio sigue respondiendo: la degradacion es parcial ==========
+GET /api/movimientos/110?limite=2 -> 200
+
+========== Reintentos y transiciones, en el log del contenedor ==========
+2026-10-05T15:51:18.940Z  WARN 1 --- [movimientos-service] [      cuentas-2] .d.b.m.c.ObservabilidadResilienciaConfig : >> resiliencia: REINTENTO 1 hacia cuentas tras ServicioNoDisponibleException - No se pudo consultar la cuenta 110 en cuentas-service
+2026-10-05T15:51:20.143Z  WARN 1 --- [movimientos-service] [      cuentas-3] .d.b.m.c.ObservabilidadResilienciaConfig : >> resiliencia: se agotaron los 2 intentos hacia cuentas
+2026-10-05T15:51:21.186Z  WARN 1 --- [movimientos-service] [      cuentas-4] .d.b.m.c.ObservabilidadResilienciaConfig : >> resiliencia: CIRCUITO cuentas paso de CLOSED a OPEN
+2026-10-05T15:51:21.186Z  WARN 1 --- [movimientos-service] [      cuentas-4] .d.b.m.c.ObservabilidadResilienciaConfig : >> resiliencia: REINTENTO 1 hacia cuentas tras ServicioNoDisponibleException - No se pudo consultar la cuenta 110 en cuentas-service
+
+========== Vuelve el contenedor de cuentas-service ==========
+$ docker compose start cuentas-service
+docker :  Container broker-artemis Waiting 
+En C:\Users\ignac\Documents\Portafolio_Profesional\Estudios_y_Cursos\AAnalista_Programador\DESARROLLO DE BACKEND 
+lll\banco-xyz-batch\banco-xyz-batch\Exp3_S6_S8_Microservicios\evidencia\generar_evidencia_docker.ps1: 344 Carácter: 49
++ ... mpose start cuentas-service' { docker compose start cuentas-service }
++                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( Container broker-artemis Waiting :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ Container config-server Waiting 
+ Container discovery-server Waiting 
+ Container discovery-server Healthy 
+ Container config-server Healthy 
+ Container broker-artemis Healthy 
+ Container cuentas-service Starting 
+ Container cuentas-service Started
+
+========== El circuito prueba, le resulta y se cierra solo ==========
+intento 1 : origen = SERVICIO
+intento 2 : origen = SERVICIO
+intento 3 : origen = SERVICIO
+intento 4 : origen = SERVICIO
+{
+    "circuitBreakers":  {
+                            "cuentas":  {
+                                            "failureRate":  "-1.0%",
+                                            "slowCallRate":  "-1.0%",
+                                            "failureRateThreshold":  "50.0%",
+                                            "slowCallRateThreshold":  "100.0%",
+                                            "bufferedCalls":  1,
+                                            "failedCalls":  0,
+                                            "slowCalls":  0,
+                                            "slowFailedCalls":  0,
+                                            "notPermittedCalls":  0,
+                                            "state":  "CLOSED"
+                                        }
+                        }
+}
+
+========== Ciclo completo de transiciones del circuito ==========
+2026-10-05T15:51:21.186Z  WARN 1 --- [movimientos-service] [      cuentas-4] .d.b.m.c.ObservabilidadResilienciaConfig : >> resiliencia: CIRCUITO cuentas paso de CLOSED a OPEN
+2026-10-05T15:51:31.187Z  WARN 1 --- [movimientos-service] [ransitionThread] .d.b.m.c.ObservabilidadResilienciaConfig : >> resiliencia: CIRCUITO cuentas paso de OPEN a HALF_OPEN
+2026-10-05T15:51:52.442Z  WARN 1 --- [movimientos-service] [      cuentas-7] .d.b.m.c.ObservabilidadResilienciaConfig : >> resiliencia: CIRCUITO cuentas paso de HALF_OPEN a CLOSED

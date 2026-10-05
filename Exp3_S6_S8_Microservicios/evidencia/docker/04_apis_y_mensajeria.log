@@ -1,0 +1,117 @@
+
+========== Carga del dataset legacy en cada microservicio ==========
+2026-10-05T15:50:45.722Z  INFO 1 --- [cuentas-service] [           main] c.d.b.c.d.CuentaRepositoryEnMemoria      : >> cuentas-service: 1000 filas leidas = 399 validas + 601 omitidas por datos inconsistentes
+2026-10-05T15:50:45.725Z  INFO 1 --- [cuentas-service] [           main] c.d.b.c.d.CuentaRepositoryEnMemoria      : >> cuentas-service: 50 cuentas distintas cargadas
+2026-10-05T15:50:49.224Z  INFO 1 --- [movimientos-service] [           main] c.d.b.m.d.MovimientoRepositoryEnMemoria  : >> movimientos-service: 1000 filas leidas = 686 movimientos validos + 314 omitidos por datos inconsistentes
+2026-10-05T15:50:49.224Z  INFO 1 --- [movimientos-service] [           main] c.d.b.m.d.MovimientoRepositoryEnMemoria  : >> movimientos-service: historial cargado para 20 cuentas distintas
+
+========== GET /api/cuentas/110 por el gateway ==========
+{
+    "cuentaId":  110,
+    "nombreTitular":  "Charlie Green",
+    "edad":  25,
+    "tipoCuenta":  "prestamo",
+    "saldo":  10000
+}
+
+========== GET /api/movimientos/110/resumen antes del retiro ==========
+{
+    "cuentaId":  110,
+    "totalMovimientos":  28,
+    "totalDepositos":  18500,
+    "totalEgresos":  40500,
+    "ultimaFecha":  "2024-12-24"
+}
+
+========== POST /api/cuentas/110/retiro con 500 ==========
+El retiro se aprueba en cuentas-service, que publica un evento en la cola.
+movimientos-service no recibe ninguna llamada HTTP por esto.
+{
+    "cuentaId":  110,
+    "montoSolicitado":  500,
+    "saldoResultante":  9500,
+    "aprobado":  true,
+    "motivoRechazo":  null,
+    "eventoId":  "b6424dd4-f546-48bf-bebd-f617a4b93082",
+    "eventoPublicado":  true
+}
+
+========== El saldo bajo en cuentas-service ==========
+{
+    "cuentaId":  110,
+    "nombreTitular":  "Charlie Green",
+    "edad":  25,
+    "tipoCuenta":  "prestamo",
+    "saldo":  9500
+}
+
+========== Y el movimiento aparecio en movimientos-service, llegado por la cola ==========
+{
+    "value":  [
+                  {
+                      "cuentaId":  110,
+                      "fecha":  "2026-10-05",
+                      "tipoMovimiento":  "retiro",
+                      "monto":  500,
+                      "descripcion":  "Retiro por canal cajero"
+                  }
+              ],
+    "Count":  1
+}
+{
+    "cuentaId":  110,
+    "totalMovimientos":  29,
+    "totalDepositos":  18500,
+    "totalEgresos":  41000,
+    "ultimaFecha":  "2026-10-05"
+}
+
+========== Los dos extremos de la cola, en los logs de los contenedores ==========
+2026-10-05T15:51:08.353Z  INFO 1 --- [cuentas-service] [nio-8081-exec-9] c.d.b.c.mensajeria.PublicadorRetiros     : >> cuentas-service: evento b6424dd4-f546-48bf-bebd-f617a4b93082 publicado en la cola banco.retiros (cuenta 110, monto 500)
+2026-10-05T15:51:08.365Z  INFO 1 --- [movimientos-service] [ntContainer#0-1] c.d.b.m.mensajeria.ConsumidorRetiros     : >> movimientos-service: evento b6424dd4-f546-48bf-bebd-f617a4b93082 consumido, retiro de 500 agregado al historial de la cuenta 110
+
+========== El broker: la cola declarada y la autenticacion activa ==========
+2026-10-05T15:50:32.230Z  INFO 1 --- [broker-artemis] [           main] c.d.b.broker.BrokerArtemisApplication    : >> broker-artemis: acceptor TCP en 0.0.0.0:61616 con autenticacion activada
+2026-10-05T15:50:32.758Z  INFO 1 --- [broker-artemis] [           main] o.apache.activemq.artemis.core.server    : AMQ221080: Deploying address banco.retiros supporting [ANYCAST]
+2026-10-05T15:50:32.759Z  INFO 1 --- [broker-artemis] [           main] o.apache.activemq.artemis.core.server    : AMQ221003: Deploying ANYCAST queue banco.retiros on address banco.retiros
+2026-10-05T15:50:38.088Z  INFO 1 --- [broker-artemis] [io-61617-exec-1] org.apache.activemq.audit.base           : AMQ601014: User anonymous@unknown is getting name on target resource: QueueImpl[name=banco.retiros, postOffice=PostOfficeImpl [server=ActiveMQServerImpl::name=localhost], temp=false]@2cd8e9e
+2026-10-05T15:50:48.448Z  INFO 1 --- [broker-artemis] [io-61617-exec-3] org.apache.activemq.audit.base           : AMQ601014: User anonymous@unknown is getting name on target resource: QueueImpl[name=banco.retiros, postOffice=PostOfficeImpl [server=ActiveMQServerImpl::name=localhost], temp=false]@2cd8e9e
+2026-10-05T15:50:52.969Z  INFO 1 --- [broker-artemis] [mpl$6@30a9e3db)] org.apache.activemq.audit.base           : AMQ601265: User artemis(banco)@172.22.0.6:54240 is creating a core consumer on target resource ServerSessionImpl() with parameters: [0, banco.retiros, null, 0, false, true, null]
+2026-10-05T15:50:58.536Z  INFO 1 --- [broker-artemis] [io-61617-exec-5] org.apache.activemq.audit.base           : AMQ601014: User anonymous@unknown is getting name on target resource: QueueImpl[name=banco.retiros, postOffice=PostOfficeImpl [server=ActiveMQServerImpl::name=localhost], temp=false]@2cd8e9e
+2026-10-05T15:51:08.346Z  INFO 1 --- [broker-artemis] [mpl$6@30a9e3db)] org.apache.activemq.audit.message        : AMQ601501: User artemis(banco)@172.22.0.6:54240 is consuming a message from banco.retiros: Reference[49]:RELIABLE:CoreMessage[messageID=49, durable=true, userID=9490e760-c0d4-11f1-ae81-4296685c1d4b, priority=4, timestamp=Mon Oct 05 15:51:08 UTC 2026, expiration=0, durable=true, address=banco.retiros, size=641, properties=TypedProperties[__AMQ_CID=8c441e0d-c0d4-11f1-ae81-4296685c1d4b, _tipoEvento=cl.duoc.bancoxyz.common.evento.RetiroRealizadoEvento, _AMQ_ROUTING_TYPE=1]]@606666910
+2026-10-05T15:51:08.347Z  INFO 1 --- [broker-artemis] [mpl$6@30a9e3db)] org.apache.activemq.audit.message        : AMQ601500: User artemis(banco)@172.22.0.5:44496 sent a message CoreMessage[messageID=49, durable=true, userID=9490e760-c0d4-11f1-ae81-4296685c1d4b, priority=4, timestamp=Mon Oct 05 15:51:08 UTC 2026, expiration=0, durable=true, address=banco.retiros, size=641, properties=TypedProperties[__AMQ_CID=8c441e0d-c0d4-11f1-ae81-4296685c1d4b, _tipoEvento=cl.duoc.bancoxyz.common.evento.RetiroRealizadoEvento, _AMQ_ROUTING_TYPE=1]]@606666910, context: RoutingContextImpl(Address=banco.retiros, routingType=ANYCAST, PreviousAddress=banco.retiros previousRoute:ANYCAST, reusable=true, version=-2147483645)
+***** durable queues banco.retiros:
+***** non durable for banco.retiros:
+- queueID=7 address:banco.retiros name:banco.retiros filter:null
+2026-10-05T15:51:08.371Z  INFO 1 --- [broker-artemis] [mpl$6@30a9e3db)] org.apache.activemq.audit.message        : AMQ601759: User artemis(banco)@172.22.0.6:54240 added acknowledgement of a message from banco.retiros: CoreMessage[messageID=49, durable=true, userID=9490e760-c0d4-11f1-ae81-4296685c1d4b, priority=4, timestamp=Mon Oct 05 15:51:08 UTC 2026, expiration=0, durable=true, address=banco.retiros, size=641, properties=TypedProperties[__AMQ_CID=8c441e0d-c0d4-11f1-ae81-4296685c1d4b, _tipoEvento=cl.duoc.bancoxyz.common.evento.RetiroRealizadoEvento, _AMQ_ROUTING_TYPE=1]]@606666910 to transaction: TransactionImpl [xid=null, txID=46, xid=null, state=ACTIVE, createTime=1791215468066(Mon Oct 05 15:51:08 UTC 2026), timeoutSeconds=300, nr operations = 1]@505ff6c3
+2026-10-05T15:51:08.372Z  INFO 1 --- [broker-artemis] [mpl$6@30a9e3db)] org.apache.activemq.audit.message        : AMQ601502: User artemis(banco)@172.22.0.6:54240 acknowledged message from banco.retiros: CoreMessage[messageID=49, durable=true, userID=9490e760-c0d4-11f1-ae81-4296685c1d4b, priority=4, timestamp=Mon Oct 05 15:51:08 UTC 2026, expiration=0, durable=true, address=banco.retiros, size=641, properties=TypedProperties[__AMQ_CID=8c441e0d-c0d4-11f1-ae81-4296685c1d4b, _tipoEvento=cl.duoc.bancoxyz.common.evento.RetiroRealizadoEvento, _AMQ_ROUTING_TYPE=1]]@606666910, transaction: TransactionImpl [xid=null, txID=46, xid=null, state=COMMITTED, createTime=1791215468066(Mon Oct 05 15:51:08 UTC 2026), timeoutSeconds=300, nr operations = 0]@505ff6c3
+2026-10-05T15:51:08.593Z  INFO 1 --- [broker-artemis] [io-61617-exec-6] org.apache.activemq.audit.base           : AMQ601014: User anonymous@unknown is getting name on target resource: QueueImpl[name=banco.retiros, postOffice=PostOfficeImpl [server=ActiveMQServerImpl::name=localhost], temp=false]@2cd8e9e
+
+========== Rechazos de negocio: sobre el limite por operacion y sin fondos ==========
+{
+    "cuentaId":  110,
+    "montoSolicitado":  500001,
+    "saldoResultante":  null,
+    "aprobado":  false,
+    "motivoRechazo":  "El monto supera el limite de 500000 por operacion.",
+    "eventoId":  null,
+    "eventoPublicado":  false
+}
+{
+    "cuentaId":  110,
+    "montoSolicitado":  400000,
+    "saldoResultante":  9500,
+    "aprobado":  false,
+    "motivoRechazo":  "Fondos insuficientes",
+    "eventoId":  null,
+    "eventoPublicado":  false
+}
+
+========== Un retiro rechazado no genera evento: el historial no cambio ==========
+{
+    "cuentaId":  110,
+    "totalMovimientos":  29,
+    "totalDepositos":  18500,
+    "totalEgresos":  41000,
+    "ultimaFecha":  "2026-10-05"
+}

@@ -1,0 +1,21 @@
+# Lo que no tiene por que viajar al contexto de construccion.
+#
+# No es solo por tamano: cada archivo del contexto entra en el calculo de la cache
+# del "COPY . ." del Dockerfile. Con la carpeta de evidencia dentro, regenerar los
+# logs invalidaba esa capa y obligaba a recompilar el reactor completo, aunque no
+# se hubiera tocado una sola linea de codigo.
+target/
+*/target/
+
+# Evidencia y documentacion: no forman parte de ninguna imagen.
+evidencia/
+docs/
+*.md
+*.log
+
+# Entorno local.
+.git/
+.gitignore
+.idea/
+.vscode/
+.DS_Store

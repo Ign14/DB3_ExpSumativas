@@ -1,0 +1,61 @@
+
+========== Metadatos del servidor de autorizacion ==========
+El issuer es el nombre interno de la red, no localhost: es la direccion con
+la que los microservicios alcanzan al auth-server para bajar la clave
+publica. El token pedido desde el host por el puerto publicado lleva ese
+mismo issuer, asi que los Resource Servers lo validan sin aflojar la
+comprobacion.
+$ curl http://localhost:9000/.well-known/oauth-authorization-server
+{"issuer":"http://auth-server:9000","authorization_endpoint":"http://auth-server:9000/oauth2/authorize","device_authorization_endpoint":"http://auth-server:9000/oauth2/device_authorization","token_endpoint":"http://auth-server:9000/oauth2/token","token_endpoint_auth_methods_supported":["client_secret_basic","client_secret_post","client_secret_jwt","private_key_jwt","tls_client_auth","self_signed_tls_client_auth"],"jwks_uri":"http://auth-server:9000/oauth2/jwks","response_types_supported":["code"],"grant_types_supported":["authorization_code","client_credentials","refresh_token","urn:ietf:params:oauth:grant-type:device_code","urn:ietf:params:oauth:grant-type:token-exchange"],"revocation_endpoint":"http://auth-server:9000/oauth2/revoke","revocation_endpoint_auth_methods_supported":["client_secret_basic","client_secret_post","client_secret_jwt","private_key_jwt","tls_client_auth","self_signed_tls_client_auth"],"introspection_endpoint":"http://auth-server:9000/oauth2/introspect","introspection_endpoint_auth_methods_supported":["client_secret_basic","client_secret_post","client_secret_jwt","private_key_jwt","tls_client_auth","self_signed_tls_client_auth"],"code_challenge_methods_supported":["S256"],"tls_client_certificate_bound_access_tokens":true}
+
+========== Token por client_credentials ==========
+{
+    "access_token":  "eyJraWQiOiIyNTcxYzJmMC04YTQ1LTRmZGEtYWUwYS1hMTBmMTQ1ZTQxOTMiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJiYW5jby13ZWItY2xpZW50IiwiYXVkIjoiYmFuY28td2ViLWNsaWVudCIsIm5iZiI6MTc5MTIxNTQ2Niwic2NvcGUiOlsiY3VlbnRhcy5yZWFkIiwibW92aW1pZW50b3Mud3JpdGUiLCJtb3ZpbWllbnRvcy5yZWFkIiwiY3VlbnRhcy53cml0ZSJdLCJpc3MiOiJodHRwOi8vYXV0aC1zZXJ2ZXI6OTAwMCIsImV4cCI6MTc5MTIxNzI2NiwiaWF0IjoxNzkxMjE1NDY2LCJqdGkiOiIwNTEwNmVmMC05YzJiLTQ4ZTUtOWUwNi00YzE5ZmUzYzM4OWUifQ.MCo3MYEvn4mn3ncssC8dFyAROJeAmhVtElbMysJeBE98EYb--bferPRJiGWqw-iZwnN26kp8w7AythRmXCnA9DXntX3E5SrVtHgI5dczsmR5zWFyQLMr_YOEp7ag6HdXO75hLewocAMRjE22hal7AU5H_L27wqex_VF8bfN2HZ_XIJ30fVsAFSQ15GMSJCESGzMKVPB31kIhtLy1xJ6y6oO-CKOBrrYtcGU2RsbFPfC0inWb1WpGAjnTOMWlmPUN78h3e7_oVCVOotKNZ3zSm5RI73AaYXKyZjZUjR8HgRGgU-3xbIC-T48aDz4Sw8ucm5_vJtE-5cqeuVNoFvL_PQ",
+    "scope":  "cuentas.read movimientos.write movimientos.read cuentas.write",
+    "token_type":  "Bearer",
+    "expires_in":  1799
+}
+
+========== Claims de ese mismo JWT ==========
+{
+    "sub":  "banco-web-client",
+    "aud":  "banco-web-client",
+    "nbf":  1791215466,
+    "scope":  [
+                  "cuentas.read",
+                  "movimientos.write",
+                  "movimientos.read",
+                  "cuentas.write"
+              ],
+    "iss":  "http://auth-server:9000",
+    "exp":  1791217266,
+    "iat":  1791215466,
+    "jti":  "daa640a9-91db-4ab4-bc55-88ac63568633"
+}
+
+========== Clave publica con la que los microservicios validan la firma ==========
+$ curl http://localhost:9000/oauth2/jwks
+{"keys":[{"kty":"RSA","e":"AQAB","kid":"2571c2f0-8a45-4fda-ae0a-a10f145e4193","n":"mcf2u3pnU6UvHIreWhRETIXQV8-sbfAHe9d9K6BugGjzMj-HFlLTt4WxV8XYsWr_Zlh5lTKzaZlJsFojkOAfG3F8qWgs6To_DRE3nq9pnOSSbeNYZNvcR8pIZoBUpDZ4DZg3aQsadTdKJAAkZdyiTWwxqRShmqaxyyqoqOnWTbSZ0dG3ueMiY9T0HZSDHEIc8XbgywJFciUpSrQhrGuo_Zc2K_nz1Sgg_zGe-o1npzN41N0MLghUOAd-gY3Lc0wB04ZPcYITTAS8nJKH7WiUZomGsSPHybVU0otLJQwti869PC6NYCKCrZQuC7BkerTlBiuXaO--kC3QObZU8eYCKw"}]}
+
+========== Sin token: 401 en el gateway y tambien en el microservicio directo ==========
+gateway  /api/cuentas/103     -> 401
+directo  cuentas-service:8081 -> 401
+
+========== Token manipulado: la firma no valida ==========
+token alterado -> 401
+
+========== La infraestructura tampoco esta abierta ==========
+Config Server sin credenciales -> 401
+Config Server con credenciales -> 200
+Eureka sin credenciales        -> 401
+Eureka con credenciales        -> 200
+Actuator de resiliencia sin token -> 401
+Actuator de resiliencia con token -> 200
+
+========== Minimo privilegio: el cajero no puede leer movimientos ==========
+cajero GET /api/cuentas/103     -> 200  (tiene cuentas.read)
+cajero GET /api/movimientos/103 -> 403  (no tiene movimientos.read)
+
+========== Scope no registrado para el cliente: no se emite token ==========
+$ curl -u cajero-client:*** -d grant_type=client_credentials -d scope=movimientos.read
+{"error":"invalid_scope"}

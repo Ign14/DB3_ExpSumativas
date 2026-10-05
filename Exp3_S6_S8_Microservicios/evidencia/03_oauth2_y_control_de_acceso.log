@@ -1,0 +1,121 @@
+
+========== Metadatos publicados por el servidor de autorizacion ==========
+{
+    "issuer": "http://localhost:9000",
+    "authorization_endpoint": "http://localhost:9000/oauth2/authorize",
+    "device_authorization_endpoint": "http://localhost:9000/oauth2/device_authorization",
+    "token_endpoint": "http://localhost:9000/oauth2/token",
+    "token_endpoint_auth_methods_supported": [
+        "client_secret_basic",
+        "client_secret_post",
+        "client_secret_jwt",
+        "private_key_jwt",
+        "tls_client_auth",
+        "self_signed_tls_client_auth"
+    ],
+    "jwks_uri": "http://localhost:9000/oauth2/jwks",
+    "response_types_supported": [
+        "code"
+    ],
+    "grant_types_supported": [
+        "authorization_code",
+        "client_credentials",
+        "refresh_token",
+        "urn:ietf:params:oauth:grant-type:device_code",
+        "urn:ietf:params:oauth:grant-type:token-exchange"
+    ],
+    "revocation_endpoint": "http://localhost:9000/oauth2/revoke",
+    "revocation_endpoint_auth_methods_supported": [
+        "client_secret_basic",
+        "client_secret_post",
+        "client_secret_jwt",
+        "private_key_jwt",
+        "tls_client_auth",
+        "self_signed_tls_client_auth"
+    ],
+    "introspection_endpoint": "http://localhost:9000/oauth2/introspect",
+    "introspection_endpoint_auth_methods_supported": [
+        "client_secret_basic",
+        "client_secret_post",
+        "client_secret_jwt",
+        "private_key_jwt",
+        "tls_client_auth",
+        "self_signed_tls_client_auth"
+    ],
+    "code_challenge_methods_supported": [
+        "S256"
+    ],
+    "tls_client_certificate_bound_access_tokens": true
+}
+
+========== Token por client_credentials para el canal web ==========
+{
+    "access_token": "eyJraWQiOiJmYzI2NjVmYi00MTNmLTQyMGQtOWQ1Ny1kZGM3ZWJlYzc1YjQiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJiYW5jby13ZWItY2xpZW50IiwiYXVkIjoiYmFuY28td2ViLWNsaWVudCIsIm5iZiI6MTc5MDgzOTExNywic2NvcGUiOlsiY3VlbnRhcy5yZWFkIiwibW92aW1pZW50b3Mud3JpdGUiLCJtb3ZpbWllbnRvcy5yZWFkIiwiY3VlbnRhcy53cml0ZSJdLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJleHAiOjE3OTA4NDA5MTcsImlhdCI6MTc5MDgzOTExNywianRpIjoiN2M1ZTU1YjktZWQ5YS00N2RiLWE1NTctNmVlZjNkZWNjYzE1In0.HxLHFvgDa-Iq8HfiGF_IcXuhEsk-A7_Xp9J6DxL2fzdt1gj6Ahz7ykRwyE2fGSCZ-JvswEWAhqCa-Q-HzFI30-79SZ7LhmS9F6I5vL8ipDU62rGsvujp1rnD9LxmegkBbXF5UR0F9HwyoV8ncCTtZIotJtC_wR9UhiZQ9BCDzB-Oqe5aINLItDbwWTrqGobH0SWUKJA7Ixz_Dqi5nR16E1-Knuer6tuIoRPlCfFsOU68tSax1H7NR3h5hKrGfbBJcTlXzMFsls2ngFyeJWmbAr5WVWa2G0AW8BMyO4uT-1Cmt_8wJWEh4aikThTnzS-4rLYBaZZP1gwZ0m9ZdN5inQ",
+    "scope": "cuentas.read movimientos.write movimientos.read cuentas.write",
+    "token_type": "Bearer",
+    "expires_in": 1799
+}
+
+========== Contenido de ese mismo JWT (claims decodificados) ==========
+{
+  "sub": "banco-web-client",
+  "aud": "banco-web-client",
+  "nbf": 1790839117,
+  "scope": [
+    "cuentas.read",
+    "movimientos.write",
+    "movimientos.read",
+    "cuentas.write"
+  ],
+  "iss": "http://localhost:9000",
+  "exp": 1790840917,
+  "iat": 1790839117,
+  "jti": "7c5e55b9-ed9a-47db-a557-6eef3deccc15"
+}
+
+========== Clave publica con la que los microservicios validan la firma ==========
+{
+    "keys": [
+        {
+            "kty": "RSA",
+            "e": "AQAB",
+            "kid": "fc2665fb-413f-420d-9d57-ddc7ebec75b4",
+            "n": "tR8i8R3kugBJIOzwIs4QXphv0HQoihykBEp-4YQqyggGXV-JxVojcfEWQOVtu1q3tSwJL_HEsELetzlRKA9LmekI5pH_lXk2nnsXr-24Z__7DHFJlqR5m0FkEqRdZiSiT8LNvYloYdvOBE395mE3ZbvkB-q2VEEHpAnqYRMxIAkJOIEkYXxJkgVJsysn2MD3hFPE446cvMY1F6_2u2dvjB0XXOdgY4cmTl-p1RuaNNdwymqfRaBfBW1oP25wdmbT9sVi9JDPhEsl4p4vgI4HYX0Y32XUH8zDv4MHA8oI9wXKrwYaJ65nBl1d1_GSGmJB8CpvF0E5-jRBUM-BbUPxPw"
+        }
+    ]
+}
+
+========== Credenciales incorrectas: no se emite token ==========
+{"error":"invalid_client"}
+
+========== Scope no registrado para el cliente: se rechaza ==========
+{"error":"invalid_scope"}
+
+========== La infraestructura tampoco esta abierta ==========
+Config Server sin credenciales      -> 401
+Config Server con credenciales      -> 200
+Eureka sin credenciales             -> 401
+Eureka con credenciales             -> 200
+Actuator de resiliencia sin token   -> 401
+Actuator de resiliencia con token   -> 200
+Salud (abierta para el healthcheck) -> 200
+
+========== Sin token: 401 tanto en el gateway como en el microservicio directo ==========
+gateway  /api/cuentas/103            -> 401
+gateway  /api/movimientos/103        -> 401
+directo  cuentas-service:8081        -> 401
+directo  movimientos-service:8082    -> 401
+
+========== HEAD funciona igual que GET con el mismo scope ==========
+HEAD /api/cuentas/103 -> 200
+
+========== Token manipulado: la firma no valida ==========
+token alterado -> 401
+
+========== Token valido del canal web: acceso permitido ==========
+GET /api/cuentas/103     -> 200
+GET /api/movimientos/103 -> 200
+
+========== Minimo privilegio: el token del cajero no sirve para leer movimientos ==========
+cajero GET /api/cuentas/103     -> 200 (tiene cuentas.read)
+cajero GET /api/movimientos/103 -> 403 (no tiene movimientos.read)

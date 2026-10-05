@@ -1,0 +1,21 @@
+
+========== Estado de salud de los siete componentes ==========
+config-server          UP
+discovery-server       UP
+broker-artemis         UP
+auth-server            UP
+cuentas-service        UP
+movimientos-service    UP
+api-gateway            UP
+
+========== Registro final de Eureka ==========
+API-GATEWAY            192.0.2.2:8080   UP
+AUTH-SERVER            192.0.2.2:9000   UP
+CUENTAS-SERVICE        192.0.2.2:8081   UP
+MOVIMIENTOS-SERVICE    192.0.2.2:8082   UP
+
+========== Broker: la cola de eventos ==========
+2026-10-01T07:17:18.967Z  INFO 20907 --- [broker-artemis] [           main] o.apache.activemq.artemis.core.server    : AMQ221080: Deploying address banco.retiros supporting [ANYCAST]
+2026-10-01T07:17:18.973Z  INFO 20907 --- [broker-artemis] [           main] o.apache.activemq.artemis.core.server    : AMQ221003: Deploying ANYCAST queue banco.retiros on address banco.retiros
+2026-10-01T07:17:25.061Z  INFO 20907 --- [broker-artemis] [io-61617-exec-1] org.apache.activemq.audit.base           : AMQ601014: User anonymous@unknown is getting name on target resource: QueueImpl[name=banco.retiros, postOffice=PostOfficeImpl [server=ActiveMQServerImpl::name=localhost], temp=false]@5fc60af0
+2026-10-01T07:18:03.965Z  INFO 20907 --- [broker-artemis] [mpl$6@696b52bc)] org.apache.activemq.audit.base           : AMQ601265: User artemis(banco)@127.0.0.1:45302 is creating a core consumer on target resource ServerSessionImpl() with parameters: [0, banco.retiros, null, 0, false, true, null]

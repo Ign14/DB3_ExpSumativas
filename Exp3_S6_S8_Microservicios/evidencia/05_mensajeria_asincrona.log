@@ -1,0 +1,98 @@
+
+========== Estado inicial de la cuenta 110 ==========
+saldo:
+{
+    "cuentaId": 110,
+    "nombreTitular": "Charlie Green",
+    "edad": 25,
+    "tipoCuenta": "prestamo",
+    "saldo": 10000
+}
+resumen de movimientos:
+{
+    "cuentaId": 110,
+    "totalMovimientos": 28,
+    "totalDepositos": 18500,
+    "totalEgresos": 40500,
+    "ultimaFecha": "2024-12-24"
+}
+
+========== POST /api/cuentas/110/retiro con 500 (canal cajero) ==========
+{
+    "cuentaId": 110,
+    "montoSolicitado": 500,
+    "saldoResultante": 9500,
+    "aprobado": true,
+    "motivoRechazo": null,
+    "eventoId": "1728ba6c-e8c1-4e45-9a71-d661c97e4f40",
+    "eventoPublicado": true
+}
+
+esperando a que el consumidor procese el evento...
+
+========== Despues del retiro: el saldo bajo en cuentas-service ==========
+{
+    "cuentaId": 110,
+    "nombreTitular": "Charlie Green",
+    "edad": 25,
+    "tipoCuenta": "prestamo",
+    "saldo": 9500
+}
+
+========== Y el movimiento aparecio en movimientos-service, que nunca fue llamado por HTTP ==========
+[
+    {
+        "cuentaId": 110,
+        "fecha": "2026-10-01",
+        "tipoMovimiento": "retiro",
+        "monto": 500,
+        "descripcion": "Retiro por canal cajero"
+    }
+]
+{
+    "cuentaId": 110,
+    "totalMovimientos": 29,
+    "totalDepositos": 18500,
+    "totalEgresos": 41000,
+    "ultimaFecha": "2026-10-01"
+}
+
+========== Trazas de los dos extremos de la cola ==========
+2026-10-01T07:18:39.306Z  INFO 21064 --- [cuentas-service] [nio-8081-exec-9] c.d.b.c.mensajeria.PublicadorRetiros     : >> cuentas-service: evento fe487ceb-e511-4e6b-b75e-095b0d21466c publicado en la cola banco.retiros (cuenta 103, monto 100)
+2026-10-01T07:18:40.486Z  INFO 21064 --- [cuentas-service] [nio-8081-exec-5] c.d.b.c.mensajeria.PublicadorRetiros     : >> cuentas-service: evento 1728ba6c-e8c1-4e45-9a71-d661c97e4f40 publicado en la cola banco.retiros (cuenta 110, monto 500)
+2026-10-01T07:17:52.701Z  INFO 21065 --- [movimientos-service] [           main] .d.b.m.c.ObservabilidadResilienciaConfig : >> movimientos-service: eventos de resiliencia de la instancia 'cuentas' registrados en el log
+2026-10-01T07:18:39.369Z  INFO 21065 --- [movimientos-service] [ntContainer#0-1] c.d.b.m.mensajeria.ConsumidorRetiros     : >> movimientos-service: evento fe487ceb-e511-4e6b-b75e-095b0d21466c consumido, retiro de 100 agregado al historial de la cuenta 103
+2026-10-01T07:18:40.483Z  INFO 21065 --- [movimientos-service] [ntContainer#0-1] c.d.b.m.mensajeria.ConsumidorRetiros     : >> movimientos-service: evento 1728ba6c-e8c1-4e45-9a71-d661c97e4f40 consumido, retiro de 500 agregado al historial de la cuenta 110
+
+========== Rechazos de negocio: sobre el limite por operacion y sin fondos ==========
+{
+    "cuentaId": 110,
+    "montoSolicitado": 500001,
+    "saldoResultante": null,
+    "aprobado": false,
+    "motivoRechazo": "El monto supera el limite de 500000 por operacion.",
+    "eventoId": null,
+    "eventoPublicado": false
+}
+{
+    "cuentaId": 110,
+    "montoSolicitado": 400000,
+    "saldoResultante": 9500,
+    "aprobado": false,
+    "motivoRechazo": "Fondos insuficientes",
+    "eventoId": null,
+    "eventoPublicado": false
+}
+
+========== Un retiro rechazado no genera evento: el historial no cambio ==========
+{
+    "cuentaId": 110,
+    "totalMovimientos": 29,
+    "totalDepositos": 18500,
+    "totalEgresos": 41000,
+    "ultimaFecha": "2026-10-01"
+}
+
+========== Monto invalido: error del cliente, no rechazo de negocio ==========
+{"mensaje":"El monto debe ser mayor que cero."}
+HTTP 400

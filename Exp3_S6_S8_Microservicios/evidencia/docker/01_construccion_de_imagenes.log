@@ -1,0 +1,267 @@
+ Image banco-xyz/movimientos-service:1.0.0 Building 
+ Image banco-xyz/api-gateway:1.0.0 Building 
+ Image banco-xyz/config-server:1.0.0 Building 
+ Image banco-xyz/discovery-server:1.0.0 Building 
+ Image banco-xyz/broker-artemis:1.0.0 Building 
+ Image banco-xyz/auth-server:1.0.0 Building 
+ Image banco-xyz/cuentas-service:1.0.0 Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 6.01kB 0.0s done
+#1 DONE 0.0s
+
+#2 [cuentas-service internal] load build definition from Dockerfile
+#2 transferring dockerfile: 2.36kB 0.0s done
+#2 DONE 0.0s
+
+#3 [auth-server internal] load metadata for docker.io/library/maven:3.9-eclipse-temurin-21
+#3 DONE 1.0s
+
+#4 [api-gateway internal] load metadata for docker.io/library/eclipse-temurin:21-jre
+#4 DONE 1.0s
+
+#5 [discovery-server internal] load .dockerignore
+#5 transferring context: 572B 0.0s done
+#5 DONE 0.0s
+
+#6 [broker-artemis build  1/14] FROM docker.io/library/maven:3.9-eclipse-temurin-21@sha256:99e61abcff91a9b1333463bd8451fb18495d6eba9250ac66a338b518f8278320
+#6 resolve docker.io/library/maven:3.9-eclipse-temurin-21@sha256:99e61abcff91a9b1333463bd8451fb18495d6eba9250ac66a338b518f8278320 0.0s done
+#6 DONE 0.0s
+
+#7 [config-server runtime 1/5] FROM docker.io/library/eclipse-temurin:21-jre@sha256:cff19e6215689161eb6162c11b86b0c60ddf802164f2eaf48d570f8fb79a36c5
+#7 resolve docker.io/library/eclipse-temurin:21-jre@sha256:cff19e6215689161eb6162c11b86b0c60ddf802164f2eaf48d570f8fb79a36c5 0.0s done
+#7 DONE 0.0s
+
+#8 [broker-artemis internal] load build context
+#8 transferring context: 15.34kB 0.0s done
+#8 DONE 0.0s
+
+#9 [config-server runtime 2/5] RUN apt-get update     && apt-get install -y --no-install-recommends curl     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [config-server runtime 4/5] COPY --from=build /build/config-server/target/config-server.jar app.jar
+#10 CACHED
+
+#11 [config-server runtime 3/5] WORKDIR /app
+#11 CACHED
+
+#12 [cuentas-service runtime 3/5] WORKDIR /app
+#12 CACHED
+
+#13 [cuentas-service runtime 2/5] RUN apt-get update     && apt-get install -y --no-install-recommends curl     && rm -rf /var/lib/apt/lists/*
+#13 CACHED
+
+#14 [cuentas-service runtime 4/5] COPY --from=build /build/cuentas-service/target/cuentas-service.jar app.jar
+#14 CACHED
+
+#15 [discovery-server runtime 4/5] COPY --from=build /build/discovery-server/target/discovery-server.jar app.jar
+#15 CACHED
+
+#16 [discovery-server runtime 3/5] WORKDIR /app
+#16 CACHED
+
+#17 [discovery-server runtime 2/5] RUN apt-get update     && apt-get install -y --no-install-recommends curl     && rm -rf /var/lib/apt/lists/*
+#17 CACHED
+
+#18 [api-gateway runtime 3/5] WORKDIR /app
+#18 CACHED
+
+#19 [api-gateway runtime 4/5] COPY --from=build /build/api-gateway/target/api-gateway.jar app.jar
+#19 CACHED
+
+#20 [api-gateway runtime 2/5] RUN apt-get update     && apt-get install -y --no-install-recommends curl     && rm -rf /var/lib/apt/lists/*
+#20 CACHED
+
+#21 [config-server runtime 5/5] RUN groupadd --system banco     && useradd --system --gid banco --uid 1001 banco     && chown -R banco:banco /app
+#21 CACHED
+
+#22 [auth-server runtime 2/5] RUN apt-get update     && apt-get install -y --no-install-recommends curl     && rm -rf /var/lib/apt/lists/*
+#22 CACHED
+
+#23 [auth-server runtime 4/5] COPY --from=build /build/auth-server/target/auth-server.jar app.jar
+#23 CACHED
+
+#24 [auth-server runtime 3/5] WORKDIR /app
+#24 CACHED
+
+#25 [broker-artemis runtime 2/5] RUN apt-get update     && apt-get install -y --no-install-recommends curl     && rm -rf /var/lib/apt/lists/*
+#25 CACHED
+
+#26 [broker-artemis runtime 3/5] WORKDIR /app
+#26 CACHED
+
+#27 [broker-artemis runtime 4/5] COPY --from=build /build/broker-artemis/target/broker-artemis.jar app.jar
+#27 CACHED
+
+#28 [api-gateway runtime 5/5] RUN groupadd --system banco     && useradd --system --gid banco --uid 1001 banco     && chown -R banco:banco /app
+#28 CACHED
+
+#29 [auth-server runtime 5/5] RUN groupadd --system banco     && useradd --system --gid banco --uid 1001 banco     && chown -R banco:banco /app
+#29 CACHED
+
+#30 [discovery-server runtime 5/5] RUN groupadd --system banco     && useradd --system --gid banco --uid 1001 banco     && chown -R banco:banco /app
+#30 CACHED
+
+#31 [broker-artemis runtime 5/5] RUN groupadd --system banco     && useradd --system --gid banco --uid 1001 banco     && chown -R banco:banco /app
+#31 CACHED
+
+#32 [movimientos-service build  5/14] COPY broker-artemis/pom.xml broker-artemis/
+#32 CACHED
+
+#33 [movimientos-service build  2/14] WORKDIR /build
+#33 CACHED
+
+#34 [movimientos-service build  3/14] COPY pom.xml ./
+#34 CACHED
+
+#35 [movimientos-service build 14/14] RUN mvn -B clean package -DskipTests
+#35 CACHED
+
+#36 [movimientos-service build 13/14] COPY . .
+#36 CACHED
+
+#37 [movimientos-service runtime 4/5] COPY --from=build /build/movimientos-service/target/movimientos-service.jar app.jar
+#37 CACHED
+
+#38 [movimientos-service runtime 2/5] RUN apt-get update     && apt-get install -y --no-install-recommends curl     && rm -rf /var/lib/apt/lists/*
+#38 CACHED
+
+#39 [movimientos-service build  8/14] COPY auth-server/pom.xml auth-server/
+#39 CACHED
+
+#40 [movimientos-service build  9/14] COPY api-gateway/pom.xml api-gateway/
+#40 CACHED
+
+#41 [movimientos-service build 10/14] COPY cuentas-service/pom.xml cuentas-service/
+#41 CACHED
+
+#42 [movimientos-service build 12/14] RUN mvn -B -q dependency:go-offline -DskipTests || true
+#42 CACHED
+
+#43 [movimientos-service runtime 3/5] WORKDIR /app
+#43 CACHED
+
+#44 [movimientos-service build  6/14] COPY config-server/pom.xml config-server/
+#44 CACHED
+
+#45 [movimientos-service build  7/14] COPY discovery-server/pom.xml discovery-server/
+#45 CACHED
+
+#46 [movimientos-service build 11/14] COPY movimientos-service/pom.xml movimientos-service/
+#46 CACHED
+
+#47 [movimientos-service build  4/14] COPY common-events/pom.xml common-events/
+#47 CACHED
+
+#48 [movimientos-service runtime 5/5] RUN groupadd --system banco     && useradd --system --gid banco --uid 1001 banco     && chown -R banco:banco /app
+#48 CACHED
+
+#49 [cuentas-service runtime 5/5] RUN groupadd --system banco     && useradd --system --gid banco --uid 1001 banco     && chown -R banco:banco /app
+#49 CACHED
+
+#50 [broker-artemis] exporting to image
+#50 exporting layers done
+#50 exporting manifest sha256:1241d8b61b97a61f67bd95343d60312f4fce9673e537d93ae39e7a96b15034c9 0.0s done
+#50 exporting config sha256:c27bcf314609edf45dbcd32d80db53b6d812128863028d50ab8d79daacb2051e
+#50 exporting config sha256:c27bcf314609edf45dbcd32d80db53b6d812128863028d50ab8d79daacb2051e 0.0s done
+#50 exporting attestation manifest sha256:57e0a8943125611182b6728abf87683715e50fca44289df92d09d4cb52b7a81f
+#50 exporting attestation manifest sha256:57e0a8943125611182b6728abf87683715e50fca44289df92d09d4cb52b7a81f 0.2s done
+#50 exporting manifest list sha256:480d422f6884110b45dae6b9514dbe6d2d090dd5b4becd82ec563f99721b0774
+#50 exporting manifest list sha256:480d422f6884110b45dae6b9514dbe6d2d090dd5b4becd82ec563f99721b0774 0.1s done
+#50 naming to docker.io/banco-xyz/broker-artemis:1.0.0 0.0s done
+#50 unpacking to docker.io/banco-xyz/broker-artemis:1.0.0 0.0s done
+#50 DONE 0.6s
+
+#51 [discovery-server] exporting to image
+#51 exporting layers done
+#51 exporting manifest sha256:4870658cb2924c78087c445800713a1f127f3fc3222eb359809ef1263022a384 0.0s done
+#51 exporting config sha256:c39707813d1ed88db71575e209fd6d942caa5545146e780587462b339cbb20cc 0.0s done
+#51 exporting attestation manifest sha256:7a1d470ca32c14253a6260b9393d3385715b4bbf0b8dafa679ed92d575edb182 0.2s done
+#51 exporting manifest list sha256:10def3befd716a054cd6e98fcdb9ad8e04e5b57ab6c14176cd7a60d45d3ad03f 0.1s done
+#51 naming to docker.io/banco-xyz/discovery-server:1.0.0 0.0s done
+#51 unpacking to docker.io/banco-xyz/discovery-server:1.0.0 0.0s done
+#51 DONE 0.6s
+
+#52 [auth-server] exporting to image
+#52 exporting layers done
+#52 exporting manifest sha256:695f6333804b9ef3f50c83afd7b7d923a886a09ebf4d308a05c862cc00b43c3b 0.0s done
+#52 exporting config sha256:810d17658e974c1b3636e2e0ff7548566d678faa134c0aef56ce23b971a26791 0.0s done
+#52 exporting attestation manifest sha256:02f4546264ad1b99b3e7214fc131252bdfdc610dfc1c9f7390e7c470e3946a8d 0.2s done
+#52 exporting manifest list sha256:2e0f74e79af11c5116af52deafdf646b250de8b3fb48b344fb767fd1d6b504db 0.1s done
+#52 naming to docker.io/banco-xyz/auth-server:1.0.0 0.0s done
+#52 unpacking to docker.io/banco-xyz/auth-server:1.0.0 0.0s done
+#52 DONE 0.6s
+
+#53 [movimientos-service] exporting to image
+#53 exporting layers done
+#53 exporting manifest sha256:a350af3d561253ff67a7ca0f1d96f02ef3d10562ed9eea3926a9e27f2fa8488d 0.0s done
+#53 exporting config sha256:5c440d72007bea86ea7bf853636158a5a89bc82a063b28a8682f64549aca58e2 0.0s done
+#53 exporting attestation manifest sha256:38b1f3958ebc38d179718f75bffee918f9ba5dbec61cd7384edfd09c68b49006 0.2s done
+#53 exporting manifest list sha256:ee5906d6b118cba2b6cf6a47d19f4550b7f3796689c7d81117c252839b4c6074 0.1s done
+#53 naming to docker.io/banco-xyz/movimientos-service:1.0.0 0.0s done
+#53 unpacking to docker.io/banco-xyz/movimientos-service:1.0.0 0.0s done
+#53 DONE 0.6s
+
+#54 [cuentas-service] exporting to image
+#54 exporting layers done
+#54 exporting manifest sha256:6cdfb0604907a4a8f9d498d8a4fa5278da39d0e173eb7716adef9822c75c2bc2 0.0s done
+#54 exporting config sha256:bb385b79a52aa72effb0e27a080a75b82e67624e97c3532cb8e4edaf85f3cb8c 0.0s done
+#54 exporting attestation manifest sha256:a2bd41e199bf17d83defb619ef270fb4e4795f4b746eabf10fa2d5c35aa7533a 0.2s done
+#54 exporting manifest list sha256:a37847311034197843fe18c79caa233fe23cea740d9f134986b800baec69cb5e 0.1s done
+#54 naming to docker.io/banco-xyz/cuentas-service:1.0.0 0.0s done
+#54 unpacking to docker.io/banco-xyz/cuentas-service:1.0.0 0.0s done
+#54 DONE 0.6s
+
+#55 [api-gateway] exporting to image
+#55 exporting layers done
+#55 exporting manifest sha256:6bccc3e1c6680f2894ea4e9d3b3e1240a269e4323ee8e9035315b8065a9c08db 0.0s done
+#55 exporting config sha256:a1f4fed92708362201e52c32f8af4ec25778b56701e96d586acb911a92beb60d 0.0s done
+#55 exporting attestation manifest sha256:a96cfc885880f40ef7a5fda0cc76b7e417d1714636c7a06ccb2cb309b80a5f52 0.2s done
+#55 exporting manifest list sha256:3b8dbef3b845ea81d45f50253982773e781ccb4d0eea73be558edbe1fc9b86a4 0.1s done
+#55 naming to docker.io/banco-xyz/api-gateway:1.0.0 0.0s done
+#55 unpacking to docker.io/banco-xyz/api-gateway:1.0.0 0.0s done
+#55 DONE 0.6s
+
+#56 [config-server] exporting to image
+#56 exporting layers done
+#56 exporting manifest sha256:fda2e3f74c70c89bafea063119116ebe51cc881ce04f82f85435ac95fb4cdaa7 0.0s done
+#56 exporting config sha256:e039e3131054f1ad4164a46307a31b0881eff223f92cdc111ec7984a972f3770 0.0s done
+#56 exporting attestation manifest sha256:b0ec854ca774aee1f5bcac10ac5107f95a6d70ff2578a039050b0487dd8cf49b 0.2s done
+#56 exporting manifest list sha256:74f33703db8c2017fa825a601f706fb46e403a6abf14b0b3387544e948e07df6 0.1s done
+#56 naming to docker.io/banco-xyz/config-server:1.0.0 0.0s done
+#56 unpacking to docker.io/banco-xyz/config-server:1.0.0 0.0s done
+#56 DONE 0.6s
+
+#57 [discovery-server] resolving provenance for metadata file
+#57 DONE 0.3s
+
+#58 [cuentas-service] resolving provenance for metadata file
+#58 DONE 0.2s
+
+#59 [config-server] resolving provenance for metadata file
+#59 DONE 0.1s
+
+#60 [movimientos-service] resolving provenance for metadata file
+#60 DONE 0.3s
+
+#61 [auth-server] resolving provenance for metadata file
+#61 DONE 0.2s
+
+#62 [api-gateway] resolving provenance for metadata file
+#62 DONE 0.1s
+
+#63 [broker-artemis] resolving provenance for metadata file
+#63 DONE 0.0s
+ Image banco-xyz/movimientos-service:1.0.0 Built 
+ Image banco-xyz/api-gateway:1.0.0 Built 
+ Image banco-xyz/auth-server:1.0.0 Built 
+ Image banco-xyz/broker-artemis:1.0.0 Built 
+ Image banco-xyz/config-server:1.0.0 Built 
+ Image banco-xyz/cuentas-service:1.0.0 Built 
+ Image banco-xyz/discovery-server:1.0.0 Built 
+banco-xyz/cuentas-service:1.0.0  721MB
+banco-xyz/broker-artemis:1.0.0  651MB
+banco-xyz/movimientos-service:1.0.0  729MB
+banco-xyz/discovery-server:1.0.0  693MB
+banco-xyz/api-gateway:1.0.0  689MB
+banco-xyz/auth-server:1.0.0  678MB
+banco-xyz/config-server:1.0.0  641MB

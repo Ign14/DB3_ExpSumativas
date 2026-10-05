@@ -1,0 +1,42 @@
+
+========== Version de Java y Maven ==========
+openjdk version "21.0.10" 2026-01-20
+OpenJDK Runtime Environment (build 21.0.10+7-Ubuntu-124.04)
+OpenJDK 64-Bit Server VM (build 21.0.10+7-Ubuntu-124.04, mixed mode, sharing)
+Apache Maven 3.9.9 (8e8579a9e76f7d015ee5ec7bfcdc97d260186937)
+Maven home: /root/.m2/wrapper/dists/apache-maven-3.9.9/3477a4f1
+
+========== Compilacion del reactor y ejecucion de las pruebas ==========
+[INFO] Building banco-xyz-microservicios 1.0.0                            [1/9]
+[INFO] Building common-events 1.0.0                                       [2/9]
+[INFO] Building broker-artemis 1.0.0                                      [3/9]
+[INFO] Building config-server 1.0.0                                       [4/9]
+[INFO] Building discovery-server 1.0.0                                    [5/9]
+[INFO] Building auth-server 1.0.0                                         [6/9]
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.993 s -- in cl.duoc.bancoxyz.auth.config.AuthorizationServerConfigTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Building api-gateway 1.0.0                                         [7/9]
+[INFO] Building cuentas-service 1.0.0                                     [8/9]
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.237 s -- in cl.duoc.bancoxyz.cuentas.service.RetiroServiceTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.108 s -- in cl.duoc.bancoxyz.cuentas.domain.CuentaRepositoryEnMemoriaTest
+[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Building movimientos-service 1.0.0                                 [9/9]
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.963 s -- in cl.duoc.bancoxyz.movimientos.cliente.CuentasGatewayHttpTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.594 s -- in cl.duoc.bancoxyz.movimientos.cliente.PoliticaResilienciaTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.754 s -- in cl.duoc.bancoxyz.movimientos.cliente.ResilienciaCableadaTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in cl.duoc.bancoxyz.movimientos.util.FechaLegacyParserTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s -- in cl.duoc.bancoxyz.movimientos.mensajeria.ConsumidorRetirosTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s -- in cl.duoc.bancoxyz.movimientos.service.FichaCuentaServiceTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.202 s -- in cl.duoc.bancoxyz.movimientos.domain.MovimientoRepositoryEnMemoriaTest
+[INFO] Tests run: 47, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Reactor Summary for banco-xyz-microservicios 1.0.0:
+[INFO] banco-xyz-microservicios ........................... SUCCESS [  0.115 s]
+[INFO] common-events ...................................... SUCCESS [  2.186 s]
+[INFO] broker-artemis ..................................... SUCCESS [  1.485 s]
+[INFO] config-server ...................................... SUCCESS [  0.703 s]
+[INFO] discovery-server ................................... SUCCESS [  0.881 s]
+[INFO] auth-server ........................................ SUCCESS [  3.926 s]
+[INFO] api-gateway ........................................ SUCCESS [  0.619 s]
+[INFO] cuentas-service .................................... SUCCESS [  2.284 s]
+[INFO] movimientos-service ................................ SUCCESS [ 16.160 s]
+[INFO] BUILD SUCCESS

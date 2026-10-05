@@ -1,0 +1,237 @@
+
+========== Configuracion que el Config Server entrega a cada microservicio ==========
+--- cuentas-service
+{
+    "name": "cuentas-service",
+    "profiles": [
+        "default"
+    ],
+    "label": null,
+    "version": null,
+    "state": null,
+    "propertySources": [
+        {
+            "name": "classpath:/configuracion-central/cuentas-service.yml",
+            "source": {
+                "server.port": 8081,
+                "spring.security.oauth2.resourceserver.jwt.issuer-uri": "${AUTH_ISSUER_URI:http://localhost:9000}",
+                "spring.security.oauth2.resourceserver.jwt.jwk-set-uri": "${AUTH_ISSUER_URI:http://localhost:9000}/oauth2/jwks",
+                "spring.artemis.mode": "native",
+                "spring.artemis.broker-url": "tcp://${ARTEMIS_HOST:localhost}:61616?callTimeout=4000&connectionTTL=30000",
+                "spring.artemis.user": "${ARTEMIS_USER:artemis}",
+                "spring.artemis.password": "${ARTEMIS_PASSWORD:artemis}",
+                "banco.cuentas.limite-retiro-por-operacion": 500000
+            }
+        },
+        {
+            "name": "classpath:/configuracion-central/application.yml",
+            "source": {
+                "eureka.client.service-url.defaultZone": "http://${EUREKA_USER:banco-eureka}:${EUREKA_PASSWORD:banco-eureka-secret}@${EUREKA_HOST:localhost}:8761/eureka/",
+                "eureka.client.register-with-eureka": true,
+                "eureka.client.fetch-registry": true,
+                "eureka.client.registry-fetch-interval-seconds": 5,
+                "eureka.client.disable-delta": true,
+                "eureka.instance.prefer-ip-address": true,
+                "eureka.instance.lease-renewal-interval-in-seconds": 10,
+                "management.endpoints.web.exposure.include": "health,info,circuitbreakers,circuitbreakerevents,retries,retryevents",
+                "management.endpoint.health.show-details": "when-authorized",
+                "management.endpoint.health.probes.enabled": true,
+                "logging.level.root": "INFO",
+                "logging.level.cl.duoc.bancoxyz": "INFO"
+            }
+        }
+    ]
+}
+--- movimientos-service
+{
+    "name": "movimientos-service",
+    "profiles": [
+        "default"
+    ],
+    "label": null,
+    "version": null,
+    "state": null,
+    "propertySources": [
+        {
+            "name": "classpath:/configuracion-central/movimientos-service.yml",
+            "source": {
+                "server.port": 8082,
+                "spring.security.oauth2.resourceserver.jwt.issuer-uri": "${AUTH_ISSUER_URI:http://localhost:9000}",
+                "spring.security.oauth2.resourceserver.jwt.jwk-set-uri": "${AUTH_ISSUER_URI:http://localhost:9000}/oauth2/jwks",
+                "spring.security.oauth2.client.registration.cuentas-client.provider": "banco-auth",
+                "spring.security.oauth2.client.registration.cuentas-client.client-id": "movimientos-service",
+                "spring.security.oauth2.client.registration.cuentas-client.client-secret": "${MOVIMIENTOS_CLIENT_SECRET:movimientos-secret}",
+                "spring.security.oauth2.client.registration.cuentas-client.authorization-grant-type": "client_credentials",
+                "spring.security.oauth2.client.registration.cuentas-client.scope": "cuentas.read",
+                "spring.security.oauth2.client.provider.banco-auth.token-uri": "${AUTH_ISSUER_URI:http://localhost:9000}/oauth2/token",
+                "spring.artemis.mode": "native",
+                "spring.artemis.broker-url": "tcp://${ARTEMIS_HOST:localhost}:61616?callTimeout=4000&connectionTTL=30000",
+                "spring.artemis.user": "${ARTEMIS_USER:artemis}",
+                "spring.artemis.password": "${ARTEMIS_PASSWORD:artemis}",
+                "banco.cuentas-service.url": "http://${CUENTAS_HOST:localhost}:8081",
+                "resilience4j.circuitbreaker.instances.cuentas.register-health-indicator": true,
+                "resilience4j.circuitbreaker.instances.cuentas.event-consumer-buffer-size": 100,
+                "resilience4j.circuitbreaker.instances.cuentas.sliding-window-type": "COUNT_BASED",
+                "resilience4j.circuitbreaker.instances.cuentas.sliding-window-size": 10,
+                "resilience4j.circuitbreaker.instances.cuentas.minimum-number-of-calls": 4,
+                "resilience4j.circuitbreaker.instances.cuentas.failure-rate-threshold": 50,
+                "resilience4j.circuitbreaker.instances.cuentas.wait-duration-in-open-state": "10s",
+                "resilience4j.circuitbreaker.instances.cuentas.permitted-number-of-calls-in-half-open-state": 3,
+                "resilience4j.circuitbreaker.instances.cuentas.automatic-transition-from-open-to-half-open-enabled": true,
+                "resilience4j.circuitbreaker.instances.cuentas.record-exceptions[0]": "cl.duoc.bancoxyz.common.excepcion.ServicioNoDisponibleException",
+                "resilience4j.circuitbreaker.instances.cuentas.record-exceptions[1]": "java.util.concurrent.TimeoutException",
+                "resilience4j.retry.instances.cuentas.max-attempts": 2,
+                "resilience4j.retry.instances.cuentas.wait-duration": "200ms",
+                "resilience4j.retry.instances.cuentas.event-consumer-buffer-size": 100,
+                "resilience4j.retry.instances.cuentas.retry-exceptions[0]": "cl.duoc.bancoxyz.common.excepcion.ServicioNoDisponibleException",
+                "resilience4j.retry.instances.cuentas.retry-exceptions[1]": "java.util.concurrent.TimeoutException",
+                "resilience4j.retry.instances.cuentas.ignore-exceptions[0]": "io.github.resilience4j.circuitbreaker.CallNotPermittedException",
+                "resilience4j.retry.instances.cuentas.ignore-exceptions[1]": "cl.duoc.bancoxyz.common.excepcion.LlamadaRechazadaException",
+                "resilience4j.timelimiter.instances.cuentas.timeout-duration": "2s",
+                "resilience4j.timelimiter.instances.cuentas.cancel-running-future": true
+            }
+        },
+        {
+            "name": "classpath:/configuracion-central/application.yml",
+            "source": {
+                "eureka.client.service-url.defaultZone": "http://${EUREKA_USER:banco-eureka}:${EUREKA_PASSWORD:banco-eureka-secret}@${EUREKA_HOST:localhost}:8761/eureka/",
+                "eureka.client.register-with-eureka": true,
+                "eureka.client.fetch-registry": true,
+                "eureka.client.registry-fetch-interval-seconds": 5,
+                "eureka.client.disable-delta": true,
+                "eureka.instance.prefer-ip-address": true,
+                "eureka.instance.lease-renewal-interval-in-seconds": 10,
+                "management.endpoints.web.exposure.include": "health,info,circuitbreakers,circuitbreakerevents,retries,retryevents",
+                "management.endpoint.health.show-details": "when-authorized",
+                "management.endpoint.health.probes.enabled": true,
+                "logging.level.root": "INFO",
+                "logging.level.cl.duoc.bancoxyz": "INFO"
+            }
+        }
+    ]
+}
+--- api-gateway
+{
+    "name": "api-gateway",
+    "profiles": [
+        "default"
+    ],
+    "label": null,
+    "version": null,
+    "state": null,
+    "propertySources": [
+        {
+            "name": "classpath:/configuracion-central/api-gateway.yml",
+            "source": {
+                "server.port": 8080,
+                "spring.security.oauth2.resourceserver.jwt.issuer-uri": "${AUTH_ISSUER_URI:http://localhost:9000}",
+                "spring.security.oauth2.resourceserver.jwt.jwk-set-uri": "${AUTH_ISSUER_URI:http://localhost:9000}/oauth2/jwks",
+                "spring.cloud.gateway.discovery.locator.enabled": false,
+                "spring.cloud.gateway.routes[0].id": "cuentas-service",
+                "spring.cloud.gateway.routes[0].uri": "lb://cuentas-service",
+                "spring.cloud.gateway.routes[0].predicates[0]": "Path=/api/cuentas/**",
+                "spring.cloud.gateway.routes[0].filters[0]": "StripPrefix=1",
+                "spring.cloud.gateway.routes[1].id": "movimientos-service",
+                "spring.cloud.gateway.routes[1].uri": "lb://movimientos-service",
+                "spring.cloud.gateway.routes[1].predicates[0]": "Path=/api/movimientos/**",
+                "spring.cloud.gateway.routes[1].filters[0]": "StripPrefix=1"
+            }
+        },
+        {
+            "name": "classpath:/configuracion-central/application.yml",
+            "source": {
+                "eureka.client.service-url.defaultZone": "http://${EUREKA_USER:banco-eureka}:${EUREKA_PASSWORD:banco-eureka-secret}@${EUREKA_HOST:localhost}:8761/eureka/",
+                "eureka.client.register-with-eureka": true,
+                "eureka.client.fetch-registry": true,
+                "eureka.client.registry-fetch-interval-seconds": 5,
+                "eureka.client.disable-delta": true,
+                "eureka.instance.prefer-ip-address": true,
+                "eureka.instance.lease-renewal-interval-in-seconds": 10,
+                "management.endpoints.web.exposure.include": "health,info,circuitbreakers,circuitbreakerevents,retries,retryevents",
+                "management.endpoint.health.show-details": "when-authorized",
+                "management.endpoint.health.probes.enabled": true,
+                "logging.level.root": "INFO",
+                "logging.level.cl.duoc.bancoxyz": "INFO"
+            }
+        }
+    ]
+}
+--- auth-server
+{
+    "name": "auth-server",
+    "profiles": [
+        "default"
+    ],
+    "label": null,
+    "version": null,
+    "state": null,
+    "propertySources": [
+        {
+            "name": "classpath:/configuracion-central/auth-server.yml",
+            "source": {
+                "server.port": 9000,
+                "spring.security.oauth2.authorizationserver.issuer": "${AUTH_ISSUER_URI:http://localhost:9000}",
+                "banco.oauth2.clientes.banco-web": "${WEB_CLIENT_SECRET:banco-web-secret}",
+                "banco.oauth2.clientes.cajero": "${CAJERO_CLIENT_SECRET:cajero-secret}",
+                "banco.oauth2.clientes.movimientos-service": "${MOVIMIENTOS_CLIENT_SECRET:movimientos-secret}"
+            }
+        },
+        {
+            "name": "classpath:/configuracion-central/application.yml",
+            "source": {
+                "eureka.client.service-url.defaultZone": "http://${EUREKA_USER:banco-eureka}:${EUREKA_PASSWORD:banco-eureka-secret}@${EUREKA_HOST:localhost}:8761/eureka/",
+                "eureka.client.register-with-eureka": true,
+                "eureka.client.fetch-registry": true,
+                "eureka.client.registry-fetch-interval-seconds": 5,
+                "eureka.client.disable-delta": true,
+                "eureka.instance.prefer-ip-address": true,
+                "eureka.instance.lease-renewal-interval-in-seconds": 10,
+                "management.endpoints.web.exposure.include": "health,info,circuitbreakers,circuitbreakerevents,retries,retryevents",
+                "management.endpoint.health.show-details": "when-authorized",
+                "management.endpoint.health.probes.enabled": true,
+                "logging.level.root": "INFO",
+                "logging.level.cl.duoc.bancoxyz": "INFO"
+            }
+        }
+    ]
+}
+
+========== Confirmacion en los logs de que la configuracion vino del Config Server ==========
+2026-10-01T07:17:34.968Z  INFO 21064 --- [cuentas-service] [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://localhost:8888
+2026-10-01T07:17:34.984Z  INFO 21064 --- [cuentas-service] [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Located environment: name=cuentas-service, profiles=[default], label=null, version=null, state=null
+2026-10-01T07:17:35.496Z  INFO 21065 --- [movimientos-service] [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://localhost:8888
+2026-10-01T07:17:35.499Z  INFO 21065 --- [movimientos-service] [           main] o.s.c.c.c.ConfigServerConfigDataLoader   : Located environment: name=movimientos-service, profiles=[default], label=null, version=null, state=null
+
+========== Servicios registrados en Eureka ==========
+API-GATEWAY            192.0.2.2:8080   UP
+AUTH-SERVER            192.0.2.2:9000   UP
+CUENTAS-SERVICE        192.0.2.2:8081   UP
+MOVIMIENTOS-SERVICE    192.0.2.2:8082   UP
+
+========== El gateway resuelve por nombre de servicio, no por host y puerto ==========
+Las rutas que el Config Server le entrega al gateway:
+spring.cloud.gateway.routes[0].filters[0] = StripPrefix=1
+spring.cloud.gateway.routes[0].id = cuentas-service
+spring.cloud.gateway.routes[0].predicates[0] = Path=/api/cuentas/**
+spring.cloud.gateway.routes[0].uri = lb://cuentas-service
+spring.cloud.gateway.routes[1].filters[0] = StripPrefix=1
+spring.cloud.gateway.routes[1].id = movimientos-service
+spring.cloud.gateway.routes[1].predicates[0] = Path=/api/movimientos/**
+spring.cloud.gateway.routes[1].uri = lb://movimientos-service
+
+El balanceador de carga del gateway resolviendo esos nombres:
+2026-10-01T07:18:27.318Z  WARN 21066 --- [api-gateway] [     parallel-2] o.s.c.l.core.RoundRobinLoadBalancer      : No servers available for service: movimientos-service
+2026-10-01T07:18:30.340Z  WARN 21066 --- [api-gateway] [     parallel-2] o.s.c.l.core.RoundRobinLoadBalancer      : No servers available for service: movimientos-service
+2026-10-01T07:18:33.361Z  WARN 21066 --- [api-gateway] [     parallel-2] o.s.c.l.core.RoundRobinLoadBalancer      : No servers available for service: movimientos-service
+(si no hay lineas, es que no hubo nada que reportar: la resolucion por nombre
+ solo deja traza cuando falla. Se ve funcionando en la seccion 04, donde las
+ peticiones a /api/** llegan a los microservicios sin que el gateway conozca
+ su host ni su puerto.)
+
+{
+    "status": "UP",
+    "groups": [
+        "liveness",
+        "readiness"
+    ]
+}

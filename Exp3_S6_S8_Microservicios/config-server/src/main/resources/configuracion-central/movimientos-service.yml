@@ -1,0 +1,102 @@
+server:
+  port: 8082
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AUTH_ISSUER_URI:http://localhost:9000}
+          # Indicar el jwk-set-uri explicitamente evita que este servicio
+          # consulte los metadatos del auth-server durante el arranque: baja a
+          # buscar la clave publica la primera vez que valida un token. Asi el
+          # orden de arranque entre servicios deja de ser critico, sin perder la
+          # validacion del issuer, que sigue activa por la linea anterior.
+          jwk-set-uri: ${AUTH_ISSUER_URI:http://localhost:9000}/oauth2/jwks
+      # Este servicio es ademas cliente OAuth2: para llamar a cuentas-service
+      # necesita su propio token, que obtiene por client_credentials.
+      client:
+        registration:
+          cuentas-client:
+            provider: banco-auth
+            client-id: movimientos-service
+            client-secret: ${MOVIMIENTOS_CLIENT_SECRET:movimientos-secret}
+            authorization-grant-type: client_credentials
+            scope: cuentas.read
+        provider:
+          banco-auth:
+            token-uri: ${AUTH_ISSUER_URI:http://localhost:9000}/oauth2/token
+  artemis:
+    mode: native
+    # callTimeout acota cuanto espera el cliente una respuesta del broker. Por
+    # defecto son 30 s, y ese es el tiempo que un broker colgado dejaria
+    # bloqueado el hilo que atiende el retiro antes de poder responder.
+    broker-url: tcp://${ARTEMIS_HOST:localhost}:61616?callTimeout=4000&connectionTTL=30000
+    user: ${ARTEMIS_USER:artemis}
+    password: ${ARTEMIS_PASSWORD:artemis}
+
+banco:
+  cuentas-service:
+    url: http://${CUENTAS_HOST:localhost}:8081
+
+# Tolerancia a fallos sobre la llamada saliente hacia cuentas-service.
+#
+# Los numeros forman un presupuesto de tiempo que tiene que ser coherente con los
+# timeouts del cliente HTTP (1 s de conexion + 1 s de lectura = 2 s por intento,
+# en ClienteCuentasConfig):
+#
+#   por intento:  2 s de HTTP, acotados por el TimeLimiter en 2 s
+#   peor caso:    2 s + 0,2 s de espera + 2 s = 4,2 s para la respuesta degradada
+#
+# Si el TimeLimiter fuera mas corto que el peor caso del HTTP, cortaria la espera
+# del cliente pero dejaria la peticion viva ocupando un hilo; si fuera mas largo,
+# el que acotaria de verdad seria el cliente HTTP y el TimeLimiter no serviria de
+# nada.
+resilience4j:
+  circuitbreaker:
+    instances:
+      cuentas:
+        register-health-indicator: true
+        # Sin buffer no hay historial de eventos que mostrar en
+        # /actuator/circuitbreakerevents ni /actuator/retryevents.
+        event-consumer-buffer-size: 100
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        # Con 2 intentos por peticion, bastan 2 peticiones fallidas para tener
+        # datos suficientes y abrir el circuito.
+        minimum-number-of-calls: 4
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+        # Solo cuenta como fallo que el servicio no responda. Un 404 significa
+        # que respondio bien y la cuenta no existe: si contara como fallo,
+        # consultar cuentas inexistentes abriria el circuito de las validas.
+        # Y LlamadaRechazadaException (401, 403, 400) tampoco esta: es un problema
+        # de configuracion permanente, y abrir el circuito solo lo disfrazaria de
+        # caida pasajera.
+        record-exceptions:
+          - cl.duoc.bancoxyz.common.excepcion.ServicioNoDisponibleException
+          - java.util.concurrent.TimeoutException
+  retry:
+    instances:
+      cuentas:
+        # Dos intentos, no tres: contra un servicio caido, el tercero agrega mas
+        # de dos segundos a la espera del usuario para muy poca probabilidad extra
+        # de exito. El fallo sostenido lo resuelve el circuit breaker, no insistir.
+        max-attempts: 2
+        wait-duration: 200ms
+        event-consumer-buffer-size: 100
+        retry-exceptions:
+          - cl.duoc.bancoxyz.common.excepcion.ServicioNoDisponibleException
+          - java.util.concurrent.TimeoutException
+        # Reintentar contra un circuito abierto es gastar tiempo en algo que ya
+        # sabemos que va a fallar: se va directo al fallback.
+        ignore-exceptions:
+          - io.github.resilience4j.circuitbreaker.CallNotPermittedException
+          - cl.duoc.bancoxyz.common.excepcion.LlamadaRechazadaException
+  timelimiter:
+    instances:
+      cuentas:
+        timeout-duration: 2s
+        cancel-running-future: true

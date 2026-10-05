@@ -1,0 +1,55 @@
+
+========== Salud de los siete contenedores ==========
+$ docker compose ps
+NAME                  IMAGE                                 COMMAND                  SERVICE               CREATED              STATUS                        PORTS
+api-gateway           banco-xyz/api-gateway:1.0.0           "java -XX:MaxRAMPercÔÇª"   api-gateway           About a minute ago   Up 58 seconds (healthy)       0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
+auth-server           banco-xyz/auth-server:1.0.0           "java -XX:MaxRAMPercÔÇª"   auth-server           About a minute ago   Up About a minute (healthy)   0.0.0.0:9000->9000/tcp, [::]:9000->9000/tcp
+broker-artemis        banco-xyz/broker-artemis:1.0.0        "java -XX:MaxRAMPercÔÇª"   broker-artemis        About a minute ago   Up About a minute (healthy)   0.0.0.0:61617->61617/tcp, [::]:61617->61617/tcp
+config-server         banco-xyz/config-server:1.0.0         "java -XX:MaxRAMPercÔÇª"   config-server         About a minute ago   Up About a minute (healthy)   0.0.0.0:8888->8888/tcp, [::]:8888->8888/tcp
+cuentas-service       banco-xyz/cuentas-service:1.0.0       "java -XX:MaxRAMPercÔÇª"   cuentas-service       About a minute ago   Up 30 seconds (healthy)       0.0.0.0:8081->8081/tcp, [::]:8081->8081/tcp
+discovery-server      banco-xyz/discovery-server:1.0.0      "java -XX:MaxRAMPercÔÇª"   discovery-server      About a minute ago   Up About a minute (healthy)   0.0.0.0:8761->8761/tcp, [::]:8761->8761/tcp
+movimientos-service   banco-xyz/movimientos-service:1.0.0   "java -XX:MaxRAMPercÔÇª"   movimientos-service   About a minute ago   Up About a minute (healthy)   0.0.0.0:8082->8082/tcp, [::]:8082->8082/tcp
+
+========== Registro final de Eureka ==========
+$ curl -u *** http://localhost:8761/eureka/apps
+{"applications":{"versions__delta":"1","apps__hashcode":"UP_4_","application":[{"name":"AUTH-SERVER","instance":[{"instanceId":"763085634d4d:auth-server:9000","hostName":"172.22.0.7","app":"AUTH-SERVER","ipAddr":"172.22.0.7","status":"UP","overriddenStatus":"UNKNOWN","port":{"$":9000,"@enabled":"true"},"securePort":{"$":443,"@enabled":"false"},"countryId":1,"dataCenterInfo":{"@class":"com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo","name":"MyOwn"},"leaseInfo":{"renewalIntervalInSecs":10,"durationInSecs":90,"registrationTimestamp":1791215451206,"lastRenewalTimestamp":1791215571115,"evictionTimestamp":0,"serviceUpTimestamp":1791215451207},"metadata":{"management.port":"9000"},"homePageUrl":"http://172.22.0.7:9000/","statusPageUrl":"http://172.22.0.7:9000/actuator/info","healthCheckUrl":"http://172.22.0.7:9000/actuator/health","vipAddress":"auth-server","secureVipAddress":"auth-server","isCoordinatingDiscoveryServer":"false","lastUpdatedTimestamp":"1791215451207","lastDirtyTimestamp":"1791215450914","actionType":"ADDED"}]},{"name":"MOVIMIENTOS-SERVICE","instance":[{"instanceId":"423bff8c63d0:movimientos-service:8082","hostName":"172.22.0.6","app":"MOVIMIENTOS-SERVICE","ipAddr":"172.22.0.6","status":"UP","overriddenStatus":"UNKNOWN","port":{"$":8082,"@enabled":"true"},"securePort":{"$":443,"@enabled":"false"},"countryId":1,"dataCenterInfo":{"@class":"com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo","name":"MyOwn"},"leaseInfo":{"renewalIntervalInSecs":10,"durationInSecs":90,"registrationTimestamp":1791215452568,"lastRenewalTimestamp":1791215572657,"evictionTimestamp":0,"serviceUpTimestamp":1791215452568},"metadata":{"management.port":"8082"},"homePageUrl":"http://172.22.0.6:8082/","statusPageUrl":"http://172.22.0.6:8082/actuator/info","healthCheckUrl":"http://172.22.0.6:8082/actuator/health","vipAddress":"movimientos-service","secureVipAddress":"movimientos-service","isCoordinatingDiscoveryServer":"false","lastUpdatedTimestamp":"1791215452568","lastDirtyTimestamp":"1791215452468","actionType":"ADDED"}]},{"name":"API-GATEWAY","instance":[{"instanceId":"a72b97217f0b:api-gateway:8080","hostName":"172.22.0.8","app":"API-GATEWAY","ipAddr":"172.22.0.8","status":"UP","overriddenStatus":"UNKNOWN","port":{"$":8080,"@enabled":"true"},"securePort":{"$":443,"@enabled":"false"},"countryId":1,"dataCenterInfo":{"@class":"com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo","name":"MyOwn"},"leaseInfo":{"renewalIntervalInSecs":10,"durationInSecs":90,"registrationTimestamp":1791215461129,"lastRenewalTimestamp":1791215571156,"evictionTimestamp":0,"serviceUpTimestamp":1791215461129},"metadata":{"management.port":"8080"},"homePageUrl":"http://172.22.0.8:8080/","statusPageUrl":"http://172.22.0.8:8080/actuator/info","healthCheckUrl":"http://172.22.0.8:8080/actuator/health","vipAddress":"api-gateway","secureVipAddress":"api-gateway","isCoordinatingDiscoveryServer":"false","lastUpdatedTimestamp":"1791215461129","lastDirtyTimestamp":"1791215461020","actionType":"ADDED"}]},{"name":"CUENTAS-SERVICE","instance":[{"instanceId":"370a40e7a059:cuentas-service:8081","hostName":"172.22.0.5","app":"CUENTAS-SERVICE","ipAddr":"172.22.0.5","status":"UP","overriddenStatus":"UNKNOWN","port":{"$":8081,"@enabled":"true"},"securePort":{"$":443,"@enabled":"false"},"countryId":1,"dataCenterInfo":{"@class":"com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo","name":"MyOwn"},"leaseInfo":{"renewalIntervalInSecs":10,"durationInSecs":90,"registrationTimestamp":1791215488539,"lastRenewalTimestamp":1791215488539,"evictionTimestamp":0,"serviceUpTimestamp":1791215488539},"metadata":{"management.port":"8081"},"homePageUrl":"http://172.22.0.5:8081/","statusPageUrl":"http://172.22.0.5:8081/actuator/info","healthCheckUrl":"http://172.22.0.5:8081/actuator/health","vipAddress":"cuentas-service","secureVipAddress":"cuentas-service","isCoordinatingDiscoveryServer":"false","lastUpdatedTimestamp":"1791215488539","lastDirtyTimestamp":"1791215488425","actionType":"ADDED"}]}]}}
+
+========== Bajando la orquestacion ==========
+$ docker compose down
+docker :  Container api-gateway Stopping 
+En C:\Users\ignac\Documents\Portafolio_Profesional\Estudios_y_Cursos\AAnalista_Programador\DESARROLLO DE BACKEND 
+lll\banco-xyz-batch\banco-xyz-batch\Exp3_S6_S8_Microservicios\evidencia\generar_evidencia_docker.ps1: 374 Carácter: 32
++ Correr 'docker compose down' { docker compose down }
++                                ~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( Container api-gateway Stopping :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ Container cuentas-service Stopping 
+ Container movimientos-service Stopping 
+ Container cuentas-service Stopped 
+ Container cuentas-service Removing 
+ Container cuentas-service Removed 
+ Container api-gateway Stopped 
+ Container api-gateway Removing 
+ Container api-gateway Removed 
+ Container auth-server Stopping 
+ Container movimientos-service Stopped 
+ Container movimientos-service Removing 
+ Container movimientos-service Removed 
+ Container broker-artemis Stopping 
+ Container auth-server Stopped 
+ Container auth-server Removing 
+ Container auth-server Removed 
+ Container config-server Stopping 
+ Container discovery-server Stopping 
+ Container broker-artemis Stopped 
+ Container broker-artemis Removing 
+ Container broker-artemis Removed 
+ Container config-server Stopped 
+ Container config-server Removing 
+ Container config-server Removed 
+ Container discovery-server Stopped 
+ Container discovery-server Removing 
+ Container discovery-server Removed 
+ Network banco-xyz-microservicios_banco Removing 
+ Network banco-xyz-microservicios_banco Removed

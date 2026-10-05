@@ -1,0 +1,54 @@
+
+========== Resumen de la cuenta 114 antes de nada ==========
+{
+    "cuentaId": 114,
+    "totalMovimientos": 41,
+    "totalDepositos": 23500,
+    "totalEgresos": 63500,
+    "ultimaFecha": "2024-12-29"
+}
+
+========== Se detiene movimientos-service, el consumidor de la cola ==========
+movimientos-service responde: sin respuesta (puerto cerrado)
+
+========== Un retiro con el consumidor caido: se aprueba igual y el evento se publica ==========
+{
+    "cuentaId": 114,
+    "montoSolicitado": 300,
+    "saldoResultante": 7700,
+    "aprobado": true,
+    "motivoRechazo": null,
+    "eventoId": "2abb7987-e9e7-4ca4-b113-91cc1787afe2",
+    "eventoPublicado": true
+}
+
+========== El saldo ya bajo, aunque el historial todavia no se puede consultar ==========
+{
+    "cuentaId": 114,
+    "nombreTitular": "Unknown",
+    "edad": 35,
+    "tipoCuenta": "ahorro",
+    "saldo": 7700
+}
+
+========== Vuelve movimientos-service y procesa el evento que estaba en la cola ==========
+  movimientos-service levantado (pid 21656)
+  esperando a movimientos-service ...... listo
+{
+    "cuentaId": 114,
+    "totalMovimientos": 42,
+    "totalDepositos": 23500,
+    "totalEgresos": 63800,
+    "ultimaFecha": "2026-10-01"
+}
+[
+    {
+        "cuentaId": 114,
+        "fecha": "2026-10-01",
+        "tipoMovimiento": "retiro",
+        "monto": 300,
+        "descripcion": "Retiro por canal cajero-sin-consumidor"
+    }
+]
+2026-10-01T07:19:24.039Z  INFO 21656 --- [movimientos-service] [           main] .d.b.m.c.ObservabilidadResilienciaConfig : >> movimientos-service: eventos de resiliencia de la instancia 'cuentas' registrados en el log
+2026-10-01T07:19:27.850Z  INFO 21656 --- [movimientos-service] [ntContainer#0-1] c.d.b.m.mensajeria.ConsumidorRetiros     : >> movimientos-service: evento 2abb7987-e9e7-4ca4-b113-91cc1787afe2 consumido, retiro de 300 agregado al historial de la cuenta 114

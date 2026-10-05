@@ -1,0 +1,147 @@
+
+========== Carga del dataset legacy en cada microservicio ==========
+2026-10-01T07:17:47.381Z  INFO 21064 --- [cuentas-service] [           main] c.d.b.c.d.CuentaRepositoryEnMemoria      : >> cuentas-service: 1000 filas leidas = 399 validas + 601 omitidas por datos inconsistentes
+2026-10-01T07:17:47.384Z  INFO 21064 --- [cuentas-service] [           main] c.d.b.c.d.CuentaRepositoryEnMemoria      : >> cuentas-service: 50 cuentas distintas cargadas
+2026-10-01T07:17:52.913Z  INFO 21065 --- [movimientos-service] [           main] c.d.b.m.d.MovimientoRepositoryEnMemoria  : >> movimientos-service: 1000 filas leidas = 686 movimientos validos + 314 omitidos por datos inconsistentes
+2026-10-01T07:17:52.913Z  INFO 21065 --- [movimientos-service] [           main] c.d.b.m.d.MovimientoRepositoryEnMemoria  : >> movimientos-service: historial cargado para 20 cuentas distintas
+
+========== GET /api/cuentas (primeras 3 cuentas de las cargadas) ==========
+total de cuentas: 50
+[
+  {
+    "cuentaId": 101,
+    "nombreTitular": "Charlie Green",
+    "edad": 100,
+    "tipoCuenta": "prestamo",
+    "saldo": 8000
+  },
+  {
+    "cuentaId": 102,
+    "nombreTitular": "Diana Prince",
+    "edad": 30,
+    "tipoCuenta": "hipoteca",
+    "saldo": 12000
+  },
+  {
+    "cuentaId": 103,
+    "nombreTitular": "Bob Johnson",
+    "edad": 30,
+    "tipoCuenta": "ahorro",
+    "saldo": 7000
+  }
+]
+
+========== GET /api/cuentas/103 ==========
+{
+    "cuentaId": 103,
+    "nombreTitular": "Bob Johnson",
+    "edad": 30,
+    "tipoCuenta": "ahorro",
+    "saldo": 7000
+}
+
+========== POST /api/cuentas/103/retiro (el septimo endpoint; el flujo completo esta en la seccion 05) ==========
+{
+    "cuentaId": 103,
+    "montoSolicitado": 100,
+    "saldoResultante": 6900,
+    "aprobado": true,
+    "motivoRechazo": null,
+    "eventoId": "fe487ceb-e511-4e6b-b75e-095b0d21466c",
+    "eventoPublicado": true
+}
+
+========== GET /api/cuentas/999999 (cuenta inexistente) ==========
+{"mensaje":"La cuenta 999999 no existe."}
+HTTP 404
+
+========== GET /api/movimientos/103?limite=3 ==========
+[
+    {
+        "cuentaId": 103,
+        "fecha": "2026-10-01",
+        "tipoMovimiento": "retiro",
+        "monto": 100,
+        "descripcion": "Retiro por canal web"
+    },
+    {
+        "cuentaId": 103,
+        "fecha": "2024-12-23",
+        "tipoMovimiento": "retiro",
+        "monto": 2500,
+        "descripcion": "Sin descripcion"
+    },
+    {
+        "cuentaId": 103,
+        "fecha": "2024-12-19",
+        "tipoMovimiento": "compra",
+        "monto": 5000,
+        "descripcion": "Retiro parcial"
+    }
+]
+
+========== GET /api/movimientos/103/resumen ==========
+{
+    "cuentaId": 103,
+    "totalMovimientos": 30,
+    "totalDepositos": 10500,
+    "totalEgresos": 61100,
+    "ultimaFecha": "2026-10-01"
+}
+
+========== GET /api/movimientos/103/ficha (agregacion entre los dos microservicios) ==========
+{
+  "cuentaId": 103,
+  "cuenta": {
+    "cuentaId": 103,
+    "nombreTitular": "Bob Johnson",
+    "edad": 30,
+    "tipoCuenta": "ahorro",
+    "saldo": 6900
+  },
+  "origenDatosCuenta": "SERVICIO",
+  "resumen": {
+    "cuentaId": 103,
+    "totalMovimientos": 30,
+    "totalDepositos": 10500,
+    "totalEgresos": 61100,
+    "ultimaFecha": "2026-10-01"
+  },
+  "movimientos": [
+    {
+      "cuentaId": 103,
+      "fecha": "2024-01-27",
+      "tipoMovimiento": "retiro",
+      "monto": 2000,
+      "descripcion": "Ingreso mensual"
+    },
+    {
+      "cuentaId": 103,
+      "fecha": "2024-02-12",
+      "tipoMovimiento": "compra",
+      "monto": 3000,
+      "descripcion": "Compra en tienda"
+    },
+    "... recortado para la evidencia"
+  ]
+}
+
+========== Validaciones de parametros: limite fuera de rango y no numerico ==========
+{"mensaje":"El parametro 'limite' debe estar entre 1 y 20."}
+HTTP 400
+{"mensaje":"El parametro 'limite' debe estar entre 1 y 20."}
+HTTP 400
+{"mensaje":"El parametro 'limite' tiene un valor invalido."}
+HTTP 400
+
+========== POST /api/movimientos: un registro valido se acepta con 201 ==========
+{"cuentaId":103,"fecha":"2024-06-15","tipoMovimiento":"deposito","monto":1200,"descripcion":"Sin descripcion"}
+HTTP 201
+(la fecha llego en formato legacy y el tipo con tilde y mayuscula; la
+ descripcion venia en blanco. Los tres se normalizaron al registrar.)
+
+========== POST /api/movimientos con datos invalidos (misma validacion que la carga del CSV) ==========
+{"mensaje":"El movimiento no cumple las reglas del dominio: fecha interpretable, monto mayor que cero y tipo entre compra, deposito, pago o retiro."}
+HTTP 400
+{"mensaje":"El movimiento no cumple las reglas del dominio: fecha interpretable, monto mayor que cero y tipo entre compra, deposito, pago o retiro."}
+HTTP 400

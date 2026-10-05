@@ -1,0 +1,42 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    # Perfil "native": la configuracion se sirve desde el classpath del propio
+    # servidor y no desde un repositorio Git remoto. Es la opcion adecuada para
+    # una entrega academica reproducible: quien clone el repositorio levanta el
+    # ecosistema completo sin depender de credenciales ni de un repo externo.
+    # En produccion se cambiaria a un backend Git versionado.
+    active: native
+  security:
+    user:
+      name: ${CONFIG_USER:banco-config}
+      password: ${CONFIG_PASSWORD:banco-config-secret}
+  cloud:
+    config:
+      server:
+        native:
+          # El directorio NO se llama "config" a proposito: classpath:/config es
+          # una de las ubicaciones desde las que Spring Boot carga la
+          # configuracion de la propia aplicacion, y con mas precedencia que
+          # classpath:/. El Config Server terminaria aplicandose a si mismo la
+          # configuracion escrita para sus clientes.
+          search-locations: classpath:/configuracion-central
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    cl.duoc.bancoxyz: INFO

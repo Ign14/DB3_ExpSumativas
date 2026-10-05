@@ -1,0 +1,48 @@
+# Configuracion comun a todos los microservicios que consumen este Config
+# Server. Lo que esta aqui no se repite en el jar de cada servicio: cambiarlo
+# en un solo lugar cambia el comportamiento de todo el ecosistema.
+
+eureka:
+  client:
+    service-url:
+      # Las credenciales viajan en la URL porque es la forma en que el cliente
+      # de Eureka envia autenticacion basica.
+      defaultZone: http://${EUREKA_USER:banco-eureka}:${EUREKA_PASSWORD:banco-eureka-secret}@${EUREKA_HOST:localhost}:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+    # Por defecto el cliente refresca su copia del registro cada 30 segundos y
+    # pide solo los cambios (delta). Eso tiene dos efectos molestos en un
+    # ecosistema chico: tras levantar un servicio, el gateway tarda hasta medio
+    # minuto en poder enrutar hacia el, y si una instancia se reinicia con el
+    # mismo identificador, el delta puede traer la baja de la instancia anterior
+    # despues del alta de la nueva y dejarla fuera del cache del cliente hasta
+    # el refresco siguiente. Con un refresco corto y el registro completo en
+    # cada consulta, el costo es despreciable para siete componentes y el
+    # registro converge en segundos.
+    registry-fetch-interval-seconds: 5
+    disable-delta: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # Se exponen los endpoints de Resilience4j para poder observar el
+        # estado del circuit breaker durante la demostracion.
+        include: health,info,circuitbreakers,circuitbreakerevents,retries,retryevents
+  endpoint:
+    health:
+      # No "always": el healthcheck de Docker solo necesita el estado, y el
+      # detalle completo nombra el Config Server, los property sources en uso y
+      # el inventario de servicios registrados. Es reconocimiento gratuito para
+      # quien alcance el puerto sin credenciales.
+      show-details: when-authorized
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    cl.duoc.bancoxyz: INFO

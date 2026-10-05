@@ -1,0 +1,100 @@
+
+========== Levantando la orquestacion completa ==========
+$ docker compose up -d
+docker :  Network banco-xyz-microservicios_banco Creating 
+En C:\Users\ignac\Documents\Portafolio_Profesional\Estudios_y_Cursos\AAnalista_Programador\DESARROLLO DE BACKEND 
+lll\banco-xyz-batch\banco-xyz-batch\Exp3_S6_S8_Microservicios\evidencia\generar_evidencia_docker.ps1: 164 Carácter: 33
++ Correr 'docker compose up -d' { docker compose up -d }
++                                 ~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( Network banco-...banco Creating :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ Network banco-xyz-microservicios_banco Created 
+ Container config-server Creating 
+ Container broker-artemis Creating 
+ Container discovery-server Creating 
+ Container broker-artemis Created 
+ Container discovery-server Created 
+ Container config-server Created 
+ Container auth-server Creating 
+ Container cuentas-service Creating 
+ Container movimientos-service Creating 
+ Container cuentas-service Created 
+ Container auth-server Created 
+ Container api-gateway Creating 
+ Container movimientos-service Created 
+ Container api-gateway Created 
+ Container discovery-server Starting 
+ Container broker-artemis Starting 
+ Container config-server Starting 
+ Container broker-artemis Started 
+ Container discovery-server Started 
+ Container config-server Started 
+ Container config-server Waiting 
+ Container discovery-server Waiting 
+ Container discovery-server Waiting 
+ Container broker-artemis Waiting 
+ Container discovery-server Waiting 
+ Container config-server Waiting 
+ Container broker-artemis Waiting 
+ Container config-server Waiting 
+ Container config-server Healthy 
+ Container discovery-server Healthy 
+ Container config-server Healthy 
+ Container discovery-server Healthy 
+ Container discovery-server Healthy 
+ Container auth-server Starting 
+ Container broker-artemis Healthy 
+ Container cuentas-service Starting 
+ Container config-server Healthy 
+ Container broker-artemis Healthy 
+ Container movimientos-service Starting 
+ Container cuentas-service Started 
+ Container movimientos-service Started 
+ Container auth-server Started 
+ Container config-server Waiting 
+ Container discovery-server Waiting 
+ Container auth-server Waiting 
+ Container discovery-server Healthy 
+ Container config-server Healthy 
+ Container auth-server Healthy 
+ Container api-gateway Starting 
+ Container api-gateway Started
+
+========== Estado de los contenedores ==========
+La columna de salud es la que importa: docker-compose encadena el orden de
+arranque con condition: service_healthy contra el endpoint de salud real de
+cada servicio, no solo con depends_on.
+$ docker compose ps
+NAME                  IMAGE                                 COMMAND                  SERVICE               CREATED          STATUS                    PORTS
+api-gateway           banco-xyz/api-gateway:1.0.0           "java -XX:MaxRAMPercÔÇª"   api-gateway           38 seconds ago   Up 10 seconds (healthy)   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
+auth-server           banco-xyz/auth-server:1.0.0           "java -XX:MaxRAMPercÔÇª"   auth-server           39 seconds ago   Up 26 seconds (healthy)   0.0.0.0:9000->9000/tcp, [::]:9000->9000/tcp
+broker-artemis        banco-xyz/broker-artemis:1.0.0        "java -XX:MaxRAMPercÔÇª"   broker-artemis        39 seconds ago   Up 37 seconds (healthy)   0.0.0.0:61617->61617/tcp, [::]:61617->61617/tcp
+config-server         banco-xyz/config-server:1.0.0         "java -XX:MaxRAMPercÔÇª"   config-server         39 seconds ago   Up 37 seconds (healthy)   0.0.0.0:8888->8888/tcp, [::]:8888->8888/tcp
+cuentas-service       banco-xyz/cuentas-service:1.0.0       "java -XX:MaxRAMPercÔÇª"   cuentas-service       39 seconds ago   Up 26 seconds (healthy)   0.0.0.0:8081->8081/tcp, [::]:8081->8081/tcp
+discovery-server      banco-xyz/discovery-server:1.0.0      "java -XX:MaxRAMPercÔÇª"   discovery-server      39 seconds ago   Up 37 seconds (healthy)   0.0.0.0:8761->8761/tcp, [::]:8761->8761/tcp
+movimientos-service   banco-xyz/movimientos-service:1.0.0   "java -XX:MaxRAMPercÔÇª"   movimientos-service   39 seconds ago   Up 26 seconds (healthy)   0.0.0.0:8082->8082/tcp, [::]:8082->8082/tcp
+
+========== Estado y puertos publicados de cada contenedor ==========
+$ docker ps --filter label=com.docker.compose.project=banco-xyz-microservicios
+api-gateway  Up 10 seconds (healthy)  0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
+movimientos-service  Up 26 seconds (healthy)  0.0.0.0:8082->8082/tcp, [::]:8082->8082/tcp
+auth-server  Up 26 seconds (healthy)  0.0.0.0:9000->9000/tcp, [::]:9000->9000/tcp
+cuentas-service  Up 26 seconds (healthy)  0.0.0.0:8081->8081/tcp, [::]:8081->8081/tcp
+config-server  Up 37 seconds (healthy)  0.0.0.0:8888->8888/tcp, [::]:8888->8888/tcp
+broker-artemis  Up 37 seconds (healthy)  0.0.0.0:61617->61617/tcp, [::]:61617->61617/tcp
+discovery-server  Up 37 seconds (healthy)  0.0.0.0:8761->8761/tcp, [::]:8761->8761/tcp
+$ docker network ls --filter name=banco
+NETWORK ID     NAME                             DRIVER    SCOPE
+5b52deba1b0d   banco-xyz-batch_default          bridge    local
+9fae842227fd   banco-xyz-microservicios_banco   bridge    local
+
+========== La resolucion por nombre funciona dentro de la red ==========
+Se consulta el Config Server desde dentro del contenedor del gateway, usando
+el nombre de servicio como host. No hay IPs ni puertos escritos a mano.
+$ docker compose exec -T api-gateway curl -s -u *** http://config-server:8888/api-gateway/default
+{"name":"api-gateway","profiles":["default"],"label":null,"version":null,"state":null,"propertySources":[{"name":"classpath:/configuracion-central/api-gateway.yml","source":{"server.port":8080,"spring.security.oauth2.resourceserver.jwt.issuer-uri":"${AUTH_ISSUER_URI:http://localhost:9000}","spring.security.oauth2.resourceserver.jwt.jwk-set-uri":"${AUTH_ISSUER_URI:http://localhost:9000}/oauth2/jwks","spring.cloud.gateway.discovery.locator.enabled":false,"spring.cloud.gateway.routes[0].id":"cuentas-service","spring.cloud.gateway.routes[0].uri":"lb://cuentas-service","spring.cloud.gateway.routes[0].predicates[0]":"Path=/api/cuentas/**","spring.cloud.gateway.routes[0].filters[0]":"StripPrefix=1","spring.cloud.gateway.routes[1].id":"movimientos-service","spring.cloud.gateway.routes[1].uri":"lb://movimientos-service","spring.cloud.gateway.routes[1].predicates[0]":"Path=/api/movimientos/**","spring.cloud.gateway.routes[1].filters[0]":"StripPrefix=1"}},{"name":"classpath:/configuracion-central/application.yml","source":{"eureka.client.service-url.defaultZone":"http://${EUREKA_USER:banco-eureka}:${EUREKA_PASSWORD:banco-eureka-secret}@${EUREKA_HOST:localhost}:8761/eureka/","eureka.client.register-with-eureka":true,"eureka.client.fetch-registry":true,"eureka.client.registry-fetch-interval-seconds":5,"eureka.client.disable-delta":true,"eureka.instance.prefer-ip-address":true,"eureka.instance.lease-renewal-interval-in-seconds":10,"management.endpoints.web.exposure.include":"health,info,circuitbreakers,circuitbreakerevents,retries,retryevents","management.endpoint.health.show-details":"when-authorized","management.endpoint.health.probes.enabled":true,"logging.level.root":"INFO","logging.level.cl.duoc.bancoxyz":"INFO"}}]}
+
+========== Servicios registrados en Eureka ==========
+$ curl -u *** http://localhost:8761/eureka/apps
+{"applications":{"versions__delta":"1","apps__hashcode":"UP_3_","application":[{"name":"AUTH-SERVER","instance":[{"instanceId":"763085634d4d:auth-server:9000","hostName":"172.22.0.7","app":"AUTH-SERVER","ipAddr":"172.22.0.7","status":"UP","overriddenStatus":"UNKNOWN","port":{"$":9000,"@enabled":"true"},"securePort":{"$":443,"@enabled":"false"},"countryId":1,"dataCenterInfo":{"@class":"com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo","name":"MyOwn"},"leaseInfo":{"renewalIntervalInSecs":10,"durationInSecs":90,"registrationTimestamp":1791215451206,"lastRenewalTimestamp":1791215451206,"evictionTimestamp":0,"serviceUpTimestamp":1791215451207},"metadata":{"management.port":"9000"},"homePageUrl":"http://172.22.0.7:9000/","statusPageUrl":"http://172.22.0.7:9000/actuator/info","healthCheckUrl":"http://172.22.0.7:9000/actuator/health","vipAddress":"auth-server","secureVipAddress":"auth-server","isCoordinatingDiscoveryServer":"false","lastUpdatedTimestamp":"1791215451207","lastDirtyTimestamp":"1791215450914","actionType":"ADDED"}]},{"name":"MOVIMIENTOS-SERVICE","instance":[{"instanceId":"423bff8c63d0:movimientos-service:8082","hostName":"172.22.0.6","app":"MOVIMIENTOS-SERVICE","ipAddr":"172.22.0.6","status":"UP","overriddenStatus":"UNKNOWN","port":{"$":8082,"@enabled":"true"},"securePort":{"$":443,"@enabled":"false"},"countryId":1,"dataCenterInfo":{"@class":"com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo","name":"MyOwn"},"leaseInfo":{"renewalIntervalInSecs":10,"durationInSecs":90,"registrationTimestamp":1791215452568,"lastRenewalTimestamp":1791215452568,"evictionTimestamp":0,"serviceUpTimestamp":1791215452568},"metadata":{"management.port":"8082"},"homePageUrl":"http://172.22.0.6:8082/","statusPageUrl":"http://172.22.0.6:8082/actuator/info","healthCheckUrl":"http://172.22.0.6:8082/actuator/health","vipAddress":"movimientos-service","secureVipAddress":"movimientos-service","isCoordinatingDiscoveryServer":"false","lastUpdatedTimestamp":"1791215452568","lastDirtyTimestamp":"1791215452468","actionType":"ADDED"}]},{"name":"CUENTAS-SERVICE","instance":[{"instanceId":"370a40e7a059:cuentas-service:8081","hostName":"172.22.0.5","app":"CUENTAS-SERVICE","ipAddr":"172.22.0.5","status":"UP","overriddenStatus":"UNKNOWN","port":{"$":8081,"@enabled":"true"},"securePort":{"$":443,"@enabled":"false"},"countryId":1,"dataCenterInfo":{"@class":"com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo","name":"MyOwn"},"leaseInfo":{"renewalIntervalInSecs":10,"durationInSecs":90,"registrationTimestamp":1791215451206,"lastRenewalTimestamp":1791215451206,"evictionTimestamp":0,"serviceUpTimestamp":1791215451207},"metadata":{"management.port":"8081"},"homePageUrl":"http://172.22.0.5:8081/","statusPageUrl":"http://172.22.0.5:8081/actuator/info","healthCheckUrl":"http://172.22.0.5:8081/actuator/health","vipAddress":"cuentas-service","secureVipAddress":"cuentas-service","isCoordinatingDiscoveryServer":"false","lastUpdatedTimestamp":"1791215451207","lastDirtyTimestamp":"1791215450909","actionType":"ADDED"}]}]}}

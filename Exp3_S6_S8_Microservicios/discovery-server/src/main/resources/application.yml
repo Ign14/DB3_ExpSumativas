@@ -1,0 +1,52 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: discovery-server
+  security:
+    user:
+      name: ${EUREKA_USER:banco-eureka}
+      password: ${EUREKA_PASSWORD:banco-eureka-secret}
+
+eureka:
+  instance:
+    # Tiene que coincidir con el host de la URL de abajo. El servidor arma su lista
+    # de nodos pares desde service-url y descarta de esa lista su propia URL
+    # comparandola con este nombre; si no coinciden, se trata a si mismo como otro
+    # nodo y se replica a si mismo, lo que llena el log de timeouts de lectura.
+    hostname: ${EUREKA_SELF_HOST:localhost}
+  client:
+    # El propio servidor de registro no se registra en si mismo.
+    register-with-eureka: false
+    fetch-registry: false
+    # Aunque no se registre, el servidor usa esta URL para la replicacion entre
+    # nodos. Al poner autenticacion basica en /eureka/**, sin credenciales aqui el
+    # propio servidor se habla a si mismo sin autenticarse y cada tarea de
+    # replicacion falla con 401 ("discarding N replication tasks"). Con un solo
+    # nodo el registro local funciona igual, asi que el sintoma es solo un log
+    # lleno de errores; con dos nodos la replicacion quedaria caida.
+    service-url:
+      defaultZone: http://${EUREKA_USER:banco-eureka}:${EUREKA_PASSWORD:banco-eureka-secret}@${eureka.instance.hostname}:${server.port:8761}/eureka/
+  server:
+    # Se desactiva el modo de autoproteccion: en un ecosistema de desarrollo
+    # con pocos servicios, mantener registros de instancias ya caidas confunde
+    # mas de lo que ayuda.
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 5000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.netflix.eureka: WARN
+    com.netflix.discovery: WARN

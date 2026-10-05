@@ -1,0 +1,123 @@
+
+========== Estado del circuito con cuentas-service arriba ==========
+{
+    "circuitBreakers": {
+        "cuentas": {
+            "failureRate": "-1.0%",
+            "slowCallRate": "-1.0%",
+            "failureRateThreshold": "50.0%",
+            "slowCallRateThreshold": "100.0%",
+            "bufferedCalls": 1,
+            "failedCalls": 0,
+            "slowCalls": 0,
+            "slowFailedCalls": 0,
+            "notPermittedCalls": 0,
+            "state": "CLOSED"
+        }
+    }
+}
+
+========== Ficha completa: los datos de cuenta vienen del servicio ==========
+origenDatosCuenta: SERVICIO
+cuenta: {"cuentaId": 110, "nombreTitular": "Charlie Green", "edad": 25, "tipoCuenta": "prestamo", "saldo": 9500}
+movimientos en el historial: 29
+
+========== Se detiene cuentas-service para provocar el fallo ==========
+cuentas-service responde: sin respuesta (puerto cerrado)
+
+========== Lo que cuesta responder degradado, antes y despues de que el circuito se abra ==========
+El presupuesto de tiempo acota el PEOR caso: 2 s de TimeLimiter + 0,2 s de
+espera + 2 s del reintento = 4,2 s. Ese peor caso es un servicio que acepta
+la conexion y no contesta. Un servicio caido, como este, es el caso facil:
+el sistema operativo rechaza la conexion de inmediato y cada intento falla
+en milisegundos, asi que lo que se mide es basicamente la espera entre
+reintentos. Con el circuito abierto se ahorra tambien esa espera, y sobre
+todo se deja de molestar a un servicio que esta intentando arrancar.
+circuito cerrado, reintentando: 0.248802 s
+
+========== Siete consultas seguidas con la dependencia caida ==========
+intento 1: origen = DEGRADADO | movimientos = 29 | cuenta = None
+intento 2: origen = DEGRADADO | movimientos = 29 | cuenta = None
+intento 3: origen = DEGRADADO | movimientos = 29 | cuenta = None
+intento 4: origen = DEGRADADO | movimientos = 29 | cuenta = None
+intento 5: origen = DEGRADADO | movimientos = 29 | cuenta = None
+intento 6: origen = DEGRADADO | movimientos = 29 | cuenta = None
+intento 7: origen = DEGRADADO | movimientos = 29 | cuenta = None
+
+========== Con el circuito ya abierto, la misma consulta vuelve de inmediato ==========
+circuito abierto, directo al fallback: 0.032806 s
+
+========== El circuito quedo abierto y las llamadas ya no salen a la red ==========
+{
+    "circuitBreakers": {
+        "cuentas": {
+            "failureRate": "50.0%",
+            "slowCallRate": "0.0%",
+            "failureRateThreshold": "50.0%",
+            "slowCallRateThreshold": "100.0%",
+            "bufferedCalls": 4,
+            "failedCalls": 2,
+            "slowCalls": 0,
+            "slowFailedCalls": 0,
+            "notPermittedCalls": 8,
+            "state": "OPEN"
+        }
+    }
+}
+
+========== Transiciones registradas por Resilience4j ==========
+07:18:48 CLOSED_TO_OPEN
+
+========== El historial propio sigue respondiendo normal: la degradacion es parcial ==========
+[{"cuentaId":110,"fecha":"2026-10-01","tipoMovimiento":"retiro","monto":500,"descripcion":"Retiro por canal cajero"},{"cuentaId":110,"fecha":"2024-12-24","tipoMovimiento":"retiro","monto":3000,"descripcion":"Retiro parcial"}]
+HTTP 200
+
+========== Trazas del fallback ==========
+2026-10-01T07:18:48.583Z  WARN 21065 --- [movimientos-service] [nio-8082-exec-3] c.d.b.m.c.CuentasClienteResiliente       : >> movimientos-service: cuenta 110 servida en modo degradado por CallNotPermittedException: CircuitBreaker 'cuentas' is OPEN and does not permit further calls
+2026-10-01T07:18:48.625Z  WARN 21065 --- [movimientos-service] [nio-8082-exec-4] c.d.b.m.c.CuentasClienteResiliente       : >> movimientos-service: cuenta 110 servida en modo degradado por CallNotPermittedException: CircuitBreaker 'cuentas' is OPEN and does not permit further calls
+2026-10-01T07:18:48.661Z  WARN 21065 --- [movimientos-service] [nio-8082-exec-5] c.d.b.m.c.CuentasClienteResiliente       : >> movimientos-service: cuenta 110 servida en modo degradado por CallNotPermittedException: CircuitBreaker 'cuentas' is OPEN and does not permit further calls
+2026-10-01T07:18:48.728Z  WARN 21065 --- [movimientos-service] [nio-8082-exec-6] c.d.b.m.c.CuentasClienteResiliente       : >> movimientos-service: cuenta 110 servida en modo degradado por CallNotPermittedException: CircuitBreaker 'cuentas' is OPEN and does not permit further calls
+2026-10-01T07:18:48.770Z  WARN 21065 --- [movimientos-service] [nio-8082-exec-7] c.d.b.m.c.CuentasClienteResiliente       : >> movimientos-service: cuenta 110 servida en modo degradado por CallNotPermittedException: CircuitBreaker 'cuentas' is OPEN and does not permit further calls
+
+========== Se vuelve a levantar cuentas-service ==========
+  cuentas-service levantado (pid 21540)
+  esperando a cuentas-service ..... listo
+esperando el paso a HALF_OPEN (wait-duration-in-open-state = 10 s)...
+
+========== El circuito prueba, le resulta y se cierra solo ==========
+intento 1: origen = SERVICIO
+intento 2: origen = SERVICIO
+intento 3: origen = SERVICIO
+intento 4: origen = SERVICIO
+{
+    "circuitBreakers": {
+        "cuentas": {
+            "failureRate": "-1.0%",
+            "slowCallRate": "-1.0%",
+            "failureRateThreshold": "50.0%",
+            "slowCallRateThreshold": "100.0%",
+            "bufferedCalls": 1,
+            "failedCalls": 0,
+            "slowCalls": 0,
+            "slowFailedCalls": 0,
+            "notPermittedCalls": 0,
+            "state": "CLOSED"
+        }
+    }
+}
+
+========== El gateway vuelve a enrutar hacia la instancia reiniciada ==========
+  esperando a que el gateway vuelva a enrutar  listo
+GET /api/cuentas/110 -> 200
+
+========== Ciclo completo de transiciones ==========
+07:18:48 CLOSED_TO_OPEN
+07:18:58 OPEN_TO_HALF_OPEN
+07:19:11 HALF_OPEN_TO_CLOSED
+
+========== Reintentos y transiciones, tal como quedan en el log del servicio ==========
+2026-10-01T07:18:48.149Z  WARN 21065 --- [movimientos-service] [      cuentas-3] .d.b.m.c.ObservabilidadResilienciaConfig : >> resiliencia: REINTENTO 1 hacia cuentas tras ServicioNoDisponibleException - No se pudo consultar la cuenta 110 en cuentas-service
+2026-10-01T07:18:48.361Z  WARN 21065 --- [movimientos-service] [      cuentas-4] .d.b.m.c.ObservabilidadResilienciaConfig : >> resiliencia: CIRCUITO cuentas paso de CLOSED a OPEN
+2026-10-01T07:18:48.362Z  WARN 21065 --- [movimientos-service] [      cuentas-4] .d.b.m.c.ObservabilidadResilienciaConfig : >> resiliencia: se agotaron los 2 intentos hacia cuentas
+2026-10-01T07:18:58.363Z  WARN 21065 --- [movimientos-service] [ransitionThread] .d.b.m.c.ObservabilidadResilienciaConfig : >> resiliencia: CIRCUITO cuentas paso de OPEN a HALF_OPEN
+2026-10-01T07:19:11.903Z  WARN 21065 --- [movimientos-service] [      cuentas-7] .d.b.m.c.ObservabilidadResilienciaConfig : >> resiliencia: CIRCUITO cuentas paso de HALF_OPEN a CLOSED

@@ -1,0 +1,53 @@
+server:
+  # Puerto HTTP solo para el endpoint de salud: es lo que docker-compose
+  # consulta para no arrancar los microservicios antes que el broker.
+  port: 61617
+
+spring:
+  application:
+    name: broker-artemis
+  artemis:
+    mode: embedded
+    embedded:
+      enabled: true
+      # Sin persistencia a disco: el ecosistema se levanta y se baja completo
+      # en cada demostracion, y un journal sobreviviente solo haria que una
+      # ejecucion arrastrara eventos de la anterior.
+      persistent: false
+      # Artemis crea igual algunos directorios de trabajo: se los deja fuera del
+      # directorio de la aplicacion para no ensuciar ni el repositorio ni la
+      # imagen de Docker.
+      data-directory: ${java.io.tmpdir}/artemis-banco
+      # La cola se declara aqui y no en los microservicios, para que exista
+      # aunque el consumidor todavia no haya arrancado y ningun evento se
+      # pierda por orden de arranque.
+      queues: banco.retiros
+
+management:
+  health:
+    # El indicador JMS de Spring Boot usa la factoria de conexiones embebida,
+    # que no lleva credenciales: con la autenticacion encendida reportaria DOWN
+    # con el broker sano. Se reemplaza por un indicador propio que le pregunta
+    # al servidor, en SaludBrokerIndicator.
+    jms:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+banco:
+  broker:
+    # Las credenciales que los microservicios usan para conectarse. En Docker se
+    # pasan por variable de entorno; en local valen los valores por defecto.
+    usuario: ${ARTEMIS_USER:artemis}
+    clave: ${ARTEMIS_PASSWORD:artemis}
+
+logging:
+  level:
+    root: INFO
+    org.apache.activemq.artemis: INFO
