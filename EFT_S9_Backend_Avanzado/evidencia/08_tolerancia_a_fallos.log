@@ -1,0 +1,77 @@
+
+==============================================================
+  08 - TOLERANCIA A FALLOS CON RESILIENCE4J
+==============================================================
+Se detiene cuentas-service y se observa el ciclo completo del circuit
+breaker sobre la ficha de cuenta, que es la llamada saliente de
+pagos-service hacia cuentas-service.
+
+--- Estado inicial del circuito ---
+   cuentas: CLOSED  fallos=-1.0%
+
+--- La ficha con cuentas-service arriba ---
+   origenDatosCuenta: SERVICIO
+   cuenta: {"cuentaId": 101, "nombreTitular": "John Doe", "edad": 40, "tipoCuenta": "prestamo", "saldo": 5550}
+
+--- Se detiene cuentas-service ---
+   cuentas-service detenido (pid 5589)
+
+--- Seis peticiones consecutivas: el circuito se abre y la respuesta se degrada ---
+   peticion 1: origenDatosCuenta=DEGRADADO  circuito=CLOSED
+   peticion 2: origenDatosCuenta=DEGRADADO  circuito=OPEN
+   peticion 3: origenDatosCuenta=DEGRADADO  circuito=OPEN
+   peticion 4: origenDatosCuenta=DEGRADADO  circuito=OPEN
+   peticion 5: origenDatosCuenta=DEGRADADO  circuito=OPEN
+   peticion 6: origenDatosCuenta=DEGRADADO  circuito=OPEN
+
+--- La respuesta degradada sigue sirviendo el historial, que es el dato buscado ---
+   origenDatosCuenta: DEGRADADO
+   cuenta: None
+   movimientos entregados: 40
+   resumen: {"cuentaId": 101, "totalMovimientos": 40, "totalDepositos": 21200, "totalEgresos": 51900, "ultimaFecha": "2026-10-08"}
+
+--- La apertura del circuito salio al topico de alertas ---
+2026-10-08T18:19:35.612Z  INFO 6201 --- [pagos-service] [           main] .d.b.p.c.ObservabilidadResilienciaConfig : >> pagos-service: eventos de resiliencia de la instancia 'cuentas' registrados en el log y las transiciones del circuito publicadas en el topico banco.alertas-seguridad
+2026-10-08T18:20:39.536Z  WARN 6201 --- [pagos-service] [      cuentas-5] .d.b.p.c.ObservabilidadResilienciaConfig : >> resiliencia: CIRCUITO cuentas paso de CLOSED a OPEN
+2026-10-08T18:20:39.557Z  INFO 6201 --- [pagos-service] [      cuentas-5] c.d.b.p.m.PublicadorEventosKafka         : >> pagos-service: alerta DEPENDENCIA_DEGRADADA publicada en banco.alertas-seguridad (severidad ALTA)
+-- y clientes-service la recibio:
+2026-10-08T18:20:39.561Z ERROR 5591 --- [clientes-service] [ntainer#1-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: ALERTA ALTA DEPENDENCIA_DEGRADADA sobre la cuenta null - El circuito hacia cuentas se abrio: las llamadas se responden degradadas sin intentar la dependencia.
+
+--- Una transferencia con la dependencia caida se rechaza, no se degrada ---
+   POST /api/pagos/transferencia/101 -> HTTP 500
+   No hay version degradada de mover dinero: o se mueve o se informa el fallo.
+
+--- Se vuelve a levantar cuentas-service ---
+>> arrancando cuentas-service
+   cuentas-service UP (tras 11s)
+   el gateway ya enruta hacia el servicio (tras 1s)
+
+--- El circuito pasa a HALF_OPEN y se cierra solo ---
+   peticion 1: origenDatosCuenta=SERVICIO   circuito=HALF_OPEN
+   peticion 2: origenDatosCuenta=SERVICIO   circuito=HALF_OPEN
+   peticion 3: origenDatosCuenta=SERVICIO   circuito=CLOSED
+   peticion 4: origenDatosCuenta=SERVICIO   circuito=CLOSED
+   peticion 5: origenDatosCuenta=SERVICIO   circuito=CLOSED
+   peticion 6: origenDatosCuenta=SERVICIO   circuito=CLOSED
+   peticion 7: origenDatosCuenta=SERVICIO   circuito=CLOSED
+   peticion 8: origenDatosCuenta=SERVICIO   circuito=CLOSED
+
+--- Transiciones del circuito registradas por Resilience4j ---
+   2026-10-08T18:20:39 CLOSED_TO_OPEN
+   2026-10-08T18:20:49 OPEN_TO_HALF_OPEN
+   2026-10-08T18:21:09 HALF_OPEN_TO_CLOSED
+
+--- Reintentos registrados ---
+   RETRY: 2
+   ERROR: 2
+   IGNORED_ERROR: 6
+   total de eventos de reintento: 10
+
+--- Eventos de resiliencia en el log del servicio ---
+2026-10-08T18:20:38.989Z  WARN 6201 --- [pagos-service] [      cuentas-2] .d.b.p.c.ObservabilidadResilienciaConfig : >> resiliencia: REINTENTO 1 hacia cuentas tras ServicioNoDisponibleException - No se pudo consultar la cuenta 101 en cuentas-service
+2026-10-08T18:20:39.205Z  WARN 6201 --- [pagos-service] [      cuentas-3] .d.b.p.c.ObservabilidadResilienciaConfig : >> resiliencia: se agotaron los 2 intentos hacia cuentas
+2026-10-08T18:20:39.312Z  WARN 6201 --- [pagos-service] [      cuentas-4] .d.b.p.c.ObservabilidadResilienciaConfig : >> resiliencia: REINTENTO 1 hacia cuentas tras ServicioNoDisponibleException - No se pudo consultar la cuenta 101 en cuentas-service
+2026-10-08T18:20:39.536Z  WARN 6201 --- [pagos-service] [      cuentas-5] .d.b.p.c.ObservabilidadResilienciaConfig : >> resiliencia: CIRCUITO cuentas paso de CLOSED a OPEN
+2026-10-08T18:20:39.557Z  WARN 6201 --- [pagos-service] [      cuentas-5] .d.b.p.c.ObservabilidadResilienciaConfig : >> resiliencia: se agotaron los 2 intentos hacia cuentas
+2026-10-08T18:20:49.539Z  WARN 6201 --- [pagos-service] [ransitionThread] .d.b.p.c.ObservabilidadResilienciaConfig : >> resiliencia: CIRCUITO cuentas paso de OPEN a HALF_OPEN
+2026-10-08T18:21:09.492Z  WARN 6201 --- [pagos-service] [      cuentas-8] .d.b.p.c.ObservabilidadResilienciaConfig : >> resiliencia: CIRCUITO cuentas paso de HALF_OPEN a CLOSED

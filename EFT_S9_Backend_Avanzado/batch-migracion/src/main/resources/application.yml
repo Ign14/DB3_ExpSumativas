@@ -1,0 +1,82 @@
+spring:
+  application:
+    name: batch-migracion
+
+  # Perfil activo por defecto: dev (H2 embebido) para poder ejecutar y validar
+  # el proyecto sin depender de un servidor externo. Para un despliegue real se
+  # activa el perfil "postgres", documentado en application-postgres.yml y en la
+  # sección 7 de despliegue.md.
+  profiles:
+    active: dev
+
+  batch:
+    job:
+      # Se desactiva el auto-arranque de todos los Jobs al levantar el contexto:
+      # los tres procesos se lanzan explícitamente desde JobLauncherRunner
+      # según el argumento --job=..., lo que permite ejecutarlos de forma
+      # individual y repetible (necesario para las pruebas de escalado).
+      enabled: false
+    jdbc:
+      initialize-schema: always
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+    open-in-view: false
+
+# ---------------------------------------------------------------------------
+# Parámetros propios del proyecto: rutas de entrada y configuración de
+# escalado/tolerancia a fallos. Se definen aquí (y no "hardcodeados" en el
+# código) para poder ajustarlos por línea de comandos, por ejemplo:
+#   java -jar batch-migracion.jar --job=transacciones --batch.partition.grid-size=8
+# ---------------------------------------------------------------------------
+batch:
+  input:
+    transacciones-path: classpath:data/movimientos_financieros_diarios.csv
+    intereses-path: classpath:data/intereses_trimestrales.csv
+    cuentas-anuales-path: classpath:data/estados_financieros_anuales.csv
+  partition:
+    # Cantidad de particiones en las que se divide cada archivo de entrada.
+    grid-size: 4
+    # Tamaño del pool de hilos que ejecuta las particiones en paralelo.
+    thread-pool-size: 4
+  fault-tolerance:
+    # Cantidad máxima de registros inválidos que se pueden omitir antes de que
+    # el Step se marque como fallido.
+    #
+    # El límite es POR EJECUCIÓN DE STEP, no por archivo, y eso tiene una
+    # consecuencia que conviene tener presente: con particionamiento, cada
+    # partición lleva su propia cuenta. El mismo archivo con el mismo límite
+    # puede fallar con una partición y pasar con cuatro, porque al repartir las
+    # filas ninguna partición alcanza el tope por separado.
+    #
+    # El valor está calibrado sobre el dataset real: movimientos_financieros_
+    # diarios.csv trae 608 filas inválidas de 1.000, que es mucho más sucio que
+    # los otros dos archivos. Con 700 el job procesa el archivo completo con
+    # cualquier número de particiones, que es lo que se quiere: que el resultado
+    # no dependa del grado de paralelismo.
+    #
+    # Para ver el límite actuando —y de paso la política de reejecución y el
+    # código de salida—, basta bajarlo por línea de comandos:
+    #   --batch.fault-tolerance.skip-limit=100
+    skip-limit: 700
+    retry-limit: 3
+  # Política de reejecución automática del Job completo, para el fallo crítico
+  # que el skip no cubre: una caída de la base de datos a mitad del proceso hace
+  # fallar el Job entero, y es el caso en que un operador volvería a lanzarlo.
+  # El límite es deliberado: si el fallo es permanente, insistir solo retrasa
+  # que alguien se entere.
+  job-retry:
+    max-intentos: 2
+    espera-ms: 3000
+  chunk-size: 50
+  intereses:
+    tasa-ahorro: 0.005
+    tasa-prestamo: 0.018
+    tasa-hipoteca: 0.012

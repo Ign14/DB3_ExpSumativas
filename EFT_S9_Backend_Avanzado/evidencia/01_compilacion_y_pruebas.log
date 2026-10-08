@@ -1,0 +1,782 @@
+
+==============================================================
+  01 - COMPILACION Y PRUEBAS AUTOMATIZADAS
+==============================================================
+Fecha: 2026-10-08T18:15:03+00:00
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=45043 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+openjdk version "21.0.10" 2026-01-20
+OpenJDK Runtime Environment (build 21.0.10+7-Ubuntu-124.04)
+OpenJDK 64-Bit Server VM (build 21.0.10+7-Ubuntu-124.04, mixed mode, sharing)
+
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=45043 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] eft-backend-avanzado                                               [pom]
+[INFO] common-dominio                                                     [jar]
+[INFO] batch-migracion                                                    [jar]
+[INFO] broker-artemis                                                     [jar]
+[INFO] broker-kafka                                                       [jar]
+[INFO] config-server                                                      [jar]
+[INFO] discovery-server                                                   [jar]
+[INFO] auth-server                                                        [jar]
+[INFO] api-gateway                                                        [jar]
+[INFO] cuentas-service                                                    [jar]
+[INFO] pagos-service                                                      [jar]
+[INFO] clientes-service                                                   [jar]
+[INFO] bff-common                                                         [jar]
+[INFO] bff-web                                                            [jar]
+[INFO] bff-movil                                                          [jar]
+[INFO] bff-cajero                                                         [jar]
+[INFO] 
+[INFO] ---------------< cl.duoc.bancoxyz:eft-backend-avanzado >----------------
+[INFO] Building eft-backend-avanzado 1.0.0                               [1/16]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ eft-backend-avanzado ---
+[INFO] 
+[INFO] ------------------< cl.duoc.bancoxyz:common-dominio >-------------------
+[INFO] Building common-dominio 1.0.0                                     [2/16]
+[INFO]   from common-dominio/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ common-dominio ---
+[INFO] Deleting /home/claude/EFT_S9_Backend_Avanzado/common-dominio/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ common-dominio ---
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ common-dominio ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 20 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ common-dominio ---
+[INFO] skip non existing resourceDirectory /home/claude/EFT_S9_Backend_Avanzado/common-dominio/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ common-dominio ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ common-dominio ---
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ common-dominio ---
+[INFO] Building jar: /home/claude/EFT_S9_Backend_Avanzado/common-dominio/target/common-dominio-1.0.0.jar
+[INFO] 
+[INFO] ------------------< cl.duoc.bancoxyz:batch-migracion >------------------
+[INFO] Building batch-migracion 1.0.0                                    [3/16]
+[INFO]   from batch-migracion/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ batch-migracion ---
+[INFO] Deleting /home/claude/EFT_S9_Backend_Avanzado/batch-migracion/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ batch-migracion ---
+[INFO] Copying 3 resources from src/main/resources to target/classes
+[INFO] Copying 4 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ batch-migracion ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 32 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ batch-migracion ---
+[INFO] skip non existing resourceDirectory /home/claude/EFT_S9_Backend_Avanzado/batch-migracion/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ batch-migracion ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 4 source files with javac [debug parameters release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ batch-migracion ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=45043 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+[INFO] Running cl.duoc.bancoxyz.batch.intereses.InteresItemProcessorTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.326 s -- in cl.duoc.bancoxyz.batch.intereses.InteresItemProcessorTest
+[INFO] Running cl.duoc.bancoxyz.batch.cuentasanuales.MovimientoItemProcessorTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.063 s -- in cl.duoc.bancoxyz.batch.cuentasanuales.MovimientoItemProcessorTest
+[INFO] Running cl.duoc.bancoxyz.batch.common.util.FechaLegacyParserTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.056 s -- in cl.duoc.bancoxyz.batch.common.util.FechaLegacyParserTest
+[INFO] Running cl.duoc.bancoxyz.batch.transacciones.TransaccionItemProcessorTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.033 s -- in cl.duoc.bancoxyz.batch.transacciones.TransaccionItemProcessorTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 15, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ batch-migracion ---
+[INFO] Building jar: /home/claude/EFT_S9_Backend_Avanzado/batch-migracion/target/batch-migracion.jar
+[INFO] 
+[INFO] --- spring-boot:3.3.4:repackage (repackage) @ batch-migracion ---
+[INFO] Replacing main artifact /home/claude/EFT_S9_Backend_Avanzado/batch-migracion/target/batch-migracion.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /home/claude/EFT_S9_Backend_Avanzado/batch-migracion/target/batch-migracion.jar.original
+[INFO] 
+[INFO] ------------------< cl.duoc.bancoxyz:broker-artemis >-------------------
+[INFO] Building broker-artemis 1.0.0                                     [4/16]
+[INFO]   from broker-artemis/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ broker-artemis ---
+[INFO] Deleting /home/claude/EFT_S9_Backend_Avanzado/broker-artemis/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ broker-artemis ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ broker-artemis ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 2 source files with javac [debug parameters release 21] to target/classes
+[INFO] /home/claude/EFT_S9_Backend_Avanzado/broker-artemis/src/main/java/cl/duoc/bancoxyz/broker/BrokerArtemisApplication.java: /home/claude/EFT_S9_Backend_Avanzado/broker-artemis/src/main/java/cl/duoc/bancoxyz/broker/BrokerArtemisApplication.java uses or overrides a deprecated API.
+[INFO] /home/claude/EFT_S9_Backend_Avanzado/broker-artemis/src/main/java/cl/duoc/bancoxyz/broker/BrokerArtemisApplication.java: Recompile with -Xlint:deprecation for details.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ broker-artemis ---
+[INFO] skip non existing resourceDirectory /home/claude/EFT_S9_Backend_Avanzado/broker-artemis/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ broker-artemis ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ broker-artemis ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ broker-artemis ---
+[INFO] Building jar: /home/claude/EFT_S9_Backend_Avanzado/broker-artemis/target/broker-artemis.jar
+[INFO] 
+[INFO] --- spring-boot:3.3.4:repackage (repackage) @ broker-artemis ---
+[INFO] Replacing main artifact /home/claude/EFT_S9_Backend_Avanzado/broker-artemis/target/broker-artemis.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /home/claude/EFT_S9_Backend_Avanzado/broker-artemis/target/broker-artemis.jar.original
+[INFO] 
+[INFO] -------------------< cl.duoc.bancoxyz:broker-kafka >--------------------
+[INFO] Building broker-kafka 1.0.0                                       [5/16]
+[INFO]   from broker-kafka/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ broker-kafka ---
+[INFO] Deleting /home/claude/EFT_S9_Backend_Avanzado/broker-kafka/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ broker-kafka ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ broker-kafka ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 2 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ broker-kafka ---
+[INFO] skip non existing resourceDirectory /home/claude/EFT_S9_Backend_Avanzado/broker-kafka/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ broker-kafka ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ broker-kafka ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ broker-kafka ---
+[INFO] Building jar: /home/claude/EFT_S9_Backend_Avanzado/broker-kafka/target/broker-kafka.jar
+[INFO] 
+[INFO] --- spring-boot:3.3.4:repackage (repackage) @ broker-kafka ---
+[INFO] Replacing main artifact /home/claude/EFT_S9_Backend_Avanzado/broker-kafka/target/broker-kafka.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /home/claude/EFT_S9_Backend_Avanzado/broker-kafka/target/broker-kafka.jar.original
+[INFO] 
+[INFO] -------------------< cl.duoc.bancoxyz:config-server >-------------------
+[INFO] Building config-server 1.0.0                                      [6/16]
+[INFO]   from config-server/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ config-server ---
+[INFO] Deleting /home/claude/EFT_S9_Backend_Avanzado/config-server/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ config-server ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 5 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ config-server ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 2 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ config-server ---
+[INFO] skip non existing resourceDirectory /home/claude/EFT_S9_Backend_Avanzado/config-server/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ config-server ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ config-server ---
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ config-server ---
+[INFO] Building jar: /home/claude/EFT_S9_Backend_Avanzado/config-server/target/config-server.jar
+[INFO] 
+[INFO] --- spring-boot:3.3.4:repackage (repackage) @ config-server ---
+[INFO] Replacing main artifact /home/claude/EFT_S9_Backend_Avanzado/config-server/target/config-server.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /home/claude/EFT_S9_Backend_Avanzado/config-server/target/config-server.jar.original
+[INFO] 
+[INFO] -----------------< cl.duoc.bancoxyz:discovery-server >------------------
+[INFO] Building discovery-server 1.0.0                                   [7/16]
+[INFO]   from discovery-server/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ discovery-server ---
+[INFO] Deleting /home/claude/EFT_S9_Backend_Avanzado/discovery-server/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ discovery-server ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ discovery-server ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 2 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ discovery-server ---
+[INFO] skip non existing resourceDirectory /home/claude/EFT_S9_Backend_Avanzado/discovery-server/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ discovery-server ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ discovery-server ---
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ discovery-server ---
+[INFO] Building jar: /home/claude/EFT_S9_Backend_Avanzado/discovery-server/target/discovery-server.jar
+[INFO] 
+[INFO] --- spring-boot:3.3.4:repackage (repackage) @ discovery-server ---
+[INFO] Replacing main artifact /home/claude/EFT_S9_Backend_Avanzado/discovery-server/target/discovery-server.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /home/claude/EFT_S9_Backend_Avanzado/discovery-server/target/discovery-server.jar.original
+[INFO] 
+[INFO] --------------------< cl.duoc.bancoxyz:auth-server >--------------------
+[INFO] Building auth-server 1.0.0                                        [8/16]
+[INFO]   from auth-server/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ auth-server ---
+[INFO] Deleting /home/claude/EFT_S9_Backend_Avanzado/auth-server/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ auth-server ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ auth-server ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 2 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ auth-server ---
+[INFO] skip non existing resourceDirectory /home/claude/EFT_S9_Backend_Avanzado/auth-server/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ auth-server ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug parameters release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ auth-server ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=45043 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+[INFO] Running cl.duoc.bancoxyz.auth.config.AuthorizationServerConfigTest
+18:15:18.627 [main] INFO cl.duoc.bancoxyz.auth.config.AuthorizationServerConfig -- >> auth-server: clientes registrados = banco-web-client, banco-movil-client, cajero-client, pagos-service
+18:15:18.994 [main] INFO cl.duoc.bancoxyz.auth.config.AuthorizationServerConfig -- >> auth-server: clientes registrados = banco-web-client, banco-movil-client, cajero-client, pagos-service
+18:15:19.296 [main] INFO cl.duoc.bancoxyz.auth.config.AuthorizationServerConfig -- >> auth-server: clientes registrados = banco-web-client, banco-movil-client, cajero-client, pagos-service
+18:15:19.592 [main] INFO cl.duoc.bancoxyz.auth.config.AuthorizationServerConfig -- >> auth-server: clientes registrados = banco-web-client, banco-movil-client, cajero-client, pagos-service
+18:15:19.898 [main] INFO cl.duoc.bancoxyz.auth.config.AuthorizationServerConfig -- >> auth-server: clientes registrados = banco-web-client, banco-movil-client, cajero-client, pagos-service
+18:15:20.423 [main] INFO cl.duoc.bancoxyz.auth.config.AuthorizationServerConfig -- >> auth-server: clientes registrados = banco-web-client, banco-movil-client, cajero-client, pagos-service
+18:15:20.693 [main] INFO cl.duoc.bancoxyz.auth.config.AuthorizationServerConfig -- >> auth-server: clientes registrados = banco-web-client, banco-movil-client, cajero-client, pagos-service
+18:15:21.123 [main] INFO cl.duoc.bancoxyz.auth.config.AuthorizationServerConfig -- >> auth-server: clientes registrados = banco-web-client, banco-movil-client, cajero-client, pagos-service
+18:15:21.402 [main] INFO cl.duoc.bancoxyz.auth.config.AuthorizationServerConfig -- >> auth-server: clientes registrados = banco-web-client, banco-movil-client, cajero-client, pagos-service
+18:15:21.714 [main] INFO cl.duoc.bancoxyz.auth.config.AuthorizationServerConfig -- >> auth-server: clientes registrados = banco-web-client, banco-movil-client, cajero-client, pagos-service
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.682 s -- in cl.duoc.bancoxyz.auth.config.AuthorizationServerConfigTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ auth-server ---
+[INFO] Building jar: /home/claude/EFT_S9_Backend_Avanzado/auth-server/target/auth-server.jar
+[INFO] 
+[INFO] --- spring-boot:3.3.4:repackage (repackage) @ auth-server ---
+[INFO] Replacing main artifact /home/claude/EFT_S9_Backend_Avanzado/auth-server/target/auth-server.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /home/claude/EFT_S9_Backend_Avanzado/auth-server/target/auth-server.jar.original
+[INFO] 
+[INFO] --------------------< cl.duoc.bancoxyz:api-gateway >--------------------
+[INFO] Building api-gateway 1.0.0                                        [9/16]
+[INFO]   from api-gateway/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ api-gateway ---
+[INFO] Deleting /home/claude/EFT_S9_Backend_Avanzado/api-gateway/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ api-gateway ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ api-gateway ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 2 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ api-gateway ---
+[INFO] skip non existing resourceDirectory /home/claude/EFT_S9_Backend_Avanzado/api-gateway/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ api-gateway ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ api-gateway ---
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ api-gateway ---
+[INFO] Building jar: /home/claude/EFT_S9_Backend_Avanzado/api-gateway/target/api-gateway.jar
+[INFO] 
+[INFO] --- spring-boot:3.3.4:repackage (repackage) @ api-gateway ---
+[INFO] Replacing main artifact /home/claude/EFT_S9_Backend_Avanzado/api-gateway/target/api-gateway.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /home/claude/EFT_S9_Backend_Avanzado/api-gateway/target/api-gateway.jar.original
+[INFO] 
+[INFO] ------------------< cl.duoc.bancoxyz:cuentas-service >------------------
+[INFO] Building cuentas-service 1.0.0                                   [10/16]
+[INFO]   from cuentas-service/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ cuentas-service ---
+[INFO] Deleting /home/claude/EFT_S9_Backend_Avanzado/cuentas-service/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ cuentas-service ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ cuentas-service ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 10 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ cuentas-service ---
+[INFO] Copying 1 resource from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ cuentas-service ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 4 source files with javac [debug parameters release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ cuentas-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=45043 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+[INFO] Running cl.duoc.bancoxyz.cuentas.config.ReglasDeAutorizacionTest
+2026-10-08T18:15:28.718Z  WARN 4430 --- [cuentas-service-test] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$DeferringLoadBalancerInterceptorConfig' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$DeferringLoadBalancerInterceptorConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [lbRestClientPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2026-10-08T18:15:28.737Z  WARN 4430 --- [cuentas-service-test] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'deferringLoadBalancerInterceptor' of type [org.springframework.cloud.client.loadbalancer.DeferringLoadBalancerInterceptor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-08T18:15:31.470Z  WARN 4430 --- [cuentas-service-test] [           main] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/root/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.19/byte-buddy-agent-1.14.19.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.109 s -- in cl.duoc.bancoxyz.cuentas.config.ReglasDeAutorizacionTest
+[INFO] Running cl.duoc.bancoxyz.cuentas.service.LiquidacionServiceTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.081 s -- in cl.duoc.bancoxyz.cuentas.service.LiquidacionServiceTest
+[INFO] Running cl.duoc.bancoxyz.cuentas.service.RetiroServiceTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.082 s -- in cl.duoc.bancoxyz.cuentas.service.RetiroServiceTest
+[INFO] Running cl.duoc.bancoxyz.cuentas.domain.CuentaRepositoryEnMemoriaTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.071 s -- in cl.duoc.bancoxyz.cuentas.domain.CuentaRepositoryEnMemoriaTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 33, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ cuentas-service ---
+[INFO] Building jar: /home/claude/EFT_S9_Backend_Avanzado/cuentas-service/target/cuentas-service.jar
+[INFO] 
+[INFO] --- spring-boot:3.3.4:repackage (repackage) @ cuentas-service ---
+[INFO] Replacing main artifact /home/claude/EFT_S9_Backend_Avanzado/cuentas-service/target/cuentas-service.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /home/claude/EFT_S9_Backend_Avanzado/cuentas-service/target/cuentas-service.jar.original
+[INFO] 
+[INFO] -------------------< cl.duoc.bancoxyz:pagos-service >-------------------
+[INFO] Building pagos-service 1.0.0                                     [11/16]
+[INFO]   from pagos-service/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ pagos-service ---
+[INFO] Deleting /home/claude/EFT_S9_Backend_Avanzado/pagos-service/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ pagos-service ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ pagos-service ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 22 source files with javac [debug parameters release 21] to target/classes
+[INFO] Annotation processing is enabled because one or more processors were found
+  on the class path. A future release of javac may disable annotation processing
+  unless at least one processor is specified by name (-processor), or a search
+  path is specified (--processor-path, --processor-module-path), or annotation
+  processing is enabled explicitly (-proc:only, -proc:full).
+  Use -Xlint:-options to suppress this message.
+  Use -proc:none to disable annotation processing.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ pagos-service ---
+[INFO] Copying 1 resource from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ pagos-service ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 9 source files with javac [debug parameters release 21] to target/test-classes
+[INFO] Annotation processing is enabled because one or more processors were found
+  on the class path. A future release of javac may disable annotation processing
+  unless at least one processor is specified by name (-processor), or a search
+  path is specified (--processor-path, --processor-module-path), or annotation
+  processing is enabled explicitly (-proc:only, -proc:full).
+  Use -Xlint:-options to suppress this message.
+  Use -proc:none to disable annotation processing.
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ pagos-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=45043 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+[INFO] Running cl.duoc.bancoxyz.pagos.cliente.CuentasGatewayHttpTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.637 s -- in cl.duoc.bancoxyz.pagos.cliente.CuentasGatewayHttpTest
+[INFO] Running cl.duoc.bancoxyz.pagos.cliente.PoliticaResilienciaTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.599 s -- in cl.duoc.bancoxyz.pagos.cliente.PoliticaResilienciaTest
+[INFO] Running cl.duoc.bancoxyz.pagos.cliente.ResilienciaCableadaTest
+18:15:42.894 [pool-7-thread-1] ERROR cl.duoc.bancoxyz.pagos.cliente.CuentasClienteResiliente -- >> pagos-service: cuentas-service RECHAZO la llamada de la cuenta 103 con HTTP 401 - esto no se arregla solo, revise las credenciales del cliente OAuth2 y el issuer: 401
+18:15:45.602 [pool-17-thread-1] WARN cl.duoc.bancoxyz.pagos.cliente.CuentasClienteResiliente -- >> pagos-service: cuenta 103 servida en modo degradado por ServicioNoDisponibleException: cuentas-service no responde
+18:15:47.996 [pool-23-thread-1] WARN cl.duoc.bancoxyz.pagos.cliente.CuentasClienteResiliente -- >> pagos-service: cuenta 103 servida en modo degradado por ServicioNoDisponibleException: caido
+18:15:48.049 [pool-22-thread-4] WARN cl.duoc.bancoxyz.pagos.cliente.CuentasClienteResiliente -- >> pagos-service: cuenta 103 servida en modo degradado por ServicioNoDisponibleException: caido
+18:15:48.051 [main] WARN cl.duoc.bancoxyz.pagos.cliente.CuentasClienteResiliente -- >> pagos-service: cuenta 103 servida en modo degradado por CallNotPermittedException: CircuitBreaker 'cuentas' is OPEN and does not permit further calls
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.004 s -- in cl.duoc.bancoxyz.pagos.cliente.ResilienciaCableadaTest
+[INFO] Running cl.duoc.bancoxyz.pagos.util.FechaLegacyParserTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in cl.duoc.bancoxyz.pagos.util.FechaLegacyParserTest
+[INFO] Running cl.duoc.bancoxyz.pagos.config.ReglasDeAutorizacionTest
+2026-10-08T18:15:51.810Z  WARN 4533 --- [pagos-service-test] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$DeferringLoadBalancerInterceptorConfig' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$DeferringLoadBalancerInterceptorConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [lbRestClientPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2026-10-08T18:15:51.817Z  WARN 4533 --- [pagos-service-test] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'deferringLoadBalancerInterceptor' of type [org.springframework.cloud.client.loadbalancer.DeferringLoadBalancerInterceptor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-08T18:15:54.806Z  WARN 4533 --- [pagos-service-test] [           main] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/root/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.19/byte-buddy-agent-1.14.19.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.317 s -- in cl.duoc.bancoxyz.pagos.config.ReglasDeAutorizacionTest
+[INFO] Running cl.duoc.bancoxyz.pagos.mensajeria.ConsumidorRetirosTest
+2026-10-08T18:15:56.409Z  WARN 4533 --- [pagos-service-test] [           main] c.d.b.p.mensajeria.ConsumidorRetiros     : >> pagos-service: evento descartado por venir sin identificador
+2026-10-08T18:15:56.409Z  WARN 4533 --- [pagos-service-test] [           main] c.d.b.p.mensajeria.ConsumidorRetiros     : >> pagos-service: evento descartado por venir sin identificador
+2026-10-08T18:15:56.412Z ERROR 4533 --- [pagos-service-test] [           main] c.d.b.p.mensajeria.ConsumidorRetiros     : >> pagos-service: evento evt-malo rechazado por no cumplir las reglas del dominio (cuenta 500, monto 500, fecha 31/02/2024)
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.013 s -- in cl.duoc.bancoxyz.pagos.mensajeria.ConsumidorRetirosTest
+[INFO] Running cl.duoc.bancoxyz.pagos.service.PagoServiceTest
+2026-10-08T18:15:56.450Z  WARN 4533 --- [pagos-service-test] [           main] c.d.bancoxyz.pagos.service.PagoService   : >> pagos-service: transferencia c2df60b1-5b83-4da7-86e6-369e8ae6a745 fallo al abonar la cuenta 102 por ServicioNoDisponibleException - compensando el cargo de 500 en la cuenta 101
+2026-10-08T18:15:56.524Z  WARN 4533 --- [pagos-service-test] [           main] c.d.bancoxyz.pagos.service.PagoService   : >> pagos-service: transferencia 0fa229bc-38d6-4a01-a4f5-eddd30086a16 fallo al abonar la cuenta 999 por RecursoNoEncontradoException - compensando el cargo de 500 en la cuenta 101
+2026-10-08T18:15:56.640Z  WARN 4533 --- [pagos-service-test] [           main] c.d.bancoxyz.pagos.service.PagoService   : >> pagos-service: transferencia 7a8f80e5-e374-406f-a25f-61c483a10da6 fallo al abonar la cuenta 102 por ServicioNoDisponibleException - compensando el cargo de 500 en la cuenta 101
+2026-10-08T18:15:56.641Z ERROR 4533 --- [pagos-service-test] [           main] c.d.bancoxyz.pagos.service.PagoService   : >> pagos-service: DESCALCE en la transferencia 7a8f80e5-e374-406f-a25f-61c483a10da6 - se cargaron 500 a la cuenta 101, no se abonaron a la cuenta 102 y la compensacion tambien fallo por ServicioNoDisponibleException. Requiere reposicion manual.
+2026-10-08T18:15:56.669Z  WARN 4533 --- [pagos-service-test] [           main] c.d.bancoxyz.pagos.service.PagoService   : >> pagos-service: transferencia c69003b0-5f83-4776-9716-7c3c3a1a7ecb fallo al abonar la cuenta 102 por ServicioNoDisponibleException - compensando el cargo de 500 en la cuenta 101
+[INFO] Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.247 s -- in cl.duoc.bancoxyz.pagos.service.PagoServiceTest
+[INFO] Running cl.duoc.bancoxyz.pagos.service.FichaCuentaServiceTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in cl.duoc.bancoxyz.pagos.service.FichaCuentaServiceTest
+[INFO] Running cl.duoc.bancoxyz.pagos.domain.MovimientoRepositoryEnMemoriaTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.170 s -- in cl.duoc.bancoxyz.pagos.domain.MovimientoRepositoryEnMemoriaTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 66, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ pagos-service ---
+[INFO] Building jar: /home/claude/EFT_S9_Backend_Avanzado/pagos-service/target/pagos-service.jar
+[INFO] 
+[INFO] --- spring-boot:3.3.4:repackage (repackage) @ pagos-service ---
+[INFO] Replacing main artifact /home/claude/EFT_S9_Backend_Avanzado/pagos-service/target/pagos-service.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /home/claude/EFT_S9_Backend_Avanzado/pagos-service/target/pagos-service.jar.original
+[INFO] 
+[INFO] -----------------< cl.duoc.bancoxyz:clientes-service >------------------
+[INFO] Building clientes-service 1.0.0                                  [12/16]
+[INFO]   from clientes-service/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ clientes-service ---
+[INFO] Deleting /home/claude/EFT_S9_Backend_Avanzado/clientes-service/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ clientes-service ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ clientes-service ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 8 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ clientes-service ---
+[INFO] Copying 1 resource from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ clientes-service ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 3 source files with javac [debug parameters release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ clientes-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=45043 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+[INFO] Running cl.duoc.bancoxyz.clientes.config.ReglasDeAutorizacionTest
+2026-10-08T18:16:01.237Z  WARN 4681 --- [clientes-service-test] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$DeferringLoadBalancerInterceptorConfig' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration$DeferringLoadBalancerInterceptorConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [lbRestClientPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2026-10-08T18:16:01.247Z  WARN 4681 --- [clientes-service-test] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'deferringLoadBalancerInterceptor' of type [org.springframework.cloud.client.loadbalancer.DeferringLoadBalancerInterceptor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [lbRestClientPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-08T18:16:02.650Z  WARN 4681 --- [clientes-service-test] [           main] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/root/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.19/byte-buddy-agent-1.14.19.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.405 s -- in cl.duoc.bancoxyz.clientes.config.ReglasDeAutorizacionTest
+[INFO] Running cl.duoc.bancoxyz.clientes.mensajeria.ConsumidorEventosTest
+2026-10-08T18:16:03.941Z ERROR 4681 --- [clientes-service-test] [           main] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: ALERTA ALTA DEPENDENCIA_DEGRADADA sobre la cuenta null - El circuito hacia cuentas se abrio
+2026-10-08T18:16:03.952Z  WARN 4681 --- [clientes-service-test] [           main] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: alerta RETIRO_SOBRE_LIMITE (MEDIA) sobre la cuenta 101 - Intento de retiro por 900000
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.036 s -- in cl.duoc.bancoxyz.clientes.mensajeria.ConsumidorEventosTest
+[INFO] Running cl.duoc.bancoxyz.clientes.domain.ClienteRepositoryEnMemoriaTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.076 s -- in cl.duoc.bancoxyz.clientes.domain.ClienteRepositoryEnMemoriaTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 22, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ clientes-service ---
+[INFO] Building jar: /home/claude/EFT_S9_Backend_Avanzado/clientes-service/target/clientes-service.jar
+[INFO] 
+[INFO] --- spring-boot:3.3.4:repackage (repackage) @ clientes-service ---
+[INFO] Replacing main artifact /home/claude/EFT_S9_Backend_Avanzado/clientes-service/target/clientes-service.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /home/claude/EFT_S9_Backend_Avanzado/clientes-service/target/clientes-service.jar.original
+[INFO] 
+[INFO] --------------------< cl.duoc.bancoxyz:bff-common >---------------------
+[INFO] Building bff-common 1.0.0                                        [13/16]
+[INFO]   from bff-common/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ bff-common ---
+[INFO] Deleting /home/claude/EFT_S9_Backend_Avanzado/bff-common/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ bff-common ---
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ bff-common ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 11 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ bff-common ---
+[INFO] skip non existing resourceDirectory /home/claude/EFT_S9_Backend_Avanzado/bff-common/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ bff-common ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ bff-common ---
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ bff-common ---
+[INFO] Building jar: /home/claude/EFT_S9_Backend_Avanzado/bff-common/target/bff-common-1.0.0.jar
+[INFO] 
+[INFO] ----------------------< cl.duoc.bancoxyz:bff-web >----------------------
+[INFO] Building bff-web 1.0.0                                           [14/16]
+[INFO]   from bff-web/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ bff-web ---
+[INFO] Deleting /home/claude/EFT_S9_Backend_Avanzado/bff-web/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ bff-web ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ bff-web ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 6 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ bff-web ---
+[INFO] skip non existing resourceDirectory /home/claude/EFT_S9_Backend_Avanzado/bff-web/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ bff-web ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug parameters release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ bff-web ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=45043 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+[INFO] Running cl.duoc.bancoxyz.bff.web.service.CuentaWebServiceTest
+18:16:05.785 [main] WARN cl.duoc.bancoxyz.bff.web.service.CuentaWebService -- Cuenta 101 servida sin perfil: clientes-service no respondio (clientes-service)
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.223 s -- in cl.duoc.bancoxyz.bff.web.service.CuentaWebServiceTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ bff-web ---
+[INFO] Building jar: /home/claude/EFT_S9_Backend_Avanzado/bff-web/target/bff-web.jar
+[INFO] 
+[INFO] --- spring-boot:3.3.4:repackage (repackage) @ bff-web ---
+[INFO] Replacing main artifact /home/claude/EFT_S9_Backend_Avanzado/bff-web/target/bff-web.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /home/claude/EFT_S9_Backend_Avanzado/bff-web/target/bff-web.jar.original
+[INFO] 
+[INFO] ---------------------< cl.duoc.bancoxyz:bff-movil >---------------------
+[INFO] Building bff-movil 1.0.0                                         [15/16]
+[INFO]   from bff-movil/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ bff-movil ---
+[INFO] Deleting /home/claude/EFT_S9_Backend_Avanzado/bff-movil/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ bff-movil ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ bff-movil ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 6 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ bff-movil ---
+[INFO] skip non existing resourceDirectory /home/claude/EFT_S9_Backend_Avanzado/bff-movil/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ bff-movil ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug parameters release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ bff-movil ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=45043 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+[INFO] Running cl.duoc.bancoxyz.bff.movil.service.CuentaMovilServiceTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.139 s -- in cl.duoc.bancoxyz.bff.movil.service.CuentaMovilServiceTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ bff-movil ---
+[INFO] Building jar: /home/claude/EFT_S9_Backend_Avanzado/bff-movil/target/bff-movil.jar
+[INFO] 
+[INFO] --- spring-boot:3.3.4:repackage (repackage) @ bff-movil ---
+[INFO] Replacing main artifact /home/claude/EFT_S9_Backend_Avanzado/bff-movil/target/bff-movil.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /home/claude/EFT_S9_Backend_Avanzado/bff-movil/target/bff-movil.jar.original
+[INFO] 
+[INFO] --------------------< cl.duoc.bancoxyz:bff-cajero >---------------------
+[INFO] Building bff-cajero 1.0.0                                        [16/16]
+[INFO]   from bff-cajero/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ bff-cajero ---
+[INFO] Deleting /home/claude/EFT_S9_Backend_Avanzado/bff-cajero/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ bff-cajero ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ bff-cajero ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 7 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ bff-cajero ---
+[INFO] skip non existing resourceDirectory /home/claude/EFT_S9_Backend_Avanzado/bff-cajero/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ bff-cajero ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug parameters release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ bff-cajero ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=45043 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+[INFO] Running cl.duoc.bancoxyz.bff.cajero.service.RetiroServiceTest
+18:16:08.417 [main] ERROR cl.duoc.bancoxyz.bff.cajero.service.RetiroService -- Retiro aplicado en la cuenta 103 por 500 pero el evento evt-3 no se pudo publicar: el movimiento no llegara al historial sin reposicion manual
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.156 s -- in cl.duoc.bancoxyz.bff.cajero.service.RetiroServiceTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ bff-cajero ---
+[INFO] Building jar: /home/claude/EFT_S9_Backend_Avanzado/bff-cajero/target/bff-cajero.jar
+[INFO] 
+[INFO] --- spring-boot:3.3.4:repackage (repackage) @ bff-cajero ---
+[INFO] Replacing main artifact /home/claude/EFT_S9_Backend_Avanzado/bff-cajero/target/bff-cajero.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /home/claude/EFT_S9_Backend_Avanzado/bff-cajero/target/bff-cajero.jar.original
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for eft-backend-avanzado 1.0.0:
+[INFO] 
+[INFO] eft-backend-avanzado ............................... SUCCESS [  0.135 s]
+[INFO] common-dominio ..................................... SUCCESS [  2.183 s]
+[INFO] batch-migracion .................................... SUCCESS [  5.411 s]
+[INFO] broker-artemis ..................................... SUCCESS [  0.734 s]
+[INFO] broker-kafka ....................................... SUCCESS [  0.786 s]
+[INFO] config-server ...................................... SUCCESS [  0.621 s]
+[INFO] discovery-server ................................... SUCCESS [  1.095 s]
+[INFO] auth-server ........................................ SUCCESS [  5.581 s]
+[INFO] api-gateway ........................................ SUCCESS [  0.872 s]
+[INFO] cuentas-service .................................... SUCCESS [ 10.721 s]
+[INFO] pagos-service ...................................... SUCCESS [ 23.622 s]
+[INFO] clientes-service ................................... SUCCESS [  7.127 s]
+[INFO] bff-common ......................................... SUCCESS [  0.226 s]
+[INFO] bff-web ............................................ SUCCESS [  1.522 s]
+[INFO] bff-movil .......................................... SUCCESS [  1.300 s]
+[INFO] bff-cajero ......................................... SUCCESS [  1.225 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:03 min
+[INFO] Finished at: 2026-10-08T18:16:08Z
+[INFO] ------------------------------------------------------------------------
+
+
+--- Resumen de pruebas por modulo ---
+auth-server/target/surefire-reports/cl.duoc.bancoxyz.auth.config.AuthorizationServerConfigTest.txt:Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.682 s -- in cl.duoc.bancoxyz.auth.config.AuthorizationServerConfigTest
+batch-migracion/target/surefire-reports/cl.duoc.bancoxyz.batch.common.util.FechaLegacyParserTest.txt:Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.056 s -- in cl.duoc.bancoxyz.batch.common.util.FechaLegacyParserTest
+batch-migracion/target/surefire-reports/cl.duoc.bancoxyz.batch.cuentasanuales.MovimientoItemProcessorTest.txt:Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.063 s -- in cl.duoc.bancoxyz.batch.cuentasanuales.MovimientoItemProcessorTest
+batch-migracion/target/surefire-reports/cl.duoc.bancoxyz.batch.intereses.InteresItemProcessorTest.txt:Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.326 s -- in cl.duoc.bancoxyz.batch.intereses.InteresItemProcessorTest
+batch-migracion/target/surefire-reports/cl.duoc.bancoxyz.batch.transacciones.TransaccionItemProcessorTest.txt:Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.033 s -- in cl.duoc.bancoxyz.batch.transacciones.TransaccionItemProcessorTest
+bff-cajero/target/surefire-reports/cl.duoc.bancoxyz.bff.cajero.service.RetiroServiceTest.txt:Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.156 s -- in cl.duoc.bancoxyz.bff.cajero.service.RetiroServiceTest
+bff-movil/target/surefire-reports/cl.duoc.bancoxyz.bff.movil.service.CuentaMovilServiceTest.txt:Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.139 s -- in cl.duoc.bancoxyz.bff.movil.service.CuentaMovilServiceTest
+bff-web/target/surefire-reports/cl.duoc.bancoxyz.bff.web.service.CuentaWebServiceTest.txt:Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.223 s -- in cl.duoc.bancoxyz.bff.web.service.CuentaWebServiceTest
+clientes-service/target/surefire-reports/cl.duoc.bancoxyz.clientes.config.ReglasDeAutorizacionTest.txt:Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.405 s -- in cl.duoc.bancoxyz.clientes.config.ReglasDeAutorizacionTest
+clientes-service/target/surefire-reports/cl.duoc.bancoxyz.clientes.domain.ClienteRepositoryEnMemoriaTest.txt:Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.076 s -- in cl.duoc.bancoxyz.clientes.domain.ClienteRepositoryEnMemoriaTest
+clientes-service/target/surefire-reports/cl.duoc.bancoxyz.clientes.mensajeria.ConsumidorEventosTest.txt:Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.036 s -- in cl.duoc.bancoxyz.clientes.mensajeria.ConsumidorEventosTest
+cuentas-service/target/surefire-reports/cl.duoc.bancoxyz.cuentas.config.ReglasDeAutorizacionTest.txt:Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.109 s -- in cl.duoc.bancoxyz.cuentas.config.ReglasDeAutorizacionTest
+cuentas-service/target/surefire-reports/cl.duoc.bancoxyz.cuentas.domain.CuentaRepositoryEnMemoriaTest.txt:Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.071 s -- in cl.duoc.bancoxyz.cuentas.domain.CuentaRepositoryEnMemoriaTest
+cuentas-service/target/surefire-reports/cl.duoc.bancoxyz.cuentas.service.LiquidacionServiceTest.txt:Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.081 s -- in cl.duoc.bancoxyz.cuentas.service.LiquidacionServiceTest
+cuentas-service/target/surefire-reports/cl.duoc.bancoxyz.cuentas.service.RetiroServiceTest.txt:Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.082 s -- in cl.duoc.bancoxyz.cuentas.service.RetiroServiceTest
+pagos-service/target/surefire-reports/cl.duoc.bancoxyz.pagos.cliente.CuentasGatewayHttpTest.txt:Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.637 s -- in cl.duoc.bancoxyz.pagos.cliente.CuentasGatewayHttpTest
+pagos-service/target/surefire-reports/cl.duoc.bancoxyz.pagos.cliente.PoliticaResilienciaTest.txt:Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.599 s -- in cl.duoc.bancoxyz.pagos.cliente.PoliticaResilienciaTest
+pagos-service/target/surefire-reports/cl.duoc.bancoxyz.pagos.cliente.ResilienciaCableadaTest.txt:Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.004 s -- in cl.duoc.bancoxyz.pagos.cliente.ResilienciaCableadaTest
+pagos-service/target/surefire-reports/cl.duoc.bancoxyz.pagos.config.ReglasDeAutorizacionTest.txt:Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.317 s -- in cl.duoc.bancoxyz.pagos.config.ReglasDeAutorizacionTest
+pagos-service/target/surefire-reports/cl.duoc.bancoxyz.pagos.domain.MovimientoRepositoryEnMemoriaTest.txt:Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.170 s -- in cl.duoc.bancoxyz.pagos.domain.MovimientoRepositoryEnMemoriaTest
+pagos-service/target/surefire-reports/cl.duoc.bancoxyz.pagos.mensajeria.ConsumidorRetirosTest.txt:Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.013 s -- in cl.duoc.bancoxyz.pagos.mensajeria.ConsumidorRetirosTest
+pagos-service/target/surefire-reports/cl.duoc.bancoxyz.pagos.service.FichaCuentaServiceTest.txt:Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in cl.duoc.bancoxyz.pagos.service.FichaCuentaServiceTest
+pagos-service/target/surefire-reports/cl.duoc.bancoxyz.pagos.service.PagoServiceTest.txt:Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.247 s -- in cl.duoc.bancoxyz.pagos.service.PagoServiceTest
+pagos-service/target/surefire-reports/cl.duoc.bancoxyz.pagos.util.FechaLegacyParserTest.txt:Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in cl.duoc.bancoxyz.pagos.util.FechaLegacyParserTest
+
+
+--- Total ---
+Tests: 168  Failures: 0  Errors: 0
+
+
+--- Artefactos construidos ---
+-rw-r--r-- 1 root root  58873975 Oct  8 18:15 api-gateway/target/api-gateway.jar
+-rw-r--r-- 1 root root  55820612 Oct  8 18:15 auth-server/target/auth-server.jar
+-rw-r--r-- 1 root root  41800383 Oct  8 18:15 batch-migracion/target/batch-migracion.jar
+-rw-r--r-- 1 root root  28545027 Oct  8 18:16 bff-cajero/target/bff-cajero.jar
+-rw-r--r-- 1 root root     23165 Oct  8 18:16 bff-common/target/bff-common-1.0.0.jar
+-rw-r--r-- 1 root root  28542659 Oct  8 18:16 bff-movil/target/bff-movil.jar
+-rw-r--r-- 1 root root  28547289 Oct  8 18:16 bff-web/target/bff-web.jar
+-rw-r--r-- 1 root root  48797147 Oct  8 18:15 broker-artemis/target/broker-artemis.jar
+-rw-r--r-- 1 root root 136332759 Oct  8 18:15 broker-kafka/target/broker-kafka.jar
+-rw-r--r-- 1 root root  72633468 Oct  8 18:16 clientes-service/target/clientes-service.jar
+-rw-r--r-- 1 root root     23958 Oct  8 18:15 common-dominio/target/common-dominio-1.0.0.jar
+-rw-r--r-- 1 root root  46178008 Oct  8 18:15 config-server/target/config-server.jar
+-rw-r--r-- 1 root root  85727476 Oct  8 18:15 cuentas-service/target/cuentas-service.jar
+-rw-r--r-- 1 root root  60016077 Oct  8 18:15 discovery-server/target/discovery-server.jar
+-rw-r--r-- 1 root root  87999055 Oct  8 18:15 pagos-service/target/pagos-service.jar

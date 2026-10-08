@@ -1,0 +1,181 @@
+
+==============================================================
+  02 - MIGRACION DE PROCESOS BATCH (fin_legacy_data)
+==============================================================
+Los tres procesos legacy reescritos en Spring Batch, sobre los archivos
+del repositorio KariVillagran/fin_legacy_data:
+  movimientos_financieros_diarios.csv -> reporteTransaccionesDiariasJob
+  intereses_trimestrales.csv          -> calculoInteresesMensualesJob
+  estados_financieros_anuales.csv     -> estadoCuentaAnualJob
+
+
+--- Archivos de entrada ---
+ 1001 batch-migracion/src/main/resources/data/estados_financieros_anuales.csv
+ 1001 batch-migracion/src/main/resources/data/intereses_trimestrales.csv
+ 1001 batch-migracion/src/main/resources/data/movimientos_financieros_diarios.csv
+ 3003 total
+
+
+--- Ejecucion de los tres jobs ---
+2026-10-08T18:16:15.576 INFO  [main] c.d.b.b.c.l.JobMetricsListener : >> INICIO job [reporteTransaccionesDiariasJob] parametros={'intento':'{value=1, type=class java.lang.Long, identifying=true}','timestamp':'{value=1791483375498, type=class java.lang.Long, identifying=true}'}
+2026-10-08T18:16:15.929 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=502, fecha=04/12/2024, monto=-200, tipo=debito) -> id=502 monto inválido: '-200'
+2026-10-08T18:16:15.930 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=751, fecha=26-09-2024, monto=, tipo=credito) -> id=751 monto inválido: ''
+2026-10-08T18:16:15.935 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=252, fecha=24-12-2024, monto=1500, tipo=invalido) -> id=252 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:15.930 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=1, fecha=2024/03/05, monto=1500, tipo=invalido) -> id=1 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:15.978 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=3, fecha=02/04/2024, monto=-200, tipo=debito) -> id=3 monto inválido: '-200'
+2026-10-08T18:16:15.979 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=503, fecha=22/02/2024, monto=700, tipo=invalido) -> id=503 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:15.979 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=253, fecha=29/02/2024, monto=1200, tipo=invalido) -> id=253 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:15.982 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=504, fecha=2024-11-04, monto=1200, tipo=desconocido) -> id=504 tipo de transacción fuera de dominio: 'desconocido'
+2026-10-08T18:16:15.985 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=506, fecha=2024/01/19, monto=1200, tipo=invalido) -> id=506 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:15.985 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=507, fecha=15-05-2024, monto=700, tipo=invalido) -> id=507 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:15.986 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=509, fecha=01-09-2024, monto=, tipo=desconocido) -> id=509 monto inválido: ''
+2026-10-08T18:16:15.983 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=752, fecha=2024/08/05, monto=800, tipo=invalido) -> id=752 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:15.984 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=255, fecha=2024/05/15, monto=1200, tipo=desconocido) -> id=255 tipo de transacción fuera de dominio: 'desconocido'
+2026-10-08T18:16:15.990 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=753, fecha=2024-06-30, monto=, tipo=invalido) -> id=753 monto inválido: ''
+2026-10-08T18:16:15.990 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=256, fecha=27-09-2024, monto=1200, tipo=invalido) -> id=256 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:15.991 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=754, fecha=2024-10-24, monto=500, tipo=invalido) -> id=754 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:15.991 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=257, fecha=2024-13-01, monto=800, tipo=credito) -> id=257 fecha no interpretable: '2024-13-01'
+2026-10-08T18:16:15.984 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=4, fecha=2024/04/27, monto=1200, tipo=invalido) -> id=4 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:15.992 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=5, fecha=17-08-2024, monto=, tipo=debito) -> id=5 monto inválido: ''
+2026-10-08T18:16:15.992 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=261, fecha=2024-13-01, monto=, tipo=debito) -> id=261 fecha no interpretable: '2024-13-01'
+2026-10-08T18:16:15.995 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=756, fecha=2024-06-15, monto=, tipo=credito) -> id=756 monto inválido: ''
+2026-10-08T18:16:15.996 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=262, fecha=2024-13-01, monto=800, tipo=debito) -> id=262 fecha no interpretable: '2024-13-01'
+2026-10-08T18:16:15.996 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=758, fecha=2024-02-22, monto=, tipo=debito) -> id=758 monto inválido: ''
+2026-10-08T18:16:15.997 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=263, fecha=2024/02/11, monto=1200, tipo=invalido) -> id=263 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:15.997 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=765, fecha=2024-01-17, monto=700, tipo=invalido) -> id=765 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:15.997 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=264, fecha=2024/03/07, monto=700, tipo=invalido) -> id=264 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:15.992 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=6, fecha=2024-09-26, monto=, tipo=invalido) -> id=6 monto inválido: ''
+2026-10-08T18:16:15.998 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=767, fecha=2024/10/05, monto=-200, tipo=invalido) -> id=767 monto inválido: '-200'
+2026-10-08T18:16:15.998 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=510, fecha=2024-03-20, monto=800, tipo=invalido) -> id=510 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.004 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=265, fecha=15/10/2024, monto=0, tipo=invalido) -> id=265 monto inválido: '0'
+2026-10-08T18:16:16.004 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=511, fecha=24-05-2024, monto=-100, tipo=credito) -> id=511 monto inválido: '-100'
+2026-10-08T18:16:16.005 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=266, fecha=18/10/2024, monto=, tipo=debito) -> id=266 monto inválido: ''
+2026-10-08T18:16:16.005 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=512, fecha=2024/05/17, monto=500, tipo=invalido) -> id=512 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.006 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=267, fecha=2024/05/10, monto=3000, tipo=desconocido) -> id=267 tipo de transacción fuera de dominio: 'desconocido'
+2026-10-08T18:16:16.006 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=514, fecha=24/11/2024, monto=700, tipo=desconocido) -> id=514 tipo de transacción fuera de dominio: 'desconocido'
+2026-10-08T18:16:16.007 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=268, fecha=2024/05/22, monto=3000, tipo=desconocido) -> id=268 tipo de transacción fuera de dominio: 'desconocido'
+2026-10-08T18:16:16.007 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=7, fecha=2024/01/11, monto=-200, tipo=credito) -> id=7 monto inválido: '-200'
+2026-10-08T18:16:16.010 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=768, fecha=2024-09-23, monto=, tipo=debito) -> id=768 monto inválido: ''
+2026-10-08T18:16:16.012 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=769, fecha=14/05/2024, monto=, tipo=invalido) -> id=769 monto inválido: ''
+2026-10-08T18:16:16.012 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=270, fecha=2024-13-01, monto=1500, tipo=debito) -> id=270 fecha no interpretable: '2024-13-01'
+2026-10-08T18:16:16.013 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=770, fecha=2024-13-01, monto=, tipo=invalido) -> id=770 fecha no interpretable: '2024-13-01'
+2026-10-08T18:16:16.013 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=273, fecha=2024/06/22, monto=-200, tipo=debito) -> id=273 monto inválido: '-200'
+2026-10-08T18:16:16.013 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=771, fecha=2024/06/17, monto=3000, tipo=invalido) -> id=771 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.014 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=275, fecha=02-10-2024, monto=-200, tipo=desconocido) -> id=275 monto inválido: '-200'
+2026-10-08T18:16:16.014 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=772, fecha=08-10-2024, monto=-200, tipo=invalido) -> id=772 monto inválido: '-200'
+2026-10-08T18:16:16.014 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=280, fecha=2024-04-30, monto=0, tipo=invalido) -> id=280 monto inválido: '0'
+2026-10-08T18:16:16.015 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=281, fecha=28-03-2024, monto=, tipo=debito) -> id=281 monto inválido: ''
+2026-10-08T18:16:16.011 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=516, fecha=2024/08/19, monto=-200, tipo=credito) -> id=516 monto inválido: '-200'
+2026-10-08T18:16:16.017 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=285, fecha=2024-11-01, monto=3000, tipo=desconocido) -> id=285 tipo de transacción fuera de dominio: 'desconocido'
+2026-10-08T18:16:16.020 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=287, fecha=2024/06/25, monto=1500, tipo=invalido) -> id=287 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.017 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=518, fecha=21-10-2024, monto=, tipo=invalido) -> id=518 monto inválido: ''
+2026-10-08T18:16:16.021 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=289, fecha=07/02/2024, monto=1200, tipo=desconocido) -> id=289 tipo de transacción fuera de dominio: 'desconocido'
+2026-10-08T18:16:16.018 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=10, fecha=16/04/2024, monto=-200, tipo=debito) -> id=10 monto inválido: '-200'
+2026-10-08T18:16:16.024 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=291, fecha=2024-01-05, monto=1500, tipo=invalido) -> id=291 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.024 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=12, fecha=03/06/2024, monto=3000, tipo=invalido) -> id=12 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.025 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=292, fecha=2024-04-23, monto=800, tipo=invalido) -> id=292 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.025 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=13, fecha=26-10-2024, monto=700, tipo=invalido) -> id=13 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.025 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=295, fecha=2024-13-01, monto=3000, tipo=credito) -> id=295 fecha no interpretable: '2024-13-01'
+2026-10-08T18:16:16.021 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=519, fecha=28/04/2024, monto=1500, tipo=invalido) -> id=519 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.015 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=773, fecha=24/10/2024, monto=, tipo=credito) -> id=773 monto inválido: ''
+2026-10-08T18:16:16.025 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=16, fecha=03-12-2024, monto=1200, tipo=invalido) -> id=16 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.028 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=296, fecha=21-02-2024, monto=0, tipo=debito) -> id=296 monto inválido: '0'
+2026-10-08T18:16:16.030 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=17, fecha=21-02-2024, monto=, tipo=debito) -> id=17 monto inválido: ''
+2026-10-08T18:16:16.032 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=299, fecha=2024/08/07, monto=-200, tipo=credito) -> id=299 monto inválido: '-200'
+2026-10-08T18:16:16.032 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=18, fecha=2024/07/15, monto=-200, tipo=debito) -> id=18 monto inválido: '-200'
+2026-10-08T18:16:16.033 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=19, fecha=14/08/2024, monto=1000, tipo=invalido) -> id=19 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.033 WARN  [batch-partition-3] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=300, fecha=2024-11-22, monto=500, tipo=invalido) -> id=300 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.034 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=20, fecha=09/01/2024, monto=700, tipo=invalido) -> id=20 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.034 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=21, fecha=16/06/2024, monto=-100, tipo=invalido) -> id=21 monto inválido: '-100'
+2026-10-08T18:16:16.035 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=775, fecha=20/06/2024, monto=, tipo=credito) -> id=775 monto inválido: ''
+2026-10-08T18:16:16.036 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=776, fecha=2024/02/23, monto=-200, tipo=invalido) -> id=776 monto inválido: '-200'
+2026-10-08T18:16:16.037 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=778, fecha=15-08-2024, monto=, tipo=credito) -> id=778 monto inválido: ''
+2026-10-08T18:16:16.038 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=780, fecha=13-05-2024, monto=800, tipo=invalido) -> id=780 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.030 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=520, fecha=12-11-2024, monto=, tipo=credito) -> id=520 monto inválido: ''
+2026-10-08T18:16:16.043 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=521, fecha=2024/07/20, monto=, tipo=invalido) -> id=521 monto inválido: ''
+2026-10-08T18:16:16.044 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=22, fecha=2024/07/06, monto=3000, tipo=invalido) -> id=22 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.045 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=23, fecha=2024-10-17, monto=-200, tipo=credito) -> id=23 monto inválido: '-200'
+2026-10-08T18:16:16.046 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=28, fecha=2024-13-01, monto=, tipo=invalido) -> id=28 fecha no interpretable: '2024-13-01'
+2026-10-08T18:16:16.047 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=522, fecha=03-06-2024, monto=, tipo=debito) -> id=522 monto inválido: ''
+2026-10-08T18:16:16.055 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=29, fecha=2024/06/02, monto=1000, tipo=invalido) -> id=29 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.055 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=525, fecha=02/03/2024, monto=800, tipo=invalido) -> id=525 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.056 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=526, fecha=08-12-2024, monto=1200, tipo=invalido) -> id=526 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.056 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=32, fecha=2024/08/07, monto=, tipo=invalido) -> id=32 monto inválido: ''
+2026-10-08T18:16:16.057 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=529, fecha=2024/06/08, monto=, tipo=invalido) -> id=529 monto inválido: ''
+2026-10-08T18:16:16.057 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=33, fecha=16/10/2024, monto=, tipo=debito) -> id=33 monto inválido: ''
+2026-10-08T18:16:16.057 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=530, fecha=24/09/2024, monto=700, tipo=invalido) -> id=530 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.057 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=34, fecha=2024-07-02, monto=1500, tipo=desconocido) -> id=34 tipo de transacción fuera de dominio: 'desconocido'
+2026-10-08T18:16:16.058 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=532, fecha=28-10-2024, monto=, tipo=debito) -> id=532 monto inválido: ''
+2026-10-08T18:16:16.059 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=533, fecha=2024-04-28, monto=700, tipo=invalido) -> id=533 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.065 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=36, fecha=2024/04/16, monto=-200, tipo=credito) -> id=36 monto inválido: '-200'
+2026-10-08T18:16:16.066 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=38, fecha=15-10-2024, monto=-200, tipo=debito) -> id=38 monto inválido: '-200'
+2026-10-08T18:16:16.067 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=781, fecha=11-12-2024, monto=, tipo=debito) -> id=781 monto inválido: ''
+2026-10-08T18:16:16.068 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=782, fecha=2024-08-27, monto=1500, tipo=invalido) -> id=782 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.072 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=783, fecha=2024/10/26, monto=, tipo=credito) -> id=783 monto inválido: ''
+2026-10-08T18:16:16.072 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=534, fecha=2024-13-01, monto=3000, tipo=invalido) -> id=534 fecha no interpretable: '2024-13-01'
+2026-10-08T18:16:16.075 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=39, fecha=26/01/2024, monto=, tipo=invalido) -> id=39 monto inválido: ''
+2026-10-08T18:16:16.076 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=536, fecha=12/08/2024, monto=700, tipo=invalido) -> id=536 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.076 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=40, fecha=2024/05/30, monto=-200, tipo=invalido) -> id=40 monto inválido: '-200'
+2026-10-08T18:16:16.077 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=785, fecha=08-10-2024, monto=, tipo=credito) -> id=785 monto inválido: ''
+2026-10-08T18:16:16.077 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=43, fecha=22-01-2024, monto=1000, tipo=invalido) -> id=43 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.078 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=786, fecha=2024-11-03, monto=1000, tipo=invalido) -> id=786 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.077 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=537, fecha=22/05/2024, monto=700, tipo=invalido) -> id=537 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.084 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=787, fecha=2024-12-05, monto=, tipo=debito) -> id=787 monto inválido: ''
+2026-10-08T18:16:16.085 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=789, fecha=01-07-2024, monto=-100, tipo=credito) -> id=789 monto inválido: '-100'
+2026-10-08T18:16:16.086 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=790, fecha=14/04/2024, monto=-200, tipo=credito) -> id=790 monto inválido: '-200'
+2026-10-08T18:16:16.086 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=791, fecha=06-12-2024, monto=1000, tipo=invalido) -> id=791 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.078 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=45, fecha=2024/07/17, monto=800, tipo=invalido) -> id=45 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.087 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=792, fecha=2024-13-01, monto=1200, tipo=invalido) -> id=792 fecha no interpretable: '2024-13-01'
+2026-10-08T18:16:16.088 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=794, fecha=20/05/2024, monto=, tipo=invalido) -> id=794 monto inválido: ''
+2026-10-08T18:16:16.084 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=539, fecha=2024/07/03, monto=, tipo=debito) -> id=539 monto inválido: ''
+2026-10-08T18:16:16.092 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=796, fecha=12-02-2024, monto=3000, tipo=desconocido) -> id=796 tipo de transacción fuera de dominio: 'desconocido'
+2026-10-08T18:16:16.092 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=540, fecha=03-03-2024, monto=700, tipo=desconocido) -> id=540 tipo de transacción fuera de dominio: 'desconocido'
+2026-10-08T18:16:16.092 WARN  [batch-partition-1] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=800, fecha=02-04-2024, monto=1200, tipo=desconocido) -> id=800 tipo de transacción fuera de dominio: 'desconocido'
+2026-10-08T18:16:16.088 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=46, fecha=05/11/2024, monto=-200, tipo=debito) -> id=46 monto inválido: '-200'
+2026-10-08T18:16:16.093 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=48, fecha=31-05-2024, monto=, tipo=debito) -> id=48 monto inválido: ''
+2026-10-08T18:16:16.094 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=49, fecha=2024-04-15, monto=, tipo=invalido) -> id=49 monto inválido: ''
+2026-10-08T18:16:16.095 WARN  [batch-partition-4] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=50, fecha=2024/10/08, monto=1200, tipo=invalido) -> id=50 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.099 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=541, fecha=2024/05/11, monto=1000, tipo=invalido) -> id=541 tipo de transacción fuera de dominio: 'invalido'
+2026-10-08T18:16:16.100 WARN  [batch-partition-2] c.d.b.b.c.l.AnomaliaSkipListener : [transacciones-diarias] Registro omitido en procesamiento: TransaccionCsv(id=543, fecha=2024/12/03, monto=700, tipo=desconocido) -> id=543 tipo de transacción fuera de dominio: 'desconocido'
+
+Codigo de salida del proceso: 0
+
+
+--- Politica de finalizacion: un argumento invalido termina con codigo distinto de cero ---
+Codigo de salida con --job=inexistente: 1
+
+--- Escalado: la misma carga con distinto numero de particiones ---
+El resultado tiene que ser el mismo en las tres: el paralelismo cambia
+cuanto tarda, no que filas entran.
+-- grid-size=1
+2026-10-08T18:16:34.114 INFO  [main] c.d.b.b.c.l.JobMetricsListener : << FIN job [reporteTransaccionesDiariasJob] estado=COMPLETED duracion=1684 ms
+2026-10-08T18:16:34.114 INFO  [main] c.d.b.b.c.l.JobMetricsListener :    - step [transaccionesPartitionStep] leidos=1000 escritos=392 omitidos(lectura/proceso/escritura)=0/608/0 estado=COMPLETED
+-- grid-size=4
+2026-10-08T18:16:42.520 INFO  [main] c.d.b.b.c.l.JobMetricsListener : << FIN job [reporteTransaccionesDiariasJob] estado=COMPLETED duracion=1539 ms
+2026-10-08T18:16:42.520 INFO  [main] c.d.b.b.c.l.JobMetricsListener :    - step [transaccionesPartitionStep] leidos=1000 escritos=392 omitidos(lectura/proceso/escritura)=0/608/0 estado=COMPLETED
+-- grid-size=8
+2026-10-08T18:16:50.862 INFO  [main] c.d.b.b.c.l.JobMetricsListener : << FIN job [reporteTransaccionesDiariasJob] estado=COMPLETED duracion=1531 ms
+2026-10-08T18:16:50.863 INFO  [main] c.d.b.b.c.l.JobMetricsListener :    - step [transaccionesPartitionStep] leidos=1000 escritos=392 omitidos(lectura/proceso/escritura)=0/608/0 estado=COMPLETED
+
+--- Reejecucion automatica ante un fallo critico, y el codigo de salida ---
+Se baja el limite de omisiones a 100 para provocar el fallo a proposito.
+El archivo trae 608 filas invalidas, asi que el Step supera el tope y el
+Job falla entero. Eso es lo que dispara la politica de reejecucion:
+
+   2026-10-08T18:16:57.986 INFO  [main] c.d.b.b.c.l.JobMetricsListener : << FIN job [reporteTransaccionesDiariasJob] estado=FAILED duracion=1008 ms
+   2026-10-08T18:16:57.992 WARN  [main] c.d.b.batch.config.JobLauncherRunner : >> batch: el job [reporteTransaccionesDiariasJob] termino en FAILED - reintentando en 3000 ms (intento 2 de 2)
+   2026-10-08T18:17:01.188 INFO  [main] c.d.b.b.c.l.JobMetricsListener : << FIN job [reporteTransaccionesDiariasJob] estado=FAILED duracion=183 ms
+   2026-10-08T18:17:01.190 ERROR [main] c.d.b.batch.config.JobLauncherRunner : >> batch: 1 job(s) terminaron fallidos tras agotar los reintentos: reporteTransaccionesDiariasJob
+
+   Codigo de salida del proceso: 1
+   Distinto de cero, que es lo unico que un cron o un paso de CI mira.
+   Sin eso, un batch que no proceso nada terminaria 'bien' y nadie se
+   enteraria hasta que faltaran los datos.
+
+--- Por que el limite de omisiones esta en 700 y no en 200 ---
+El limite es por ejecucion de Step, no por archivo, y con
+particionamiento cada particion lleva su propia cuenta. Con un limite
+de 200 y las 608 filas invalidas de este archivo, el job fallaba con una
+particion y pasaba con cuatro: el mismo archivo, el mismo limite y dos
+resultados distintos segun el paralelismo. Calibrado en 700, el
+resultado es el mismo con cualquier grid, que es lo que se ve arriba.

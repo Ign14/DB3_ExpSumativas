@@ -1,0 +1,36 @@
+# Configuracion de los tests de este modulo. Reemplaza al application.yml de
+# src/main/resources, que arranca pidiendole la configuracion al Config Server.
+# El razonamiento completo esta en el javadoc de ReglasDeAutorizacionTest.
+spring:
+  application:
+    name: clientes-service-test
+  main:
+    banner-mode: off
+  cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:1/jwks
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+banco:
+  kafka:
+    grupo-clientes: clientes-service-test
+
+management:
+  endpoints:
+    enabled-by-default: false
+
+logging:
+  level:
+    root: WARN

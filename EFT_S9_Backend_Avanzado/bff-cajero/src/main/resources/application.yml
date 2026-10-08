@@ -1,0 +1,50 @@
+server:
+  port: 8093
+  # Sin compresion en este canal: sus respuestas rondan los 40 bytes y el
+  # encabezado de gzip las deja mas grandes que sin comprimir. El umbral
+  # min-response-size no sirve para evitarlo, porque las respuestas se emiten
+  # con Transfer-Encoding: chunked y Tomcat no conoce su tamano de antemano.
+  compression:
+    enabled: false
+
+spring:
+  application:
+    name: bff-cajero
+  security:
+    oauth2:
+      client:
+        registration:
+          # Credenciales propias del canal. El cajero tiene los scopes mas
+          # acotados de los tres: consulta saldo y retira, y nada mas.
+          cajero:
+            provider: banco-auth
+            client-id: cajero-client
+            client-secret: ${CAJERO_CLIENT_SECRET:cajero-secret}
+            authorization-grant-type: client_credentials
+            scope: cuentas.read,cuentas.write
+        provider:
+          banco-auth:
+            token-uri: ${AUTH_ISSUER_URI:http://localhost:9000}/oauth2/token
+
+bff:
+  # Un solo destino: el api-gateway. El canal no sabe en que puerto vive cada
+  # microservicio ni cuantas instancias hay de cada uno.
+  gateway:
+    url: http://${GATEWAY_HOST:localhost}:8080
+  cajero:
+    limite-retiro-por-operacion: 500000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    cl.duoc.bancoxyz.bff: INFO

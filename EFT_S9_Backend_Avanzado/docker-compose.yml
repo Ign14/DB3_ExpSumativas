@@ -1,0 +1,437 @@
+# Orquestacion completa del sistema: once contenedores construidos desde este
+# repositorio, mas Kafka y el contenedor de un solo uso que crea sus topicos, en
+# una red privada.
+#
+# La parte que importa de este archivo no es la lista de servicios, sino el
+# orden. Un microservicio que arranca antes que el Config Server no obtiene su
+# configuracion, y uno que arranca antes que Eureka no se registra. Por eso cada
+# dependencia se declara con "condition: service_healthy" contra el endpoint de
+# salud real del servicio, y no con un depends_on simple, que solo espera a que
+# el contenedor exista y no a que el servicio dentro este listo.
+#
+# Los nombres de servicio de esta seccion son los nombres DNS dentro de la red:
+# por eso las variables de entorno apuntan a "config-server", "broker-artemis" o
+# "kafka" y no a localhost. En la ejecucion local las mismas variables tienen
+# localhost por defecto, asi que el codigo y la configuracion son los mismos en
+# los dos entornos.
+#
+# Escalabilidad horizontal: cuentas-service, pagos-service y clientes-service no
+# declaran container_name ni publican puertos al host, y eso es a proposito. Un
+# nombre de contenedor fijo impide levantar una segunda instancia, y un puerto
+# publicado chocaria entre instancias. Como no tienen ninguno de los dos, se
+# pueden escalar:
+#
+#   docker compose up -d --scale cuentas-service=2 --scale pagos-service=2
+#
+# Cada instancia se registra en Eureka con su propia IP y el gateway reparte
+# entre todas sin tocar configuracion. Los unicos puertos publicados son los del
+# gateway, los tres BFF y los componentes de infraestructura que hay que poder
+# inspeccionar: la superficie expuesta es la minima para operar y demostrar.
+
+name: eft-banco-xyz
+
+services:
+
+  # ------------------------------------------------------------------
+  # Infraestructura
+  # ------------------------------------------------------------------
+
+  config-server:
+    build:
+      context: .
+      args:
+        MODULE: config-server
+    image: banco-xyz/config-server:1.0.0
+    container_name: config-server
+    environment:
+      CONFIG_USER: ${CONFIG_USER:-banco-config}
+      CONFIG_PASSWORD: ${CONFIG_PASSWORD:-banco-config-secret}
+    ports:
+      - "8888:8888"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8888/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks: [banco]
+
+  discovery-server:
+    build:
+      context: .
+      args:
+        MODULE: discovery-server
+    image: banco-xyz/discovery-server:1.0.0
+    container_name: discovery-server
+    environment:
+      EUREKA_USER: ${EUREKA_USER:-banco-eureka}
+      EUREKA_PASSWORD: ${EUREKA_PASSWORD:-banco-eureka-secret}
+      # El nombre con el que el servidor se reconoce a si mismo dentro de la red,
+      # para no tratarse como un nodo par y replicarse a si mismo.
+      EUREKA_SELF_HOST: discovery-server
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks: [banco]
+
+  broker-artemis:
+    build:
+      context: .
+      args:
+        MODULE: broker-artemis
+    image: banco-xyz/broker-artemis:1.0.0
+    container_name: broker-artemis
+    environment:
+      ARTEMIS_USER: ${ARTEMIS_USER:-artemis}
+      ARTEMIS_PASSWORD: ${ARTEMIS_PASSWORD:-artemis-secret}
+    ports:
+      # Solo el puerto de salud. El 61616 no se publica al host: el broker lo
+      # necesitan los microservicios de esta red y nadie mas, y publicar un
+      # puerto de mensajeria es dar un camino de escritura al dominio que no pasa
+      # por el gateway.
+      - "61617:61617"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:61617/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    networks: [banco]
+
+  # Kafka es la imagen oficial en modo KRaft, sin Zookeeper. El modulo
+  # broker-kafka del repositorio no participa aqui: existe solo para que la
+  # ejecucion local sin Docker tenga un broker, y en contenedores no hay razon
+  # para no usar el broker real.
+  kafka:
+    image: apache/kafka:3.8.1
+    container_name: kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      # Escucha en todas las interfaces y se anuncia por su nombre DNS en la red.
+      # Son dos cosas distintas: el cliente pide los metadatos del cluster y
+      # luego se conecta a la direccion que el broker le devuelve. Si se
+      # anunciara 0.0.0.0, los clientes intentarian conectarse a 0.0.0.0.
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      # Un solo nodo: no hay donde replicar. En un cluster real estos tres
+      # valores serian 3, 3 y 2, y es el cambio que convierte "acks=all" del
+      # productor en una garantia de verdad.
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      # Sin esta espera, el primer consumidor de un grupo aguarda tres segundos
+      # por si llegan companeros antes de asignarse las particiones. En
+      # produccion evita rebalanceos innecesarios; aqui solo retrasa el arranque.
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      # Los topicos se crean explicitamente en kafka-init, no al vuelo.
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      CLUSTER_ID: eft-banco-xyz-cluster
+    ports:
+      # Publicado para poder inspeccionar los topicos desde el host con las
+      # herramientas de Kafka si hace falta.
+      - "9092:9092"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+      start_period: 20s
+    networks: [banco]
+
+  # Contenedor de un solo uso: crea los dos topicos y termina. Los servicios que
+  # los consumen dependen de que este haya terminado bien, no solo de que Kafka
+  # este sano, asi que ningun consumidor arranca contra un topico inexistente.
+  #
+  # Se crean aqui en vez de dejar que el primer productor los cree al vuelo
+  # porque un topico creado automaticamente toma las particiones y la replicacion
+  # por defecto del broker, que no son necesariamente las que el sistema quiere,
+  # y porque el primer envio se demora o falla mientras el topico aparece.
+  kafka-init:
+    image: apache/kafka:3.8.1
+    container_name: kafka-init
+    depends_on:
+      kafka:
+        condition: service_healthy
+    command: >
+      bash -c "
+      /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists
+        --topic banco.transacciones-completadas --partitions 3 --replication-factor 1 &&
+      /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists
+        --topic banco.alertas-seguridad --partitions 3 --replication-factor 1 &&
+      echo '>> kafka-init: topicos creados' &&
+      /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --describe
+        --topic banco.transacciones-completadas --topic banco.alertas-seguridad
+      "
+    networks: [banco]
+
+  auth-server:
+    build:
+      context: .
+      args:
+        MODULE: auth-server
+    image: banco-xyz/auth-server:1.0.0
+    container_name: auth-server
+    environment:
+      CONFIG_HOST: config-server
+      CONFIG_USER: ${CONFIG_USER:-banco-config}
+      CONFIG_PASSWORD: ${CONFIG_PASSWORD:-banco-config-secret}
+      EUREKA_HOST: discovery-server
+      EUREKA_USER: ${EUREKA_USER:-banco-eureka}
+      EUREKA_PASSWORD: ${EUREKA_PASSWORD:-banco-eureka-secret}
+      # El issuer que viaja en el claim iss de los tokens. Se fija al nombre de
+      # red para que un token pedido desde el host siga llevando el issuer que
+      # los Resource Servers de esta red exigen, sin aflojar la validacion.
+      AUTH_ISSUER_URI: http://auth-server:9000
+      WEB_CLIENT_SECRET: ${WEB_CLIENT_SECRET:-banco-web-secret}
+      MOVIL_CLIENT_SECRET: ${MOVIL_CLIENT_SECRET:-banco-movil-secret}
+      CAJERO_CLIENT_SECRET: ${CAJERO_CLIENT_SECRET:-cajero-secret}
+      PAGOS_CLIENT_SECRET: ${PAGOS_CLIENT_SECRET:-pagos-secret}
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    ports:
+      - "9000:9000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9000/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks: [banco]
+
+  api-gateway:
+    build:
+      context: .
+      args:
+        MODULE: api-gateway
+    image: banco-xyz/api-gateway:1.0.0
+    container_name: api-gateway
+    environment:
+      CONFIG_HOST: config-server
+      CONFIG_USER: ${CONFIG_USER:-banco-config}
+      CONFIG_PASSWORD: ${CONFIG_PASSWORD:-banco-config-secret}
+      EUREKA_HOST: discovery-server
+      EUREKA_USER: ${EUREKA_USER:-banco-eureka}
+      EUREKA_PASSWORD: ${EUREKA_PASSWORD:-banco-eureka-secret}
+      AUTH_ISSUER_URI: http://auth-server:9000
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+      auth-server:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks: [banco]
+
+  # ------------------------------------------------------------------
+  # Microservicios de negocio: escalables horizontalmente
+  # ------------------------------------------------------------------
+
+  cuentas-service:
+    build:
+      context: .
+      args:
+        MODULE: cuentas-service
+    image: banco-xyz/cuentas-service:1.0.0
+    environment:
+      CONFIG_HOST: config-server
+      CONFIG_USER: ${CONFIG_USER:-banco-config}
+      CONFIG_PASSWORD: ${CONFIG_PASSWORD:-banco-config-secret}
+      EUREKA_HOST: discovery-server
+      EUREKA_USER: ${EUREKA_USER:-banco-eureka}
+      EUREKA_PASSWORD: ${EUREKA_PASSWORD:-banco-eureka-secret}
+      AUTH_ISSUER_URI: http://auth-server:9000
+      ARTEMIS_HOST: broker-artemis
+      ARTEMIS_USER: ${ARTEMIS_USER:-artemis}
+      ARTEMIS_PASSWORD: ${ARTEMIS_PASSWORD:-artemis-secret}
+      KAFKA_SERVERS: kafka:9092
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+      auth-server:
+        condition: service_healthy
+      broker-artemis:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks: [banco]
+
+  pagos-service:
+    build:
+      context: .
+      args:
+        MODULE: pagos-service
+    image: banco-xyz/pagos-service:1.0.0
+    environment:
+      CONFIG_HOST: config-server
+      CONFIG_USER: ${CONFIG_USER:-banco-config}
+      CONFIG_PASSWORD: ${CONFIG_PASSWORD:-banco-config-secret}
+      EUREKA_HOST: discovery-server
+      EUREKA_USER: ${EUREKA_USER:-banco-eureka}
+      EUREKA_PASSWORD: ${EUREKA_PASSWORD:-banco-eureka-secret}
+      AUTH_ISSUER_URI: http://auth-server:9000
+      ARTEMIS_HOST: broker-artemis
+      ARTEMIS_USER: ${ARTEMIS_USER:-artemis}
+      ARTEMIS_PASSWORD: ${ARTEMIS_PASSWORD:-artemis-secret}
+      KAFKA_SERVERS: kafka:9092
+      PAGOS_CLIENT_SECRET: ${PAGOS_CLIENT_SECRET:-pagos-secret}
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+      auth-server:
+        condition: service_healthy
+      broker-artemis:
+        condition: service_healthy
+      api-gateway:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8082/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks: [banco]
+
+  clientes-service:
+    build:
+      context: .
+      args:
+        MODULE: clientes-service
+    image: banco-xyz/clientes-service:1.0.0
+    environment:
+      CONFIG_HOST: config-server
+      CONFIG_USER: ${CONFIG_USER:-banco-config}
+      CONFIG_PASSWORD: ${CONFIG_PASSWORD:-banco-config-secret}
+      EUREKA_HOST: discovery-server
+      EUREKA_USER: ${EUREKA_USER:-banco-eureka}
+      EUREKA_PASSWORD: ${EUREKA_PASSWORD:-banco-eureka-secret}
+      AUTH_ISSUER_URI: http://auth-server:9000
+      KAFKA_SERVERS: kafka:9092
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+      auth-server:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8083/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks: [banco]
+
+  # ------------------------------------------------------------------
+  # Backends for Frontends: uno por canal
+  # ------------------------------------------------------------------
+
+  bff-web:
+    build:
+      context: .
+      args:
+        MODULE: bff-web
+    image: banco-xyz/bff-web:1.0.0
+    container_name: bff-web
+    environment:
+      GATEWAY_HOST: api-gateway
+      AUTH_ISSUER_URI: http://auth-server:9000
+      WEB_CLIENT_SECRET: ${WEB_CLIENT_SECRET:-banco-web-secret}
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+    ports:
+      - "8091:8091"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8091/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    networks: [banco]
+
+  bff-movil:
+    build:
+      context: .
+      args:
+        MODULE: bff-movil
+    image: banco-xyz/bff-movil:1.0.0
+    container_name: bff-movil
+    environment:
+      GATEWAY_HOST: api-gateway
+      AUTH_ISSUER_URI: http://auth-server:9000
+      MOVIL_CLIENT_SECRET: ${MOVIL_CLIENT_SECRET:-banco-movil-secret}
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+    ports:
+      - "8092:8092"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8092/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    networks: [banco]
+
+  bff-cajero:
+    build:
+      context: .
+      args:
+        MODULE: bff-cajero
+    image: banco-xyz/bff-cajero:1.0.0
+    container_name: bff-cajero
+    environment:
+      GATEWAY_HOST: api-gateway
+      AUTH_ISSUER_URI: http://auth-server:9000
+      CAJERO_CLIENT_SECRET: ${CAJERO_CLIENT_SECRET:-cajero-secret}
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+    ports:
+      - "8093:8093"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8093/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    networks: [banco]
+
+networks:
+  banco:
+    driver: bridge

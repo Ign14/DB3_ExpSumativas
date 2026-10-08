@@ -1,0 +1,113 @@
+
+==============================================================
+  09 - PATRON BFF: UN BACKEND POR CANAL
+==============================================================
+Los tres consumen los mismos microservicios por el gateway, cada uno
+con sus propias credenciales y scopes, y devuelven payloads distintos.
+
+--- Canal WEB: GET localhost:8091/web/cuentas/101 ---
+   campos de primer nivel: ['cuenta', 'perfil', 'historialCompleto', 'resumen']
+   cuenta: {"cuentaId": 101, "nombreTitular": "John Doe", "edad": 40, "tipoCuenta": "prestamo", "saldo": 5000}
+   perfil: {"clienteId": 101, "nombre": "John Doe", "segmento": "establecido", "edad": 40, "tipoCuentaPrincipal": "prestamo", "saldoReferencial": 5000, "operacionesRegistradas": 4, "alertasRegistradas": 1, "ultimaOperacion": "TRANSFERENCIA de 300 el 2026-10-08"}
+   resumen: {"cuentaId": 101, "totalMovimientos": 40, "totalDepositos": 21200, "totalEgresos": 51900, "ultimaFecha": "2026-10-08"}
+   movimientos en el historial completo: 40
+
+--- Canal MOVIL: GET localhost:8092/movil/cuentas/101?limite=3 ---
+{
+    "saldo": 5000,
+    "tipoCuenta": "prestamo",
+    "ultimosMovimientos": [
+        {
+            "fecha": "2026-10-08",
+            "tipo": "retiro",
+            "monto": 100
+        },
+        {
+            "fecha": "2026-10-08",
+            "tipo": "deposito",
+            "monto": 1200
+        },
+        {
+            "fecha": "2026-10-08",
+            "tipo": "pago",
+            "monto": 300
+        }
+    ]
+}
+
+--- Canal CAJERO: GET localhost:8093/cajero/cuentas/101/saldo ---
+{
+    "cuentaId": 101,
+    "saldoDisponible": 5000
+}
+
+--- Tamano de la respuesta por canal, para la misma cuenta ---
+   web            4914 bytes
+   movil           215 bytes
+   cajero           39 bytes
+
+   Es el punto del patron: el cajero no recibe el historial de nadie y
+   el movil no recibe el perfil comercial del titular, porque ninguno
+   de los dos los muestra.
+
+--- Retiro por el canal cajero: una sola llamada, el historial lo actualiza la cola ---
+{
+    "cuentaId": 101,
+    "montoSolicitado": 150,
+    "saldoResultante": 4850,
+    "aprobado": true,
+    "motivoRechazo": null,
+    "fechaMovimiento": "2026-10-08",
+    "movimientoRegistrado": true
+}
+   movimiento recien anotado por el consumidor JMS:
+[
+    {
+        "cuentaId": 101,
+        "fecha": "2026-10-08",
+        "tipoMovimiento": "retiro",
+        "monto": 100,
+        "descripcion": "Retiro por canal cajero"
+    }
+]
+
+--- Panel administrativo, exclusivo del canal web ---
+{
+    "cantidadTotal": 392,
+    "montoTotal": 529400,
+    "cantidadCreditos": 176,
+    "cantidadDebitos": 216,
+    "montoCreditos": 244500,
+    "montoDebitos": 284900
+}
+
+--- Deposito por el canal web ---
+{
+    "operacionId": "95c1e72e-071e-4dc4-bca2-0c9dcbb995ff",
+    "tipoOperacion": "DEPOSITO",
+    "cuentaOrigen": 101,
+    "cuentaDestino": 101,
+    "monto": 500,
+    "saldoResultante": 5350,
+    "aprobada": true,
+    "motivoRechazo": null,
+    "eventoPublicado": true
+}
+
+--- Edicion de datos personales, tambien exclusiva del canal web ---
+{
+    "clienteId": 101,
+    "nombre": "Titular Actualizado",
+    "segmento": "establecido",
+    "edad": 40,
+    "tipoCuentaPrincipal": "prestamo",
+    "saldoReferencial": 5000,
+    "operacionesRegistradas": 6,
+    "alertasRegistradas": 1,
+    "ultimaOperacion": "DEPOSITO de 500 el 2026-10-08"
+}
+
+--- El canal cajero no tiene endpoints de clientes ni de pagos ---
+   GET localhost:8093/cajero/clientes/101 -> HTTP 404
+   Y aunque los tuviera, su token no tiene los scopes: el limite esta
+   en los dos lados, no solo en la forma de la API.

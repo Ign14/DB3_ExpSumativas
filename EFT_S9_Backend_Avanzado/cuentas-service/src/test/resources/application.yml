@@ -1,0 +1,57 @@
+# Configuracion que usan los tests de este modulo.
+#
+# Reemplaza por completo al application.yml de src/main/resources, porque las
+# clases de test van antes en el classpath. Hace falta por una razon concreta:
+# el jar real arranca con "spring.config.import: configserver:..." y
+# "fail-fast: true", de modo que no levanta si el Config Server no responde. Eso
+# es lo correcto en produccion y es justo lo que un test no debe necesitar.
+#
+# Sin este archivo, el test de las reglas de autorizacion seria en la practica un
+# test de integracion: fallaria cuando la infraestructura no esta levantada, por
+# un motivo que no tiene nada que ver con lo que esta probando.
+spring:
+  application:
+    name: cuentas-service-test
+  cloud:
+    config:
+      # Sin Config Server en los tests. La comprobacion de import hay que
+      # desactivarla explicitamente: spring-cloud exige que exista un
+      # spring.config.import y falla al arrancar si no lo encuentra, aunque el
+      # cliente este apagado.
+      enabled: false
+      import-check:
+        enabled: false
+  main:
+    banner-mode: off
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Nunca se consulta: los tests inyectan un JWT ya autenticado, asi que
+          # el decodificador no llega a usarse. Esta solo para que la
+          # autoconfiguracion del Resource Server pueda construirse.
+          jwk-set-uri: http://localhost:1/jwks
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+banco:
+  cuentas:
+    limite-retiro-por-operacion: 500000
+
+logging:
+  level:
+    root: WARN
+
+management:
+  endpoints:
+    # Se apagan los endpoints reales de Actuator en los tests. No por molestia:
+    # el indicador de salud real consulta el broker JMS y devuelve 503 cuando no
+    # hay broker, de modo que un test sobre la cadena de filtros terminaria
+    # fallando por una dependencia ausente. Apagados, las rutas /actuator/* las
+    # atiende el controlador de sonda y lo unico que puede decidir el resultado
+    # es la regla de autorizacion, que es lo que se esta probando.
+    enabled-by-default: false

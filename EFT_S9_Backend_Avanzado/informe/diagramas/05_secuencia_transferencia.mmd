@@ -1,0 +1,41 @@
+sequenceDiagram
+    autonumber
+    participant O as Operador
+    participant B as bff-web
+    participant G as api-gateway
+    participant P as pagos-service
+    participant CU as cuentas-service
+    participant K as Kafka
+
+    O->>B: POST /web/cuentas/101/transferencia {destino, monto}
+    B->>G: POST /api/pagos/transferencia/101 + Bearer
+    G->>P: POST /pagos/transferencia/101
+
+    rect rgb(235, 245, 235)
+        note over P,CU: Camino feliz
+        P->>CU: POST /cuentas/101/cargo (scope cuentas.liquidar)
+        CU-->>P: aplicado, saldo resultante
+        P->>CU: POST /cuentas/102/abono
+        CU-->>P: aplicado
+        P->>P: anota dos movimientos
+        P->>K: publica TRANSFERENCIA
+        P-->>G: 200 comprobante
+    end
+
+    rect rgb(250, 238, 238)
+        note over P,CU: Si el abono falla: compensacion
+        P->>CU: POST /cuentas/102/abono
+        CU--xP: ServicioNoDisponible
+        P->>CU: POST /cuentas/101/abono (reverso)
+        CU-->>P: aplicado
+        P->>P: anota el reverso en el historial
+        P--xG: propaga el error (no hay version degradada)
+    end
+
+    rect rgb(245, 235, 235)
+        note over P,K: Si la compensacion tambien falla
+        P->>CU: POST /cuentas/101/abono (reverso)
+        CU--xP: ServicioNoDisponible
+        P->>K: publica COMPENSACION_FALLIDA severidad ALTA
+        P->>P: log con todos los datos para reponer a mano
+    end

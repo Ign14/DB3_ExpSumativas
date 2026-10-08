@@ -1,0 +1,36 @@
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=45043 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-10-08T18:17:03.984Z  INFO 5113 --- [broker-kafka] [           main] c.d.b.b.BrokerKafkaApplication           : Starting BrokerKafkaApplication v1.0.0 using Java 21.0.10 with PID 5113 (/home/claude/EFT_S9_Backend_Avanzado/broker-kafka/target/broker-kafka.jar started by root in /home/claude/EFT_S9_Backend_Avanzado)
+2026-10-08T18:17:04.001Z  INFO 5113 --- [broker-kafka] [           main] c.d.b.b.BrokerKafkaApplication           : No active profile set, falling back to 1 default profile: "default"
+2026-10-08T18:17:07.319Z  INFO 5113 --- [broker-kafka] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 9094 (http)
+2026-10-08T18:17:07.352Z  INFO 5113 --- [broker-kafka] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-08T18:17:07.353Z  INFO 5113 --- [broker-kafka] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-10-08T18:17:07.409Z  INFO 5113 --- [broker-kafka] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-10-08T18:17:07.410Z  INFO 5113 --- [broker-kafka] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3201 ms
+2026-10-08T18:17:08.363Z  WARN 5113 --- [broker-kafka] [           main] o.a.zookeeper.server.ServerCnxnFactory   : maxCnxns is not configured, using default value 0.
+2026-10-08T18:17:11.458Z  WARN 5113 --- [broker-kafka] [r-0-send-thread] org.apache.kafka.clients.NetworkClient   : [Controller id=0, targetBrokerId=0] Connection to node 0 (localhost/127.0.0.1:9092) could not be established. Node may not be available.
+2026-10-08T18:17:11.461Z  WARN 5113 --- [broker-kafka] [r-0-send-thread] kafka.controller.RequestSendThread       : [RequestSendThread controllerId=0] Controller 0's connection to broker localhost:9092 (id: 0 rack: null) was unsuccessful
+
+java.io.IOException: Connection to localhost:9092 (id: 0 rack: null) failed.
+	at org.apache.kafka.clients.NetworkClientUtils.awaitReady(NetworkClientUtils.java:71) ~[kafka-clients-3.7.1.jar!/:na]
+	at kafka.controller.RequestSendThread.brokerReady(ControllerChannelManager.scala:298) ~[kafka_2.13-3.7.1.jar!/:na]
+	at kafka.controller.RequestSendThread.doWork(ControllerChannelManager.scala:251) ~[kafka_2.13-3.7.1.jar!/:na]
+	at org.apache.kafka.server.util.ShutdownableThread.run(ShutdownableThread.java:135) ~[kafka-server-common-3.7.1.jar!/:na]
+
+2026-10-08T18:17:12.217Z  INFO 5113 --- [broker-kafka] [           main] c.d.b.b.BrokerKafkaApplication           : >> broker-kafka: escuchando en 0.0.0.0:9092 y anunciandose como localhost:9092
+2026-10-08T18:17:12.218Z  INFO 5113 --- [broker-kafka] [           main] c.d.b.b.BrokerKafkaApplication           : >> broker-kafka: topicos creados = banco.transacciones-completadas y banco.alertas-seguridad (3 particiones cada uno)
+2026-10-08T18:17:12.754Z  INFO 5113 --- [broker-kafka] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoints beneath base path '/actuator'
+2026-10-08T18:17:12.821Z  INFO 5113 --- [broker-kafka] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 9094 (http) with context path '/'
+2026-10-08T18:17:12.844Z  INFO 5113 --- [broker-kafka] [           main] c.d.b.b.BrokerKafkaApplication           : Started BrokerKafkaApplication in 10.337 seconds (process running for 11.599)
+2026-10-08T18:17:13.297Z  INFO 5113 --- [broker-kafka] [nio-9094-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-08T18:17:13.300Z  INFO 5113 --- [broker-kafka] [nio-9094-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-08T18:17:13.301Z  INFO 5113 --- [broker-kafka] [nio-9094-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms

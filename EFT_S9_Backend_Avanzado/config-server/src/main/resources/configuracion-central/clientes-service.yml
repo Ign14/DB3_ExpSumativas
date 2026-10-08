@@ -1,0 +1,25 @@
+server:
+  port: 8083
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AUTH_ISSUER_URI:http://localhost:9000}
+          # Indicar el jwk-set-uri explicitamente evita que este servicio
+          # consulte los metadatos del auth-server durante el arranque: baja a
+          # buscar la clave publica la primera vez que valida un token. Asi el
+          # orden de arranque entre servicios deja de ser critico, sin perder la
+          # validacion del issuer, que sigue activa por la linea anterior.
+          jwk-set-uri: ${AUTH_ISSUER_URI:http://localhost:9000}/oauth2/jwks
+  kafka:
+    consumer:
+      # Un grupo propio por servicio. Las instancias de clientes-service
+      # comparten grupo entre si, de modo que al escalar el servicio las
+      # particiones se reparten y cada evento se procesa una sola vez.
+      group-id: ${banco.kafka.grupo-clientes}
+
+banco:
+  kafka:
+    grupo-clientes: clientes-service

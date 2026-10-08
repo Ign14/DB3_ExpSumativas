@@ -1,0 +1,38 @@
+# Perfil para ejecutar el batch contra PostgreSQL en vez de la base embebida.
+#
+# El perfil por defecto es "dev", con H2 en memoria, para que los tres jobs se
+# puedan ejecutar y evidenciar sin preparar nada. Este perfil existe porque el
+# repositorio de Spring Batch en memoria pierde el historial de ejecuciones al
+# terminar el proceso, y en un despliegue real ese historial es lo que permite
+# saber que corrio, cuando, y con que resultado.
+#
+# No hay ningun PostgreSQL en el docker-compose.yml de este proyecto, a
+# proposito: el compose orquesta el ecosistema en linea, y el batch no es un
+# servicio sino un proceso que se ejecuta y termina. Para probar este perfil en
+# local hay que levantar una instancia aparte:
+#
+#   docker run -d --name banco-postgres -p 5432:5432 \
+#     -e POSTGRES_DB=bancoxyz -e POSTGRES_USER=banco \
+#     -e POSTGRES_PASSWORD="$(openssl rand -base64 24)" postgres:16
+#
+# y ejecutar el jar con las credenciales por entorno:
+#
+#   DB_USER=banco DB_PASSWORD=... \
+#     java -jar batch-migracion/target/batch-migracion.jar \
+#          --spring.profiles.active=postgres --job=all
+#
+# En AWS, la base es RDS y la clave la administra Secrets Manager; el detalle
+# esta en la seccion 7 de despliegue.md.
+#
+# Las credenciales NO traen valor por defecto, y esa ausencia es deliberada. Un
+# default comodo aqui seria una credencial que nadie documenta, que funciona en
+# el equipo de quien la escribio y que termina viajando a un ambiente real sin
+# que nadie la mire. Sin default, el proceso no arranca hasta que alguien decide
+# con que credenciales se conecta, que es exactamente la conversacion que
+# corresponde tener.
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:bancoxyz}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver

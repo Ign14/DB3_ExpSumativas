@@ -1,0 +1,52 @@
+flowchart TB
+    subgraph INTERNET["Internet"]
+        USR["Canales"]
+    end
+
+    ALB["Application Load Balancer<br/>HTTPS · certificado ACM"]
+
+    subgraph PUB["Subredes publicas · 2 zonas"]
+        ALB
+    end
+
+    subgraph PRIV["Subredes privadas · 2 zonas"]
+        subgraph ECS["ECS Fargate"]
+            T1["bff-web ×2"]
+            T2["bff-movil ×2"]
+            T3["bff-cajero ×2"]
+            T4["api-gateway ×2"]
+            T5["cuentas-service ×2..10<br/>autoescalado por CPU"]
+            T6["pagos-service ×2..10"]
+            T7["clientes-service ×2..3<br/>tope: particiones del topico"]
+            T8["config-server ×1"]
+            T9["discovery-server ×1"]
+            T10["auth-server ×1<br/>clave de firma en el proceso"]
+        end
+        MSK["Amazon MSK<br/>2 brokers · replicacion 2"]
+        MQ["Amazon MQ<br/>activo / standby"]
+        RDS["RDS PostgreSQL<br/>Multi-AZ"]
+    end
+
+    SM["Secrets Manager"]
+    CW["CloudWatch<br/>logs · metricas · alarmas"]
+    EB["EventBridge<br/>cron de los 3 jobs batch"]
+
+    USR --> ALB
+    ALB --> T1
+    ALB --> T2
+    ALB --> T3
+    ALB --> T4
+    T4 --> T5
+    T4 --> T6
+    T4 --> T7
+    T5 --> MSK
+    T6 --> MSK
+    T7 --> MSK
+    T5 --> MQ
+    T6 --> MQ
+    T5 --> RDS
+    T6 --> RDS
+    T7 --> RDS
+    ECS -.-> SM
+    ECS -.-> CW
+    EB --> ECS

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>cl.duoc.bancoxyz</groupId>
+        <artifactId>eft-backend-avanzado</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>bff-common</artifactId>
+    <packaging>jar</packaging>
+    <name>bff-common</name>
+    <description>
+        Contratos de datos (DTOs) y clientes HTTP tipados hacia los servicios core,
+        compartidos por los tres BFF para evitar duplicar la logica de integracion.
+    </description>
+
+    <dependencies>
+        <!--
+          El contrato de las APIs del dominio, compartido con los
+          microservicios. Antes este modulo mantenia su propia copia de los
+          mismos records, y eso produjo un defecto real: la copia del BFF
+          llamaba "cantidadMovimientos" y "ultimoMovimientoFecha" a los campos
+          que el microservicio publica como "totalMovimientos" y "ultimaFecha",
+          asi que el canal web deserializaba 0 y null en silencio y mostraba un
+          resumen vacio sobre un historial de cuarenta movimientos. Nada fallaba
+          y nada avisaba. Dos copias de un contrato no son redundancia: son dos
+          contratos que se parecen hasta que dejan de parecerse.
+        -->
+        <dependency>
+            <groupId>cl.duoc.bancoxyz</groupId>
+            <artifactId>common-dominio</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- Los tres BFF son clientes OAuth2: cada canal pide su propio token
+             con sus propias credenciales antes de cruzar el gateway. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+    </dependencies>
+</project>

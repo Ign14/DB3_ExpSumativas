@@ -1,0 +1,57 @@
+server:
+  port: 8080
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AUTH_ISSUER_URI:http://localhost:9000}
+          # Indicar el jwk-set-uri explicitamente evita que este servicio
+          # consulte los metadatos del auth-server durante el arranque: baja a
+          # buscar la clave publica la primera vez que valida un token. Asi el
+          # orden de arranque entre servicios deja de ser critico, sin perder la
+          # validacion del issuer, que sigue activa por la linea anterior.
+          jwk-set-uri: ${AUTH_ISSUER_URI:http://localhost:9000}/oauth2/jwks
+  cloud:
+    gateway:
+      # Las rutas resuelven por nombre de servicio en Eureka (lb://), no por
+      # host y puerto: si se levanta una segunda instancia de un servicio, el
+      # gateway reparte entre ambas sin tocar configuracion.
+      discovery:
+        locator:
+          enabled: false
+      routes:
+        - id: cuentas-service
+          uri: lb://cuentas-service
+          predicates:
+            - Path=/api/cuentas/**
+          filters:
+            # El prefijo /api es de la API publica, no del microservicio: se
+            # quita antes de reenviar para que cuentas-service siga exponiendo
+            # /cuentas sin saber bajo que ruta publica queda.
+            - StripPrefix=1
+        - id: pagos-service-movimientos
+          uri: lb://pagos-service
+          predicates:
+            - Path=/api/movimientos/**
+          filters:
+            - StripPrefix=1
+        - id: pagos-service-pagos
+          uri: lb://pagos-service
+          predicates:
+            - Path=/api/pagos/**
+          filters:
+            - StripPrefix=1
+        - id: pagos-service-transacciones-diarias
+          uri: lb://pagos-service
+          predicates:
+            - Path=/api/transacciones-diarias/**
+          filters:
+            - StripPrefix=1
+        - id: clientes-service
+          uri: lb://clientes-service
+          predicates:
+            - Path=/api/clientes/**
+          filters:
+            - StripPrefix=1

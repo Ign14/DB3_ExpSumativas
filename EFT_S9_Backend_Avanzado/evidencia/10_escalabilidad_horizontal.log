@@ -1,0 +1,64 @@
+
+==============================================================
+  10 - ESCALABILIDAD HORIZONTAL Y BALANCEO DE CARGA
+==============================================================
+Se levanta una segunda instancia de cuentas-service en el puerto 8181.
+No hay que tocar configuracion de nadie: se registra en Eureka con el
+mismo nombre de servicio, y tanto el gateway (lb://) como el cliente
+balanceado de pagos-service empiezan a repartir entre las dos.
+
+--- Instancias de cuentas-service antes de escalar ---
+   instancias: 1
+     - 192.0.2.2:cuentas-service:8081 UP
+
+--- Se levanta la segunda instancia ---
+>> arrancando cuentas-service-2
+   cuentas-service-2 UP (tras 13s)
+>> esperando 20s a que Eureka y el gateway la vean
+
+--- Instancias de cuentas-service despues de escalar ---
+   instancias: 2
+     - 192.0.2.2:cuentas-service:8081 UP puerto 8081
+     - 192.0.2.2:cuentas-service:8181 UP puerto 8181
+
+--- Las dos instancias responden por separado ---
+   localhost:8081/actuator/health -> UP
+   localhost:8181/actuator/health -> UP
+
+--- Treinta peticiones por el gateway a /api/cuentas/101 ---
+   peticiones atendidas por la instancia 8081: 15
+   peticiones atendidas por la instancia 8181: 15
+   total: 30 de 30 enviadas
+
+   El reparto lo hace el balanceador del gateway por round-robin. No
+   es necesariamente 15 y 15: el gateway tambien consulta las cuentas
+   para otras cosas, y las dos instancias arrancaron en momentos
+   distintos.
+
+--- Muestra del log de acceso de cada instancia ---
+-- instancia 8081 (ultimas 5)
+192.0.2.2 - - [08/Oct/2026:18:22:21 +0000] "GET /cuentas/101 HTTP/1.1" 200 101
+192.0.2.2 - - [08/Oct/2026:18:22:21 +0000] "GET /cuentas/101 HTTP/1.1" 200 101
+192.0.2.2 - - [08/Oct/2026:18:22:21 +0000] "GET /cuentas/101 HTTP/1.1" 200 101
+192.0.2.2 - - [08/Oct/2026:18:22:21 +0000] "GET /cuentas/101 HTTP/1.1" 200 101
+192.0.2.2 - - [08/Oct/2026:18:22:21 +0000] "GET /cuentas/101 HTTP/1.1" 200 101
+-- instancia 8181 (ultimas 5)
+192.0.2.2 - - [08/Oct/2026:18:22:21 +0000] "GET /cuentas/101 HTTP/1.1" 200 101
+192.0.2.2 - - [08/Oct/2026:18:22:21 +0000] "GET /cuentas/101 HTTP/1.1" 200 101
+192.0.2.2 - - [08/Oct/2026:18:22:21 +0000] "GET /cuentas/101 HTTP/1.1" 200 101
+192.0.2.2 - - [08/Oct/2026:18:22:21 +0000] "GET /cuentas/101 HTTP/1.1" 200 101
+192.0.2.2 - - [08/Oct/2026:18:22:21 +0000] "GET /cuentas/101 HTTP/1.1" 200 101
+
+--- El trafico entre servicios tambien se reparte ---
+pagos-service llama a cuentas-service con un RestClient @LoadBalanced,
+cuya URL base es el nombre del servicio en Eureka y no un host fijo.
+52:    url: http://cuentas-service
+
+Veinte fichas por el gateway, que obligan a pagos-service a llamar a cuentas:
+   instancia 8081: 10 peticiones
+   instancia 8181: 10 peticiones
+
+--- En Docker el mismo escalado es una bandera ---
+   docker compose up -d --scale cuentas-service=2 --scale pagos-service=2
+   Los tres microservicios de negocio no declaran container_name ni
+   publican puertos al host, que es lo que permite replicarlos.

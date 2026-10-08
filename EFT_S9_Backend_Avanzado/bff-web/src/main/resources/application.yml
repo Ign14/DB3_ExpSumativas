@@ -1,0 +1,44 @@
+server:
+  port: 8091
+  compression:
+    enabled: true
+    mime-types: application/json
+
+spring:
+  application:
+    name: bff-web
+  security:
+    oauth2:
+      client:
+        registration:
+          # La consola administrativa: los seis scopes del sistema. Es el unico
+          # canal que puede mover dinero por transferencia y editar datos
+          # personales del titular.
+          web:
+            provider: banco-auth
+            client-id: banco-web-client
+            client-secret: ${WEB_CLIENT_SECRET:banco-web-secret}
+            authorization-grant-type: client_credentials
+            scope: cuentas.read,cuentas.write,movimientos.read,movimientos.write,clientes.read,clientes.write
+        provider:
+          banco-auth:
+            token-uri: ${AUTH_ISSUER_URI:http://localhost:9000}/oauth2/token
+
+bff:
+  gateway:
+    url: http://${GATEWAY_HOST:localhost}:8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    cl.duoc.bancoxyz.bff: INFO

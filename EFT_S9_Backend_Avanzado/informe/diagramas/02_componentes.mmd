@@ -1,0 +1,52 @@
+flowchart LR
+    subgraph COMPARTIDO["Modulos compartidos"]
+        CD["common-dominio<br/>DTOs + 3 eventos"]
+        BCM["bff-common<br/>clientes HTTP + gestor de tokens"]
+    end
+
+    subgraph CUENTAS["cuentas-service"]
+        C1["CuentaController"]
+        C2["RetiroService<br/>limite por operacion"]
+        C3["LiquidacionService<br/>cargo / abono"]
+        C4["CuentaRepositoryEnMemoria<br/>compute atomico"]
+        C5["PublicadorRetiros (JMS)"]
+        C6["PublicadorEventosKafka"]
+        C1 --> C2
+        C1 --> C3
+        C2 --> C4
+        C3 --> C4
+        C2 --> C5
+        C2 --> C6
+    end
+
+    subgraph PAGOS["pagos-service"]
+        P1["MovimientoController"]
+        P2["PagoController"]
+        P3["FichaCuentaService"]
+        P4["PagoService<br/>orquesta y compensa"]
+        P5["CuentasClienteResiliente<br/>Retry + CB + TimeLimiter + fallback"]
+        P6["LiquidacionClienteResiliente<br/>Retry + CB, sin fallback"]
+        P7["MovimientoRepositoryEnMemoria"]
+        P8["ConsumidorRetiros (JMS)"]
+        P9["PublicadorEventosKafka"]
+        P1 --> P3
+        P2 --> P4
+        P3 --> P5
+        P4 --> P6
+        P4 --> P7
+        P4 --> P9
+        P8 --> P7
+    end
+
+    subgraph CLIENTES["clientes-service"]
+        L1["ClienteController"]
+        L2["ClienteRepositoryEnMemoria<br/>perfil + actividad"]
+        L3["ConsumidorEventos<br/>2 listeners de Kafka"]
+        L1 --> L2
+        L3 --> L2
+    end
+
+    CD --- CUENTAS
+    CD --- PAGOS
+    CD --- CLIENTES
+    BCM --- CUENTAS

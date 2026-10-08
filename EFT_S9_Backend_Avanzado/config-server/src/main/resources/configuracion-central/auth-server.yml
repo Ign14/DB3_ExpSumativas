@@ -1,0 +1,24 @@
+server:
+  port: 9000
+
+spring:
+  security:
+    oauth2:
+      authorizationserver:
+        # El "issuer" queda explicito y es el mismo valor que los Resource
+        # Servers exigen en el claim iss del token. Al fijarlo aqui, un token
+        # pedido desde el host (localhost:9000, publicado por Docker) sigue
+        # llevando el issuer de la red interna y los microservicios lo validan
+        # sin aflojar la comprobacion.
+        issuer: ${AUTH_ISSUER_URI:http://localhost:9000}
+
+banco:
+  oauth2:
+    # Los secretos de los clientes se configuran, no se compilan. El valor por
+    # defecto permite levantar el ecosistema en local sin preparar nada; en un
+    # despliegue real vendrian de un gestor de secretos.
+    clientes:
+      banco-web: ${WEB_CLIENT_SECRET:banco-web-secret}
+      banco-movil: ${MOVIL_CLIENT_SECRET:banco-movil-secret}
+      cajero: ${CAJERO_CLIENT_SECRET:cajero-secret}
+      pagos-service: ${PAGOS_CLIENT_SECRET:pagos-secret}

@@ -1,0 +1,30 @@
+sequenceDiagram
+    autonumber
+    participant C as Cajero
+    participant B as bff-cajero
+    participant A as auth-server
+    participant G as api-gateway
+    participant CU as cuentas-service
+    participant Q as Artemis<br/>banco.retiros
+    participant P as pagos-service
+    participant K as Kafka
+    participant CL as clientes-service
+
+    C->>B: POST /cajero/cuentas/101/retiro {monto}
+    B->>B: valida el limite del canal
+    B->>A: client_credentials (cajero-client)
+    A-->>B: JWT con cuentas.read, cuentas.write
+    B->>G: POST /api/cuentas/101/retiro + Bearer
+    G->>G: valida firma e issuer
+    G->>CU: POST /cuentas/101/retiro
+    CU->>CU: valida limite del dominio
+    CU->>CU: debita (compute atomico)
+    CU->>Q: publica RetiroRealizadoEvento
+    CU->>K: publica TransaccionCompletadaEvento
+    CU-->>G: 200 comprobante
+    G-->>B: 200
+    B-->>C: comprobante con saldo resultante
+    Q-->>P: entrega el evento
+    P->>P: anota el movimiento en el historial
+    K-->>CL: entrega el hecho
+    CL->>CL: suma una operacion al titular

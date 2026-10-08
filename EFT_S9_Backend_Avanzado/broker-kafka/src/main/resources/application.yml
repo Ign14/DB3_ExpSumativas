@@ -1,0 +1,36 @@
+server:
+  # Puerto HTTP solo para el endpoint de salud, igual que en broker-artemis: es
+  # lo que los scripts de evidencia consultan para no arrancar los
+  # microservicios antes de que el broker acepte conexiones.
+  port: 9094
+
+spring:
+  application:
+    name: broker-kafka
+
+banco:
+  kafka:
+    puerto: ${KAFKA_PUERTO:9092}
+    host-anunciado: ${KAFKA_HOST_ANUNCIADO:localhost}
+    # Tres particiones por topico: suficiente para que el reparto entre
+    # consumidores de un mismo grupo sea observable, que es justo lo que se
+    # quiere poder mostrar al escalar horizontalmente un consumidor.
+    particiones: 3
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    kafka: WARN
+    org.apache.kafka: WARN
+    org.apache.zookeeper: WARN
+    state.change.logger: WARN

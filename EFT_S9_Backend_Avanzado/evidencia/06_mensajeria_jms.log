@@ -1,0 +1,95 @@
+
+==============================================================
+  06 - MENSAJERIA ASINCRONA CON JMS (Apache ActiveMQ Artemis)
+==============================================================
+cuentas-service publica el retiro en la cola banco.retiros y
+pagos-service lo consume para anotarlo en el historial. Son dos
+procesos distintos y ninguno llama al otro.
+
+--- Estado antes del retiro ---
+   saldo de la cuenta 101: 5000
+   movimientos en el historial: 37
+
+--- Retiro de 250 por el canal cajero ---
+{
+    "cuentaId": 101,
+    "montoSolicitado": 250,
+    "saldoResultante": 4750,
+    "aprobado": true,
+    "motivoRechazo": null,
+    "eventoId": "a7d9a781-779f-4efb-b0fc-6125312785f1",
+    "eventoPublicado": true
+}
+
+>> esperando 5s a que el consumidor procese el evento
+
+--- Estado despues del retiro ---
+   saldo de la cuenta 101: 5000 -> 4750   (bajo en cuentas-service)
+   movimientos: 37 -> 38   (subio en pagos-service, por la cola)
+
+--- El movimiento recien anotado, visto desde pagos-service ---
+[
+    {
+        "cuentaId": 101,
+        "fecha": "2026-10-08",
+        "tipoMovimiento": "retiro",
+        "monto": 250,
+        "descripcion": "Retiro por canal cajero"
+    }
+]
+
+--- Lo que dejo cada proceso en su log ---
+-- cuentas-service (productor)
+2026-10-08T18:19:13.454Z  INFO 5589 --- [cuentas-service] [io-8081-exec-10] c.d.b.c.mensajeria.PublicadorRetiros     : >> cuentas-service: evento a7d9a781-779f-4efb-b0fc-6125312785f1 publicado en la cola banco.retiros (cuenta 101, monto 250)
+-- pagos-service (consumidor)
+2026-10-08T18:19:13.564Z  INFO 5590 --- [pagos-service] [ntContainer#0-1] c.d.b.p.mensajeria.ConsumidorRetiros     : >> pagos-service: evento a7d9a781-779f-4efb-b0fc-6125312785f1 consumido, retiro de 250 agregado al historial de la cuenta 101
+
+--- La cola retiene el evento si el consumidor esta caido ---
+Se detiene pagos-service, se hace un retiro y se vuelve a levantar.
+   pagos-service detenido (pid 5590)
+   respuesta del retiro con el consumidor caido:
+     {
+         "cuentaId": 101,
+         "montoSolicitado": 100,
+         "saldoResultante": 4650,
+         "aprobado": true,
+         "motivoRechazo": null,
+         "eventoId": "4e613089-5c32-4096-9bcb-2a4ec3c236a8",
+         "eventoPublicado": true
+     }
+   el retiro se aprueba, el evento 4e613089-5c32-4096-9bcb-2a4ec3c236a8 queda en la cola esperando
+>> arrancando pagos-service
+   pagos-service UP (tras 13s)
+   el gateway ya enruta hacia el servicio (tras 1s)
+
+--- La prueba de que el evento espero en la cola ---
+El log de pagos-service se reinicio con el proceso, asi que todo lo que
+hay en el es posterior al arranque. Si el evento aparece consumido aqui,
+es porque la cola lo guardo mientras el consumidor no existia:
+
+   2026-10-08T18:19:40.285Z  INFO 6201 --- [pagos-service] [ntContainer#0-1] c.d.b.p.mensajeria.ConsumidorRetiros     : >> pagos-service: evento 4e613089-5c32-4096-9bcb-2a4ec3c236a8 consumido, retiro de 100 agregado al historial de la cuenta 101
+
+   CONFIRMADO: el evento publicado con el consumidor caido fue
+   consumido al volver a levantarlo.
+
+--- Por que el conteo de movimientos no sirve para demostrar esto ---
+   (el dato se obtuvo al intento 7: el gateway seguia repartiendo hacia la instancia dada de baja)
+   movimientos antes de bajar el consumidor: 38
+   movimientos despues de volver a levantarlo: 38
+
+   Los dos numeros coinciden, y seria un error leerlo como que no paso
+   nada. pagos-service mantiene el historial en memoria y lo vuelve a
+   cargar del CSV al arrancar, asi que el contador no continua donde
+   estaba: vuelve a su linea base y le suma el evento que esperaba en la
+   cola. El resultado da igual por casualidad. La prueba de que la cola
+   cumplio su trabajo es la linea del log de arriba, no este numero.
+
+   Esto es tambien una demostracion involuntaria de por que el estado en
+   memoria es la primera limitacion de la lista de proximos pasos.
+
+   Nota aparte: el conteo puede tardar varios intentos en responder.
+   Eureka conserva el registro de la instancia dada de baja hasta que su
+   lease vence, y mientras tanto el gateway reparte entre la instancia
+   nueva y una direccion que ya no contesta. Es el comportamiento
+   esperado de un registro eventualmente consistente, y la razon por la
+   que los clientes de este sistema llevan reintento.

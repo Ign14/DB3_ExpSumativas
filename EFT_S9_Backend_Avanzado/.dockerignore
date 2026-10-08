@@ -1,0 +1,17 @@
+# Lo que no tiene por que entrar al contexto de construccion de las imagenes.
+# Sin este archivo, Docker copia la carpeta completa en cada build: los jar ya
+# compilados, los logs de evidencia, las capturas y el PDF del informe. Son
+# decenas de megabytes que no se usan dentro de la imagen y que invalidan la
+# cache en cuanto cambia cualquiera de ellos.
+target/
+*/target/
+evidencia/
+informe/
+video/
+*.md
+*.pdf
+.git/
+.gitignore
+.idea/
+*.iml
+.DS_Store

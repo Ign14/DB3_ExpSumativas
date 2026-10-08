@@ -1,0 +1,81 @@
+
+==============================================================
+  04 - OAUTH 2.0 Y CONTROL DE ACCESO POR CANAL
+==============================================================
+
+--- Emision de token por client_credentials (canal web) ---
+{
+    "access_token": "eyJraWQiOiI0Zjc1MjEzMi1mNTYzLTQ3YjEtYWUwZS05OWEyNmEzZGQ5NDUiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJiYW5jby13ZWItY2xpZW50IiwiYXVkIjoiYmFuY28td2ViLWNsaWVudCIsIm5iZiI6MTc5MTQ4MzU0OSwic2NvcGUiOlsiY3VlbnRhcy5yZWFkIiwibW92aW1pZW50b3Mud3JpdGUiLCJjbGllbnRlcy53cml0ZSIsIm1vdmltaWVudG9zLnJlYWQiLCJjdWVudGFzLndyaXRlIiwiY2xpZW50ZXMucmVhZCJdLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJleHAiOjE3OTE0ODUzNDksImlhdCI6MTc5MTQ4MzU0OSwianRpIjoiMDVjZThiZWEtNjVlMi00NGE0LTljMmQtM2EyZGMzMzIwZmUyIn0.LFBet4Kyax6SlUjwPZ8SceQw1-n9xEyvU0Udl5yiRTVR8jA7Ks2-hOFuQgX57wx3j3QQGksXOF31N5JohFFiQSYkpU5wDgsDz5DKSRjIuNMftGkvwifbfrnV5WbctcvG5PnPrW-fnVlULby7ao9QK3-kcU_dg7Qh7WRtpIHpu5DJ7FxMDFMAx6zJldNM91WHYwWf_esqdS4bO0hLaEMmLLuLGnPPnepwcxgCqrBAseQAspUGHZSHcg040WtbyWaq-0ZqDBAQBybaN40r9gkXBBTHtVvljC4M9VFLODB3d7SPt1O7OXxHyqQLDKiDPN3DLC2Lxs6sB4utgnFZTuqyjQ",
+    "scope": "cuentas.read movimientos.write clientes.write movimientos.read cuentas.write clientes.read",
+    "token_type": "Bearer",
+    "expires_in": 1799
+}
+
+--- Contenido del token del canal web (payload del JWT) ---
+{
+  "aud": "banco-web-client",
+  "exp": 1791485349,
+  "iat": 1791483549,
+  "iss": "http://localhost:9000",
+  "jti": "dfe09d3d-2be1-48c8-b575-4995321479ef",
+  "nbf": 1791483549,
+  "scope": [
+    "cuentas.read",
+    "movimientos.write",
+    "clientes.write",
+    "movimientos.read",
+    "cuentas.write",
+    "clientes.read"
+  ],
+  "sub": "banco-web-client"
+}
+
+--- Clave publica con la que los Resource Servers validan la firma ---
+{
+    "keys": [
+        {
+            "kty": "RSA",
+            "e": "AQAB",
+            "kid": "4f752132-f563-47b1-ae0e-99a26a3dd945",
+            "n": "qV3Hhjocd2upobkcpQpxFgaXnovA4URLjd1tFRWf2VTDE6Ns4R576fdLsaNOAUkfXRvuemYNsF15xg9bhvhndO3JTiXWxtv4txwg9REt25cgMgwf8tBB9F29b6a4xGZ7RfuahfT8iqDnvfMIuCgnbnUUcUOSRaFGHu3HK2zV1--Z_z7I68fddg0iGUC0KCy_udygIrraWKUIHvet5XEmmQYmjp6O7MR7pGjAWKfDYSHLTt6zYnIPI-0HHll38yZvPvdhZLmx8PKUMTDveeSAoJ-pgQSNXHJu7cnwKoWgG_nK78uDJDY1oK6eJbpo7SQG9v0ZrlDTqXHPlYIAIdcl4w"
+        }
+    ]
+}
+
+--- Un secreto incorrecto no obtiene token ---
+   cajero-client con secreto erroneo -> HTTP 401
+
+--- Un cliente no puede pedir un scope que no tiene registrado ---
+{
+    "error": "invalid_scope"
+}
+
+--- Sin token, el gateway rechaza antes de enrutar ---
+   GET /api/cuentas/101 sin token -> HTTP 401
+   GET /api/movimientos/101 sin token -> HTTP 401
+   GET /api/clientes/101 sin token -> HTTP 401
+
+--- Un token alterado tampoco pasa ---
+   GET /api/cuentas/101 con token manipulado -> HTTP 401
+
+--- Minimo privilegio por canal: el mismo token no sirve para todo ---
+   CANAL            RECURSO                    HTTP
+   web              GET /api/cuentas/101       200
+   web              GET /api/clientes/101      200
+   movil            GET /api/cuentas/101       200
+   movil            GET /api/clientes/101      200
+   cajero           GET /api/cuentas/101       200
+   cajero           GET /api/movimientos/101   403
+   cajero           GET /api/clientes/101      403
+
+   El cajero recibe 403 en movimientos y clientes con un token de firma
+   perfectamente valida: la autorizacion por scope la aplica cada
+   microservicio, no solo el gateway.
+
+--- El canal movil no puede escribir aunque el endpoint exista ---
+   PUT /api/clientes/101/nombre con token movil -> HTTP 403
+
+--- Las primitivas de liquidacion exigen un scope que ningun canal tiene ---
+   POST /api/cuentas/101/abono con token web -> HTTP 403
+   Solo pagos-service tiene cuentas.liquidar, y lo usa para mover las
+   dos puntas de una transferencia.

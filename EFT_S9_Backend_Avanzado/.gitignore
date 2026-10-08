@@ -1,0 +1,9 @@
+target/
+*/target/
+*.class
+.idea/
+*.iml
+.vscode/
+.DS_Store
+# Los .pid que deja el script de evidencia al levantar los procesos
+evidencia/logs/*.pid

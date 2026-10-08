@@ -1,0 +1,45 @@
+
+==============================================================
+  03 - CONFIGURACION CENTRALIZADA Y SERVICE DISCOVERY
+==============================================================
+
+--- El Config Server exige credenciales (sin ellas, 401) ---
+GET /cuentas-service/default sin credenciales -> HTTP 401
+GET /cuentas-service/default con credenciales -> HTTP 200
+
+--- Configuracion que el Config Server sirve a cada microservicio ---
+-- cuentas-service
+   perfiles: ['default']
+   fuente: cuentas-service.yml -> 8 propiedades
+   fuente: application.yml -> 26 propiedades
+-- pagos-service
+   perfiles: ['default']
+   fuente: pagos-service.yml -> 35 propiedades
+   fuente: application.yml -> 26 propiedades
+-- clientes-service
+   perfiles: ['default']
+   fuente: clientes-service.yml -> 5 propiedades
+   fuente: application.yml -> 26 propiedades
+-- api-gateway
+   perfiles: ['default']
+   fuente: api-gateway.yml -> 24 propiedades
+   fuente: application.yml -> 26 propiedades
+
+--- Eureka tambien exige credenciales ---
+GET /eureka/apps sin credenciales -> HTTP 401
+
+--- Servicios registrados en Eureka ---
+   API-GATEWAY          1 instancia(s)
+      - 192.0.2.2:api-gateway:8080                    UP
+   AUTH-SERVER          1 instancia(s)
+      - 192.0.2.2:auth-server:9000                    UP
+   CLIENTES-SERVICE     1 instancia(s)
+      - 192.0.2.2:clientes-service:8083               UP
+   CUENTAS-SERVICE      1 instancia(s)
+      - 192.0.2.2:cuentas-service:8081                UP
+   PAGOS-SERVICE        1 instancia(s)
+      - 192.0.2.2:pagos-service:8082                  UP
+
+--- Un microservicio no arranca si el Config Server no responde (fail-fast) ---
+Configurado con spring.cloud.config.fail-fast=true en cada servicio.
+17:      fail-fast: true

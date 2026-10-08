@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>cl.duoc.bancoxyz</groupId>
+        <artifactId>eft-backend-avanzado</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>broker-kafka</artifactId>
+    <packaging>jar</packaging>
+    <name>broker-kafka</name>
+    <description>
+        Broker Kafka para la ejecucion local sin Docker, con un listener TCP en
+        9092 y los dos topicos del sistema creados al arrancar. En la
+        orquestacion con Docker este modulo no se usa: ahi el broker es la
+        imagen oficial de Apache Kafka.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>cl.duoc.bancoxyz</groupId>
+            <artifactId>common-dominio</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!--
+          spring-kafka-test trae un broker Kafka hospedable dentro de un proceso
+          Java. Es una dependencia de pruebas usada aqui en alcance de
+          compilacion, y eso merece una explicacion antes que una disculpa.
+
+          El sistema necesita un broker Kafka alcanzable para que la evidencia de
+          ejecucion se pueda reproducir en cualquier maquina con un JDK, sin
+          Docker y sin instalar nada: es la misma propiedad que ya tiene la
+          evidencia del resto del ecosistema, y perderla solo para la mensajeria
+          habria dejado el criterio de Kafka respaldado unicamente por la
+          ejecucion en contenedores. Las alternativas eran peores: descargar la
+          distribucion de Apache Kafka obliga a un paso manual fuera del
+          proyecto, y Testcontainers vuelve a exigir Docker, que es justo lo que
+          este camino evita.
+
+          Lo que no hace este modulo es pasar por produccion. En docker-compose
+          el broker es la imagen oficial apache/kafka en modo KRaft, y ningun
+          microservicio depende de este jar: todos hablan TCP contra la
+          direccion que les configura el Config Server, sea este proceso o el
+          contenedor oficial.
+        -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka-test</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>broker-kafka</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

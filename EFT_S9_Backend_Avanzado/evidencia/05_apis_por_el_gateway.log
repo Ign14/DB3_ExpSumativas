@@ -1,0 +1,78 @@
+
+==============================================================
+  05 - LOS TRES MICROSERVICIOS POR EL API GATEWAY
+==============================================================
+Todas las rutas pasan por localhost:8080 y el gateway resuelve el
+destino por nombre de servicio en Eureka (lb://), no por host y puerto.
+
+--- Gestion de cuentas: GET /api/cuentas/101 ---
+{
+    "cuentaId": 101,
+    "nombreTitular": "John Doe",
+    "edad": 40,
+    "tipoCuenta": "prestamo",
+    "saldo": 5000
+}
+
+--- Gestion de clientes: GET /api/clientes/101 ---
+{
+    "clienteId": 101,
+    "nombre": "John Doe",
+    "segmento": "establecido",
+    "edad": 40,
+    "tipoCuentaPrincipal": "prestamo",
+    "saldoReferencial": 5000,
+    "operacionesRegistradas": 0,
+    "alertasRegistradas": 0,
+    "ultimaOperacion": null
+}
+
+--- Movimientos: GET /api/movimientos/101?limite=3 ---
+[
+    {
+        "cuentaId": 101,
+        "fecha": "2024-12-19",
+        "tipoMovimiento": "compra",
+        "monto": 1500,
+        "descripcion": "Retiro parcial"
+    },
+    {
+        "cuentaId": 101,
+        "fecha": "2024-11-28",
+        "tipoMovimiento": "compra",
+        "monto": 1000,
+        "descripcion": "Ingreso de fin de a\u00f1o"
+    },
+    {
+        "cuentaId": 101,
+        "fecha": "2024-11-08",
+        "tipoMovimiento": "deposito",
+        "monto": 3000,
+        "descripcion": "Sin descripcion"
+    }
+]
+
+--- Resumen del historial: GET /api/movimientos/101/resumen ---
+{
+    "cuentaId": 101,
+    "totalMovimientos": 37,
+    "totalDepositos": 20000,
+    "totalEgresos": 51500,
+    "ultimaFecha": "2024-12-19"
+}
+
+--- Reporte de transacciones diarias (salida del proceso batch 1) ---
+{
+    "cantidadTotal": 392,
+    "montoTotal": 529400,
+    "cantidadCreditos": 176,
+    "cantidadDebitos": 216,
+    "montoCreditos": 244500,
+    "montoDebitos": 284900
+}
+
+--- Vista agregada con tolerancia a fallos: GET /api/movimientos/101/ficha ---
+   origenDatosCuenta: SERVICIO
+   cuenta: {"cuentaId": 101, "nombreTitular": "John Doe", "edad": 40, "tipoCuenta": "prestamo", "saldo": 5000}
+   resumen: {"cuentaId": 101, "totalMovimientos": 37, "totalDepositos": 20000, "totalEgresos": 51500, "ultimaFecha": "2024-12-19"}
+   movimientos en el historial: 37

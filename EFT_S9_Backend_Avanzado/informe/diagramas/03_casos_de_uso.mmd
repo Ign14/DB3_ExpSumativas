@@ -1,0 +1,35 @@
+flowchart LR
+    TIT(("Titular"))
+    OPE(("Operador<br/>del banco"))
+    CAJ(("Cajero<br/>automatico"))
+    SIS(("Proceso<br/>programado"))
+
+    subgraph SISTEMA["Sistema Banco XYZ"]
+        U1["Consultar saldo"]
+        U2["Consultar historial<br/>de movimientos"]
+        U3["Retirar dinero"]
+        U4["Depositar dinero"]
+        U5["Transferir entre cuentas"]
+        U6["Consultar perfil<br/>del titular"]
+        U7["Actualizar datos<br/>personales"]
+        U8["Ver resumen diario<br/>del banco"]
+        U9["Migrar transacciones<br/>diarias"]
+        U10["Calcular intereses"]
+        U11["Generar estados<br/>de cuenta anuales"]
+    end
+
+    TIT --> U1
+    TIT --> U2
+    TIT --> U3
+    CAJ --> U1
+    CAJ --> U3
+    OPE --> U1
+    OPE --> U2
+    OPE --> U4
+    OPE --> U5
+    OPE --> U6
+    OPE --> U7
+    OPE --> U8
+    SIS --> U9
+    SIS --> U10
+    SIS --> U11

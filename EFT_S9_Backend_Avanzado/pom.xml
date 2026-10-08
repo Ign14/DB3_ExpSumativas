@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.4</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>cl.duoc.bancoxyz</groupId>
+    <artifactId>eft-backend-avanzado</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+    <name>eft-backend-avanzado</name>
+    <description>
+        Evaluacion Final Transversal - Desarrollo Backend III (PBY2203).
+        Solucion backend completa para la modernizacion del sistema legacy del
+        Banco XYZ: migracion de los procesos batch a Spring Batch, patron
+        Backend for Frontend por canal, y microservicios seguros y resilientes
+        con Spring Cloud, Resilience4j, Kafka y JMS, orquestados con Docker.
+    </description>
+
+    <properties>
+        <java.version>21</java.version>
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-cloud.version>2023.0.3</spring-cloud.version>
+        <!--
+          Se fija una version de Lombok mas reciente que la del BOM de Spring Boot
+          3.3.4 (1.18.32). Las versiones antiguas parchan clases internas de javac
+          y se rompen con builds de JDK mas nuevos que ellas, con el error
+          "ExceptionInInitializerError: com.sun.tools.javac.code.TypeTag :: UNKNOWN".
+          El equipo de desarrollo corre JDK 24 y los artefactos se compilan con
+          release 21, de modo que el bytecode es el mismo en cualquiera de los dos.
+        -->
+        <lombok.version>1.18.46</lombok.version>
+    </properties>
+
+    <modules>
+        <module>common-dominio</module>
+        <module>batch-migracion</module>
+        <module>broker-artemis</module>
+        <module>broker-kafka</module>
+        <module>config-server</module>
+        <module>discovery-server</module>
+        <module>auth-server</module>
+        <module>api-gateway</module>
+        <module>cuentas-service</module>
+        <module>pagos-service</module>
+        <module>clientes-service</module>
+        <module>bff-common</module>
+        <module>bff-web</module>
+        <module>bff-movil</module>
+        <module>bff-cajero</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>cl.duoc.bancoxyz</groupId>
+                <artifactId>common-dominio</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cl.duoc.bancoxyz</groupId>
+                <artifactId>bff-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <release>21</release>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

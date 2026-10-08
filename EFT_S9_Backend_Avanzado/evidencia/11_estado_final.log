@@ -1,0 +1,68 @@
+
+==============================================================
+  11 - ESTADO FINAL DEL ECOSISTEMA
+==============================================================
+Fecha: 2026-10-08T18:22:29+00:00
+
+--- Salud de cada componente ---
+   broker-artemis       puerto 61617  UP
+   broker-kafka         puerto 9094   UP
+   config-server        puerto 8888   UP
+   discovery-server     puerto 8761   UP
+   auth-server          puerto 9000   UP
+   api-gateway          puerto 8080   UP
+   cuentas-service      puerto 8081   UP
+   cuentas-service-2    puerto 8181   UP
+   pagos-service        puerto 8082   UP
+   clientes-service     puerto 8083   UP
+   bff-web              puerto 8091   UP
+   bff-movil            puerto 8092   UP
+   bff-cajero           puerto 8093   UP
+
+--- Registro final de Eureka ---
+   API-GATEWAY          1 instancia(s)
+   AUTH-SERVER          1 instancia(s)
+   CLIENTES-SERVICE     1 instancia(s)
+   CUENTAS-SERVICE      2 instancia(s)
+   PAGOS-SERVICE        1 instancia(s)
+   total de instancias registradas: 6
+
+--- Estado del circuito al terminar ---
+{
+    "circuitBreakers": {
+        "cuentas": {
+            "failureRate": "0.0%",
+            "slowCallRate": "0.0%",
+            "failureRateThreshold": "50.0%",
+            "slowCallRateThreshold": "100.0%",
+            "bufferedCalls": 10,
+            "failedCalls": 0,
+            "slowCalls": 0,
+            "slowFailedCalls": 0,
+            "notPermittedCalls": 0,
+            "state": "CLOSED"
+        }
+    }
+}
+
+--- Detalle de salud del broker Kafka ---
+{
+    "status": "UP",
+    "groups": [
+        "liveness",
+        "readiness"
+    ]
+}
+
+--- Tamano de los logs generados ---
+-rw-r--r-- 1 root root 68614 Oct  8 18:16 01_compilacion_y_pruebas.log
+-rw-r--r-- 1 root root 34576 Oct  8 18:17 02_batch_migracion.log
+-rw-r--r-- 1 root root  1755 Oct  8 18:19 03_configuracion_y_discovery.log
+-rw-r--r-- 1 root root  3759 Oct  8 18:19 04_oauth2_y_control_de_acceso.log
+-rw-r--r-- 1 root root  2209 Oct  8 18:19 05_apis_por_el_gateway.log
+-rw-r--r-- 1 root root  4310 Oct  8 18:20 06_mensajeria_jms.log
+-rw-r--r-- 1 root root  5674 Oct  8 18:20 07_mensajeria_kafka.log
+-rw-r--r-- 1 root root  5108 Oct  8 18:21 08_tolerancia_a_fallos.log
+-rw-r--r-- 1 root root  3580 Oct  8 18:21 09_bff_por_canal.log
+-rw-r--r-- 1 root root  2982 Oct  8 18:22 10_escalabilidad_horizontal.log
+-rw-r--r-- 1 root root  1657 Oct  8 18:22 11_estado_final.log

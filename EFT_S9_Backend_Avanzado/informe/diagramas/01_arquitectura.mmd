@@ -1,0 +1,61 @@
+flowchart TB
+    subgraph CANALES["Canales"]
+        direction LR
+        NAV["Navegador web"]
+        MOV["App movil"]
+        CAJ["Cajero automatico"]
+    end
+
+    subgraph BFF["Backends for Frontends — uno por canal"]
+        direction LR
+        BW["bff-web :8091<br/>payload completo"]
+        BM["bff-movil :8092<br/>payload minimo"]
+        BC["bff-cajero :8093<br/>saldo y retiro"]
+    end
+
+    GW["api-gateway :8080<br/>unica puerta de entrada · valida JWT · enruta con lb://"]
+
+    subgraph DOMINIO["Microservicios de dominio — escalables horizontalmente"]
+        direction LR
+        CU["cuentas-service :8081<br/>saldo · retiros · liquidacion"]
+        PA["pagos-service :8082<br/>depositos · transferencias · historial"]
+        CL["clientes-service :8083<br/>datos personales · actividad"]
+    end
+
+    subgraph MSG["Mensajeria asincrona"]
+        direction LR
+        AR["Artemis :61616<br/>cola banco.retiros<br/>instruccion con destinatario"]
+        KA["Kafka :9092<br/>2 topicos<br/>hechos sin destinatario"]
+    end
+
+    subgraph INFRA["Infraestructura Spring Cloud"]
+        direction LR
+        CS["config-server :8888<br/>configuracion central"]
+        DS["discovery-server :8761<br/>Eureka"]
+        AS["auth-server :9000<br/>OAuth 2.0 · emite JWT"]
+    end
+
+    subgraph BATCH["Migracion de procesos legacy"]
+        direction LR
+        CSV[("fin_legacy_data<br/>3 CSV · 1.000 filas c/u")]
+        BA["batch-migracion<br/>3 jobs particionados"]
+        CSV --> BA
+    end
+
+    NAV --> BW
+    MOV --> BM
+    CAJ --> BC
+
+    BFF ==>|"HTTPS + Bearer propio del canal"| GW
+    GW ==> DOMINIO
+
+    PA -. "RestClient @LoadBalanced<br/>resuelve por Eureka" .-> CU
+
+    CU -->|"publica el retiro"| AR
+    AR -->|"consume una sola vez"| PA
+    CU -->|"publica hechos"| KA
+    PA -->|"publica hechos"| KA
+    KA -->|"consume"| CL
+
+    DOMINIO -. "descargan configuracion, se registran<br/>y validan los tokens" .-> INFRA
+    GW -.-> INFRA

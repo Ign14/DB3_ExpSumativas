@@ -1,0 +1,33 @@
+server:
+  port: 8081
+
+spring:
+  # Resource Server: valida el JWT que emite el auth-server antes de atender
+  # cualquier peticion. No guarda credenciales ni sabe autenticar usuarios.
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AUTH_ISSUER_URI:http://localhost:9000}
+          # Indicar el jwk-set-uri explicitamente evita que este servicio
+          # consulte los metadatos del auth-server durante el arranque: baja a
+          # buscar la clave publica la primera vez que valida un token. Asi el
+          # orden de arranque entre servicios deja de ser critico, sin perder la
+          # validacion del issuer, que sigue activa por la linea anterior.
+          jwk-set-uri: ${AUTH_ISSUER_URI:http://localhost:9000}/oauth2/jwks
+  # Cliente JMS. En local apunta al broker de desarrollo; en Docker, al
+  # contenedor de Artemis. El modo es siempre "native": ningun microservicio
+  # hospeda el broker.
+  artemis:
+    mode: native
+    # callTimeout acota cuanto espera el cliente una respuesta del broker. Por
+    # defecto son 30 s, y ese es el tiempo que un broker colgado dejaria
+    # bloqueado el hilo que atiende el retiro antes de poder responder.
+    broker-url: tcp://${ARTEMIS_HOST:localhost}:61616?callTimeout=4000&connectionTTL=30000
+    user: ${ARTEMIS_USER:artemis}
+    password: ${ARTEMIS_PASSWORD:artemis}
+
+banco:
+  cuentas:
+    # Regla de negocio del dominio de cuentas, configurable sin recompilar.
+    limite-retiro-por-operacion: 500000

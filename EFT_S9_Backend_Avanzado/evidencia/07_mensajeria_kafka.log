@@ -1,0 +1,118 @@
+
+==============================================================
+  07 - MENSAJERIA ASINCRONA CON KAFKA (dos topicos)
+==============================================================
+Kafka lleva hechos, no instrucciones: 'esta transaccion ocurrio' y
+'hay una alerta'. Los publican cuentas-service y pagos-service, y los
+consume clientes-service, que mantiene su propia vista de la actividad
+de cada titular sin preguntarle nada a nadie.
+
+  banco.transacciones-completadas  <- retiros, depositos, transferencias
+  banco.alertas-seguridad          <- rechazos y dependencias degradadas
+
+--- Topicos creados por el broker al arrancar ---
+{
+    "status": "UP",
+    "groups": [
+        "liveness",
+        "readiness"
+    ]
+}
+
+--- Perfil del cliente 101 antes de operar ---
+{
+    "clienteId": 101,
+    "nombre": "John Doe",
+    "segmento": "establecido",
+    "edad": 40,
+    "tipoCuentaPrincipal": "prestamo",
+    "saldoReferencial": 5000,
+    "operacionesRegistradas": 2,
+    "alertasRegistradas": 0,
+    "ultimaOperacion": "RETIRO de 100 el 2026-10-08"
+}
+
+--- Deposito de 1200 por el canal web (pagos-service orquesta y publica) ---
+{
+    "operacionId": "2bc8361f-ea65-4385-8d4e-56e81a5ba978",
+    "tipoOperacion": "DEPOSITO",
+    "cuentaOrigen": 101,
+    "cuentaDestino": 101,
+    "monto": 1200,
+    "saldoResultante": 5850,
+    "aprobada": true,
+    "motivoRechazo": null,
+    "eventoPublicado": true
+}
+
+--- Transferencia de 300 de la cuenta 101 a la 102 ---
+{
+    "operacionId": "b5cc6182-a8d3-4265-aa40-2064a7eda2bf",
+    "tipoOperacion": "TRANSFERENCIA",
+    "cuentaOrigen": 101,
+    "cuentaDestino": 102,
+    "monto": 300,
+    "saldoResultante": 5550,
+    "aprobada": true,
+    "motivoRechazo": null,
+    "eventoPublicado": true
+}
+
+--- Intento de retiro sobre el limite: genera alerta, no transaccion ---
+{
+    "cuentaId": 101,
+    "montoSolicitado": 900000,
+    "saldoResultante": null,
+    "aprobado": false,
+    "motivoRechazo": "El monto supera el limite de 500000 por operacion.",
+    "eventoId": null,
+    "eventoPublicado": false
+}
+
+>> esperando 8s a que clientes-service consuma los topicos
+
+--- Perfil del cliente 101 despues: la actividad la trajo Kafka ---
+{
+    "clienteId": 101,
+    "nombre": "John Doe",
+    "segmento": "establecido",
+    "edad": 40,
+    "tipoCuentaPrincipal": "prestamo",
+    "saldoReferencial": 5000,
+    "operacionesRegistradas": 4,
+    "alertasRegistradas": 1,
+    "ultimaOperacion": "TRANSFERENCIA de 300 el 2026-10-08"
+}
+
+--- Perfil del cliente 102: recibio el abono de la transferencia ---
+{
+    "clienteId": 102,
+    "nombre": "Sin nombre registrado",
+    "segmento": "preferente",
+    "edad": 40,
+    "tipoCuentaPrincipal": "ahorro",
+    "saldoReferencial": 10000,
+    "operacionesRegistradas": 1,
+    "alertasRegistradas": 0,
+    "ultimaOperacion": "TRANSFERENCIA de 300 el 2026-10-08"
+}
+
+--- Lo que publicaron los productores ---
+-- cuentas-service
+2026-10-08T18:19:14.543Z  INFO 5589 --- [cuentas-service] [io-8081-exec-10] c.d.b.c.m.PublicadorEventosKafka         : >> cuentas-service: evento a7d9a781-779f-4efb-b0fc-6125312785f1 publicado en el topico banco.transacciones-completadas (RETIRO de 250 en la cuenta 101)
+2026-10-08T18:19:27.910Z  INFO 5589 --- [cuentas-service] [nio-8081-exec-3] c.d.b.c.m.PublicadorEventosKafka         : >> cuentas-service: evento 4e613089-5c32-4096-9bcb-2a4ec3c236a8 publicado en el topico banco.transacciones-completadas (RETIRO de 100 en la cuenta 101)
+2026-10-08T18:20:20.103Z  INFO 5589 --- [cuentas-service] [nio-8081-exec-6] c.d.b.c.m.PublicadorEventosKafka         : >> cuentas-service: alerta RETIRO_SOBRE_LIMITE publicada en el topico banco.alertas-seguridad (cuenta 101, severidad MEDIA)
+-- pagos-service
+2026-10-08T18:20:19.758Z  INFO 6201 --- [pagos-service] [nio-8082-exec-3] c.d.b.p.m.PublicadorEventosKafka         : >> pagos-service: evento 2bc8361f-ea65-4385-8d4e-56e81a5ba978 publicado en banco.transacciones-completadas (DEPOSITO de 1200 de la cuenta 101 a la 101)
+2026-10-08T18:20:19.991Z  INFO 6201 --- [pagos-service] [nio-8082-exec-7] c.d.b.p.m.PublicadorEventosKafka         : >> pagos-service: evento b5cc6182-a8d3-4265-aa40-2064a7eda2bf publicado en banco.transacciones-completadas (TRANSFERENCIA de 300 de la cuenta 101 a la 102)
+
+--- Lo que consumio clientes-service ---
+2026-10-08T18:19:14.616Z  INFO 5591 --- [clientes-service] [ntainer#0-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: evento a7d9a781-779f-4efb-b0fc-6125312785f1 de Kafka anotado - RETIRO sobre cuenta origen 101 y destino null
+2026-10-08T18:19:27.916Z  INFO 5591 --- [clientes-service] [ntainer#0-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: evento 4e613089-5c32-4096-9bcb-2a4ec3c236a8 de Kafka anotado - RETIRO sobre cuenta origen 101 y destino null
+2026-10-08T18:20:19.762Z  INFO 5591 --- [clientes-service] [ntainer#0-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: evento 2bc8361f-ea65-4385-8d4e-56e81a5ba978 de Kafka anotado - DEPOSITO sobre cuenta origen 101 y destino 101
+2026-10-08T18:20:20.003Z  INFO 5591 --- [clientes-service] [ntainer#0-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: evento b5cc6182-a8d3-4265-aa40-2064a7eda2bf de Kafka anotado - TRANSFERENCIA sobre cuenta origen 101 y destino 102
+2026-10-08T18:20:20.135Z  WARN 5591 --- [clientes-service] [ntainer#1-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: alerta RETIRO_SOBRE_LIMITE (MEDIA) sobre la cuenta 101 - Intento de retiro por 900000 sobre el limite de 500000 desde el canal cajero
+
+--- Saldos finales de las dos cuentas de la transferencia ---
+   cuenta 101: saldo 5550
+   cuenta 102: saldo 10300

@@ -1,0 +1,39 @@
+# Configuracion de los tests de este modulo. Reemplaza al application.yml de
+# src/main/resources, que arranca pidiendole la configuracion al Config Server.
+# El razonamiento completo esta en el javadoc de ReglasDeAutorizacionTest de
+# cuentas-service.
+spring:
+  application:
+    name: pagos-service-test
+  main:
+    banner-mode: off
+  cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:1/jwks
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+banco:
+  cuentas-service:
+    url: http://localhost:1
+  pagos:
+    limite-por-operacion: 1000000
+
+management:
+  endpoints:
+    enabled-by-default: false
+
+logging:
+  level:
+    root: WARN
