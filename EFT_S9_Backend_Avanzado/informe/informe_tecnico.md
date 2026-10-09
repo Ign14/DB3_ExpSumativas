@@ -48,8 +48,8 @@ en dos capas, tolerancia a fallos con Resilience4j y una arquitectura de eventos
 sobre Kafka y JMS. Los tres escalan horizontalmente sin cambiar configuración.
 
 El estado del sistema, medido: **168 pruebas automatizadas sin librerías de
-mocks** y **veintiséis registros de ejecución** repartidos en tres entornos
-—once sobre los jar, ocho sobre contenedores en el equipo de desarrollo y siete
+mocks** y **veintisiete registros de ejecución** repartidos en tres entornos
+—once sobre los jar, nueve sobre contenedores en el equipo de desarrollo y siete
 en una **instancia EC2 de AWS**, con el sistema completo y sus dos brokers de
 mensajería corriendo fuera del equipo de desarrollo—. El ciclo completo del
 circuit breaker —`CLOSED → OPEN → HALF_OPEN → CLOSED`— está capturado sobre

@@ -22,10 +22,11 @@ powershell -ExecutionPolicy Bypass -File evidencia\generar_evidencia_docker.ps1
 El script construye las once imágenes del repositorio, levanta la orquestación completa —que
 incluye Kafka y el contenedor de un solo uso que crea los tópicos—, espera a que
 todos los contenedores reporten `healthy`, ejercita el ecosistema entero y lo
-baja al terminar. Deja ocho logs en esta carpeta:
+baja al terminar. Deja nueve logs en esta carpeta:
 
 | Archivo | Qué demuestra |
 |---|---|
+| `00_limpieza_previa.log` | Con qué estado del demonio de Docker se empezó, y qué contenedores de corridas anteriores hubo que eliminar para liberar los nombres |
 | `01_construccion_de_imagenes.log` | Las once imágenes se construyen y existen |
 | `02_orquestacion.log` | Los contenedores en `healthy`, la red propia, la resolución por nombre dentro de la red, los tópicos creados y el registro de Eureka |
 | `03_oauth2.log` | Token por `client_credentials`, claims, clave pública y los rechazos: sin token, token alterado, secreto incorrecto, scope no registrado y mínimo privilegio por canal |
@@ -39,16 +40,29 @@ La primera ejecución tarda bastante: la construcción descarga las dependencias
 Maven dentro de la imagen, y el escalado del paso 7 espera a que las réplicas
 nuevas estén sanas. En total, entre veinte y treinta minutos.
 
-## Tres cosas que en los logs se leen raro y no son fallas
+## Cinco cosas que en los logs se leen raro y no son fallas
 
 Quedan anotadas aquí en vez de editarse en los logs, porque una evidencia
 retocada a mano deja de ser evidencia.
+
+**El log `00` elimina contenedores.** Once servicios de este `docker-compose`
+fijan `container_name` para que los nombres sean legibles en la evidencia, y el
+precio de eso es que un contenedor con el mismo nombre dejado por otro proyecto
+—la Exp3, por ejemplo, que también tenía un `config-server`— hace fallar el
+`docker compose up` entero con un conflicto de nombre. El paso `00` lo detecta
+antes de empezar, elimina sólo los contenedores cuyo nombre colisiona y deja
+constancia de cuáles eran. No toca imágenes ni volúmenes.
 
 **`kafka-init` aparece como `Exited (0)`.** Es correcto y es a propósito. Es un
 contenedor de un solo uso que crea los dos tópicos con sus particiones y
 termina. Los microservicios que los consumen dependen de que este contenedor haya
 terminado bien (`service_completed_successfully`), no sólo de que Kafka esté
 sano, de modo que ningún consumidor arranca contra un tópico inexistente.
+
+**El listado de imágenes nombra las once una por una, incluso las ausentes.**
+No usa `docker image ls --filter reference=banco-xyz/*` porque ese comodín
+también trae imágenes de proyectos anteriores que comparten el prefijo, y el
+log terminaría mostrando doce donde este `docker-compose` construye once.
 
 **En `01_construccion_de_imagenes.log` pueden aparecer bloques con
 `NativeCommandError` y `CategoryInfo`.** No falló nada: Docker escribe el

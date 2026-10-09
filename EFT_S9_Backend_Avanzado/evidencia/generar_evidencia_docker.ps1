@@ -17,6 +17,10 @@ $ErrorActionPreference = 'Continue'
 $Raiz   = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $Salida = Join-Path $Raiz 'evidencia\docker'
 New-Item -ItemType Directory -Force -Path $Salida | Out-Null
+# Se borran los logs de la corrida anterior, no las capturas ni el LEEME. Sin
+# esto, una corrida que se detiene a la mitad deja mezclados logs nuevos con
+# viejos y no hay forma de saber cuales son de cuando.
+Remove-Item (Join-Path $Salida '*.log') -ErrorAction SilentlyContinue
 Set-Location $Raiz
 
 $Gw   = 'http://localhost:8080'
@@ -27,6 +31,36 @@ $EurekaPass = 'banco-eureka-secret'
 # --------------------------------------------------------------------------
 # Utilidades
 # --------------------------------------------------------------------------
+
+# Los once servicios de este compose fijan container_name, asi que sus nombres
+# son unicos en todo el demonio de Docker: un contenedor con el mismo nombre
+# dejado por otro proyecto hace fallar el 'docker compose up' entero.
+$Nombres = @('config-server','discovery-server','broker-artemis','kafka',
+             'kafka-init','auth-server','api-gateway',
+             'bff-web','bff-movil','bff-cajero')
+
+$Repos = @('banco-xyz/config-server','banco-xyz/discovery-server',
+           'banco-xyz/auth-server','banco-xyz/api-gateway',
+           'banco-xyz/cuentas-service','banco-xyz/pagos-service',
+           'banco-xyz/clientes-service','banco-xyz/bff-web',
+           'banco-xyz/bff-movil','banco-xyz/bff-cajero',
+           'banco-xyz/broker-artemis')
+
+function ImagenesDelProyecto() {
+    # Se listan por nombre exacto y no con --filter reference=banco-xyz/*,
+    # porque ese comodin tambien trae imagenes de proyectos anteriores que
+    # comparten el prefijo y haria parecer que este compose construye mas de
+    # las once que declara.
+    '{0,-32} {1}' -f 'REPOSITORIO', 'ID / TAMANO'
+    $n = 0
+    foreach ($r in $Repos) {
+        $linea = @(docker image ls "${r}:1.0.0" --format "{{.ID}}  {{.Size}}" 2>$null)[0]
+        if ($linea) { '{0,-32} {1}' -f $r, $linea; $n++ }
+        else        { '{0,-32} (no construida)' -f $r }
+    }
+    ''
+    "   $n de $($Repos.Count) imagenes del proyecto presentes"
+}
 
 function Titulo($texto) {
     ''
@@ -90,6 +124,43 @@ function EsperarSanos($intentos = 40) {
 }
 
 # --------------------------------------------------------------------------
+# 00 - Limpieza previa
+# --------------------------------------------------------------------------
+# Este compose fija container_name en once servicios, para que los nombres de
+# los contenedores sean legibles en la evidencia. El precio es que un
+# contenedor con el mismo nombre dejado por OTRO proyecto -la Exp3, por
+# ejemplo- hace fallar el 'docker compose up' entero con un conflicto de
+# nombre, y el resto de la evidencia sale vacia sin que se vea por que.
+# Esto lo detecta y lo resuelve antes de empezar, y deja dicho que lo hizo.
+Write-Host '>> 00 limpiando contenedores de corridas anteriores'
+$log = Join-Path $Salida '00_limpieza_previa.log'
+& {
+    Titulo '00 - LIMPIEZA PREVIA'
+    "Fecha: $(Get-Date -Format o)"
+
+    Paso 'Contenedores presentes antes de empezar'
+    docker ps -a --format "{{.Names}}  |  {{.Image}}  |  {{.Status}}" 2>$null
+
+    Paso 'Bajando cualquier orquestacion previa de este proyecto'
+    cmd /c "docker compose down --remove-orphans 2>&1"
+
+    Paso 'Nombres en conflicto dejados por otros proyectos'
+    $existentes = @(docker ps -a --format "{{.Names}}" 2>$null)
+    $conflictos = @($Nombres | Where-Object { $existentes -contains $_ })
+    if ($conflictos.Count -eq 0) {
+        '   ninguno: los once nombres fijos de este compose estan libres'
+    } else {
+        foreach ($n in $conflictos) { "   $n" }
+        ''
+        "   Se eliminan $($conflictos.Count) contenedor(es) para liberar los nombres."
+        foreach ($n in $conflictos) { docker rm -f $n 2>&1 }
+    }
+
+    Paso 'Estado despues de la limpieza'
+    docker ps -a --format "{{.Names}}  |  {{.Image}}  |  {{.Status}}" 2>$null
+} *>&1 | Out-File -FilePath $log -Encoding utf8
+
+# --------------------------------------------------------------------------
 # 01 - Construccion de las imagenes
 # --------------------------------------------------------------------------
 Write-Host '>> 01 construyendo las imagenes (puede tardar varios minutos)'
@@ -100,7 +171,7 @@ $log = Join-Path $Salida '01_construccion_de_imagenes.log'
 cmd /c "docker compose build > `"$log`" 2>&1"
 Add-Content $log ''
 Add-Content $log '--- Imagenes construidas ---'
-cmd /c "docker image ls --filter reference=banco-xyz/* >> `"$log`" 2>&1"
+ImagenesDelProyecto | Out-File -FilePath $log -Encoding utf8 -Append
 
 # --------------------------------------------------------------------------
 # 02 - Orquestacion
@@ -112,10 +183,25 @@ Write-Host '>> 02 levantando la orquestacion'
 
     Paso 'Levantando los contenedores'
     cmd /c "docker compose up -d 2>&1"
+    $script:CodigoUp = $LASTEXITCODE
+    "   codigo de salida de 'docker compose up': $script:CodigoUp"
 
     Paso 'Esperando a que todos reporten healthy'
     $ok = EsperarSanos
-    if (-not $ok) { '   !! no todos los contenedores llegaron a healthy' }
+    $script:Orquestado = $ok
+    if (-not $ok) {
+        '   !! no todos los contenedores llegaron a healthy'
+        ''
+        '   Diagnostico de los que no llegaron:'
+        cmd /c "docker compose ps -a 2>&1"
+        foreach ($s in @('config-server','discovery-server','auth-server','api-gateway',
+                         'cuentas-service','pagos-service','clientes-service',
+                         'broker-artemis','kafka')) {
+            ''
+            "   --- ultimas lineas de $s ---"
+            cmd /c "docker compose logs --tail 25 $s 2>&1"
+        }
+    }
 
     Paso 'Estado de los contenedores'
     cmd /c "docker compose ps 2>&1"
@@ -144,6 +230,20 @@ apps=d['applications'].get('application',[]);
 apps=[apps] if isinstance(apps,dict) else apps;
 [print('  ',a['name'],':',len(a['instance'] if isinstance(a['instance'],list) else [a['instance']]),'instancia(s)') for a in sorted(apps,key=lambda x:x['name'])]"
 } *>&1 | Out-File -FilePath (Join-Path $Salida '02_orquestacion.log') -Encoding utf8
+
+# Sin orquestacion arriba, los seis logs que siguen saldrian vacios y haria
+# falta leerlos uno por uno para darse cuenta. Mejor detenerse aca y decir
+# donde mirar.
+if (-not $Orquestado) {
+    Write-Host ''
+    Write-Host '!! La orquestacion no llego a healthy. Se detiene aca.' -ForegroundColor Red
+    Write-Host "   El diagnostico esta en $Salida\02_orquestacion.log"
+    Write-Host '   Lo mas comun: un contenedor muerto por falta de memoria'
+    Write-Host '   (Docker Desktop -> Settings -> Resources, al menos 8 GB).'
+    Write-Host '   Los contenedores quedan arriba para que puedas inspeccionarlos;'
+    Write-Host '   cuando termines: docker compose down --remove-orphans'
+    exit 1
+}
 
 # --------------------------------------------------------------------------
 # 03 - OAuth 2.0 y control de acceso
@@ -445,7 +545,7 @@ apps=[apps] if isinstance(apps,dict) else apps;
 [print('  ',a['name'],':',len(a['instance'] if isinstance(a['instance'],list) else [a['instance']]),'instancia(s)') for a in sorted(apps,key=lambda x:x['name'])]"
 
     Paso 'Imagenes del sistema'
-    cmd /c "docker image ls --filter reference=banco-xyz/* 2>&1"
+    ImagenesDelProyecto
 } *>&1 | Out-File -FilePath (Join-Path $Salida '08_estado_final.log') -Encoding utf8
 
 Write-Host '>> bajando la orquestacion'
