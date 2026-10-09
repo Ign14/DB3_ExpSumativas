@@ -10,17 +10,20 @@
 # Uso, desde la carpeta EFT_S9_Backend_Avanzado:
 #     bash evidencia/generar_evidencia.sh
 #
-# Deja los logs numerados en evidencia/ y la salida completa de cada proceso en
-# evidencia/logs/.
+# Deja los logs numerados en evidencia/local/ y la salida completa de cada
+# proceso en evidencia/local/logs/.
+#
+# Es una de las tres evidencias del proyecto; el indice de las tres esta en
+# evidencia/LEEME.md.
 
 set -u
 
 RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-EV="$RAIZ/evidencia"
+EV="$RAIZ/evidencia/local"
 LOGS="$EV/logs"
 JVM_OPTS="-Xmx320m -XX:MaxRAMPercentage=75.0"
 
-mkdir -p "$LOGS"
+mkdir -p "$EV" "$LOGS"
 rm -f "$EV"/*.log "$LOGS"/*.log "$LOGS"/*.pid
 rm -rf "$LOGS/acceso"
 mkdir -p "$LOGS/acceso"

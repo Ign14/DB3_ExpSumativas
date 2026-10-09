@@ -48,9 +48,12 @@ en dos capas, tolerancia a fallos con Resilience4j y una arquitectura de eventos
 sobre Kafka y JMS. Los tres escalan horizontalmente sin cambiar configuración.
 
 El estado del sistema, medido: **168 pruebas automatizadas sin librerías de
-mocks**, **once registros de ejecución** sobre los jar y **ocho** sobre
-contenedores, y el ciclo completo del circuit breaker —`CLOSED → OPEN →
-HALF_OPEN → CLOSED`— capturado sobre contenedores reales.
+mocks** y **veintiséis registros de ejecución** repartidos en tres entornos
+—once sobre los jar, ocho sobre contenedores en el equipo de desarrollo y siete
+en una **instancia EC2 de AWS**, con el sistema completo y sus dos brokers de
+mensajería corriendo fuera del equipo de desarrollo—. El ciclo completo del
+circuit breaker —`CLOSED → OPEN → HALF_OPEN → CLOSED`— está capturado sobre
+contenedores reales en los dos últimos.
 
 Este informe describe qué se construyó, por qué se tomó cada decisión, qué
 problemas aparecieron durante el desarrollo y qué falta. La última sección es
@@ -707,10 +710,20 @@ que un endpoint nuevo nazca cerrado.
 
 ### 8.2 Evidencia de ejecución
 
-Dos conjuntos, que demuestran cosas distintas. `evidencia/` contiene la ejecución
-sobre los jar, reproducible en cualquier máquina con un JDK y sin depender de
-Docker. `evidencia/docker/` contiene la ejecución sobre contenedores, que
-demuestra que las imágenes y la orquestación funcionan.
+Tres conjuntos, que demuestran cosas distintas y por eso no se mezclan.
+`evidencia/local/` contiene la ejecución sobre los jar, reproducible en cualquier
+máquina con un JDK y sin depender de Docker. `evidencia/docker/` contiene la
+ejecución sobre contenedores en el equipo de desarrollo, que demuestra que las
+once imágenes se construyen y que la orquestación declarada levanta el
+ecosistema. Y `evidencia/nube/` contiene la ejecución del sistema completo
+—incluidos los dos brokers de mensajería— **dentro de una instancia EC2 de AWS**,
+que es lo que demuestra que esto funciona fuera del equipo de desarrollo; sus
+registros empiezan con los metadatos de la instancia leídos del servicio de
+metadatos de AWS, porque un `docker compose ps` es idéntico en cualquier máquina
+y sin esa cabecera no habría forma de distinguir una ejecución de la otra.
+
+El índice de los tres conjuntos está en `evidencia/LEEME.md`. Los once registros
+de `evidencia/local/`:
 
 | Registro | Qué demuestra |
 |---|---|
@@ -838,12 +851,21 @@ tareas programadas de **EventBridge**, cada una con su propia frecuencia. El
 código de salida distinto de cero del proceso batch alimenta una alarma de
 CloudWatch, que es lo que hace que un batch fallido se sepa el mismo día.
 
-**Lo que está probado y lo que no.** La construcción de las imágenes, la
-orquestación completa y el escalado horizontal están ejecutados y evidenciados.
-El despliegue en una cuenta AWS real está descrito con comandos completos pero no
-ejecutado: implica una cuenta con medio de pago y costos que esta entrega no
-justifica. La primera sección de `despliegue.md` lo dice antes que cualquier otra
-cosa.
+**El despliegue que sí se ejecutó.** La arquitectura administrada que describen
+los párrafos anteriores —Fargate, MSK, Amazon MQ, RDS— está escrita con los
+comandos completos pero no se levantó: su costo es de dos órdenes de magnitud
+sobre el de esta entrega. Lo que sí se ejecutó, y es lo que `evidencia/nube/`
+registra, es el **sistema completo sobre una instancia EC2**: las once imágenes
+construidas dentro de la instancia, los trece contenedores en `healthy`
+—incluidos Artemis y Kafka, es decir los dos brokers corriendo en la nube y no en
+el equipo de desarrollo—, los microservicios conectados a ellos, el ciclo del
+circuit breaker sobre contenedores reales y dos réplicas de `cuentas-service`
+registradas en Eureka. Los pasos están en la sección 11 de `despliegue.md`.
+
+Una instancia única no demuestra tolerancia a la caída de una zona de
+disponibilidad: eso es precisamente lo que aporta la arquitectura administrada, y
+es la razón de describirla aunque no se haya levantado. La sección 0 de
+`despliegue.md` separa las dos mitades antes que cualquier otra cosa.
 
 ---
 

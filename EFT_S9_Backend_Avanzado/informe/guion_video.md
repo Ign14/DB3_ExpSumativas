@@ -17,11 +17,14 @@ no buscar nada en vivo:
 3. El diagrama `informe/diagramas/01_arquitectura.png` abierto en un visor
 4. Estos cuatro archivos de evidencia abiertos, cada uno en una pestaña del
    editor:
-   - `evidencia/02_batch_migracion.log`
-   - `evidencia/09_bff_por_canal.log`
-   - `evidencia/08_tolerancia_a_fallos.log`
-   - `evidencia/10_escalabilidad_horizontal.log`
-5. Una terminal limpia, lista para pegar comandos
+   - `evidencia/local/02_batch_migracion.log`
+   - `evidencia/local/09_bff_por_canal.log`
+   - `evidencia/local/08_tolerancia_a_fallos.log`
+   - `evidencia/local/10_escalabilidad_horizontal.log`
+5. La evidencia del despliegue en la nube: `evidencia/nube/02_orquestacion_en_ec2.log`
+   abierto en una pestaña, y al lado la captura de la consola de EC2 con la
+   instancia corriendo
+6. Una terminal limpia, lista para pegar comandos
 
 **Comprobar antes de grabar:** que el micrófono se escuche, que la webcam esté
 encendida y visible, y que el texto de la pantalla se lea al tamaño al que vas a
@@ -83,7 +86,7 @@ Ir señalando con el cursor mientras hablas.
 
 ## Minuto 1:40 – 2:30 · Resultados, parte 1: el batch y los canales
 
-**En pantalla:** `evidencia/02_batch_migracion.log`, buscando el bloque del
+**En pantalla:** `evidencia/local/02_batch_migracion.log`, buscando el bloque del
 `FIN job`.
 
 > Primer resultado: los tres procesos batch. Este es el log de una ejecución
@@ -97,7 +100,7 @@ Ir señalando con el cursor mientras hablas.
 > *(señalar las particiones)* Y acá se ve que corrió en cuatro particiones en
 > paralelo, no en serie.
 
-**Cambiar a:** `evidencia/09_bff_por_canal.log`, en el bloque de tamaños.
+**Cambiar a:** `evidencia/local/09_bff_por_canal.log`, en el bloque de tamaños.
 
 > Segundo resultado: el patrón BFF. Esta es la misma cuenta pedida por los tres
 > canales. El canal web devuelve 4.918 caracteres, con el historial completo y el
@@ -135,7 +138,7 @@ done
 > microservicio mirando el scope. Si estuviera sólo en el gateway, cualquier
 > proceso dentro de la red podría saltárselo.
 
-**Cambiar a:** `evidencia/08_tolerancia_a_fallos.log`, en el bloque de las seis
+**Cambiar a:** `evidencia/local/08_tolerancia_a_fallos.log`, en el bloque de las seis
 peticiones.
 
 > Cuarto resultado: tolerancia a fallos. Acá detuve cuentas-service y pedí la
@@ -155,7 +158,28 @@ peticiones.
 
 ---
 
-## Minuto 3:30 – 4:10 · Comparación con el sistema legacy
+## Minuto 3:30 – 4:00 · El sistema desplegado en la nube
+
+**En pantalla:** la captura de la consola de EC2 con la instancia en `running`, y
+enseguida `evidencia/nube/02_orquestacion_en_ec2.log`.
+
+> Todo lo que mostré hasta acá también corre fuera de mi equipo. Este es el
+> sistema completo desplegado en una instancia EC2 de Amazon: las once imágenes
+> construidas dentro de la instancia y los trece contenedores en healthy.
+>
+> *(señalar el encabezado del log)* Y esto de arriba importa más de lo que
+> parece. Son los metadatos de la instancia, leídos del servicio de metadatos de
+> AWS, que sólo responde desde dentro de una máquina de Amazon. Sin esa cabecera,
+> un `docker compose ps` es idéntico en cualquier computador y no probaría nada.
+>
+> *(señalar los dos brokers en la lista)* Lo que más quería demostrar acá son
+> estos dos: Artemis y Kafka. Los brokers de mensajería no están en mi portátil,
+> están en la nube, y los microservicios se conectan a ellos desde dentro de la
+> misma red privada.
+
+---
+
+## Minuto 4:00 – 4:30 · Comparación con el sistema legacy
 
 **En pantalla:** tú en cámara, o la tabla de comparación del informe técnico.
 
@@ -180,7 +204,7 @@ peticiones.
 
 ---
 
-## Minuto 4:10 – 5:10 · Desafíos y soluciones
+## Minuto 4:30 – 5:20 · Desafíos y soluciones
 
 **En pantalla:** tú en cámara. Este es el bloque más personal; mirarlo a la
 cámara y no leerlo.
@@ -227,7 +251,7 @@ cámara y no leerlo.
 
 ---
 
-## Minuto 5:10 – 5:50 · Propuestas de mejora y próximos pasos
+## Minuto 5:20 – 5:50 · Propuestas de mejora y próximos pasos
 
 **En pantalla:** la sección 9 del informe técnico, o tú en cámara.
 
@@ -277,10 +301,15 @@ corriendo de verdad mientras grabas.
 explicación de la arquitectura. Se puede bajar a treinta segundos diciendo sólo
 las cuatro capas y dejando que el diagrama hable.
 
+**Lo que no se recorta nunca:** el minuto 3:30, el despliegue en la nube. Es el
+único tramo que demuestra algo que no se puede inferir del resto del video, y es
+lo que distingue un sistema que corre en un portátil de uno desplegado. Si hay
+que elegir entre ese tramo y cualquier otro, se va el otro.
+
 **Si queda corto:** hay dos opciones. La primera, agregar en el minuto 2:30 la
 demostración en vivo de un retiro que baja el saldo en un servicio y aparece en
 el historial de otro por la cola; son dos comandos y se ve muy bien. La segunda,
-contar en el minuto 4:10 el tercer hallazgo de la auditoría —el DTO duplicado
+contar en el minuto 4:30 el tercer hallazgo de la auditoría —el DTO duplicado
 que mostraba cero— porque es el más fácil de explicar en treinta segundos y el
 que mejor ilustra que una serialización no falla, rellena.
 

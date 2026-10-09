@@ -1,10 +1,15 @@
 # Evidencia de la ejecución con Docker
 
-Los logs numerados de `evidencia/` se generaron ejecutando los jar directamente
+Ésta es la segunda de las tres evidencias del proyecto; el índice de las tres
+está en [`../LEEME.md`](../LEEME.md).
+
+Los logs de `../local/` se generaron ejecutando los jar directamente
 (`generar_evidencia.sh`), para que esa evidencia sea reproducible en cualquier
-máquina con un JDK y sin depender del demonio de Docker. Los dos conjuntos de
-evidencia cubren cosas distintas: aquel demuestra la lógica del sistema, y este
-demuestra que las imágenes y la orquestación funcionan.
+máquina con un JDK y sin depender del demonio de Docker, y los de `../nube/`
+corresponden al despliegue en una instancia EC2. Cada conjunto cubre algo
+distinto: aquél demuestra la lógica del sistema, éste demuestra que las imágenes
+se construyen y que la orquestación declarada funciona, y el de la nube
+demuestra que todo eso ocurre fuera del equipo de desarrollo.
 
 ## Cómo generarla
 

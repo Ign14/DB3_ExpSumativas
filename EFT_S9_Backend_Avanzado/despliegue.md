@@ -11,19 +11,38 @@ que funcionó.
 
 ## 0. Alcance honesto de este documento
 
-Lo que está probado y se puede reproducir hoy: la construcción de las once
-imágenes del `docker-compose`, la orquestación completa con `docker-compose` y el escalado horizontal
-con varias instancias por servicio balanceadas por Eureka y el gateway. Eso está
-en `evidencia/docker/` y en `evidencia/10_escalabilidad_horizontal.log`.
+Este documento tiene dos mitades y conviene decir cuál es cuál antes de empezar,
+porque una se ejecutó y la otra no.
 
-Lo que este documento describe sin haberlo ejecutado: el despliegue en una cuenta
-AWS real. Los comandos están completos y los valores de ejemplo son los del
-proyecto, pero levantar la infraestructura implica una cuenta con medio de pago y
-costos que esta entrega no justifica. Donde una decisión sea discutible, está
-dicho por qué, y donde haga falta un paso manual, está marcado.
+**Lo que se ejecutó: el sistema completo en una instancia EC2.** Las once
+imágenes se construyen dentro de la instancia, los trece contenedores quedan
+levantados —incluidos los dos brokers de mensajería, Artemis y Kafka—, los
+microservicios se conectan a esos brokers por la red privada de Docker en la
+nube, y el escalado horizontal se demuestra con dos réplicas de
+`cuentas-service`. Los pasos están en la **sección 11**, el script que captura la
+evidencia es `evidencia/generar_evidencia_nube.sh`, y los registros resultantes,
+en `evidencia/nube/`. Es la única parte de este documento que corresponde a algo
+que efectivamente corrió en AWS.
 
-Preferí que esto quedara claro en la primera sección antes que escribir una guía
-que pareciera un registro de algo que no pasó.
+**Lo que se describe sin haberse ejecutado: la arquitectura administrada**
+—secciones 1 a 10—. ECS Fargate con un servicio por componente, Amazon MSK para
+Kafka, Amazon MQ para el broker JMS, RDS para el estado, Secrets Manager para las
+credenciales, ALB con certificado de ACM. Es la forma correcta de operar esto en
+producción, y por eso está escrita con los comandos completos y los valores del
+proyecto, pero levantarla tiene un costo de dos órdenes de magnitud sobre el de
+una instancia que se enciende, se mide y se apaga. Esta entrega no lo justifica.
+Donde una decisión sea discutible está dicho por qué, y donde haga falta un paso
+manual está marcado.
+
+La diferencia entre las dos mitades no es sólo de costo. La sección 11 demuestra
+que el sistema funciona fuera del equipo de desarrollo; las secciones 1 a 10
+describen cómo se lo haría tolerante a la caída de una zona de disponibilidad, lo
+que una sola instancia no puede demostrar por definición. Las dos cosas se piden
+en esta evaluación y están separadas a propósito.
+
+Las otras dos evidencias del proyecto —los jar con un JDK, y los contenedores en
+el equipo de desarrollo— están en `evidencia/local/` y `evidencia/docker/`, con el
+índice de las tres en `evidencia/LEEME.md`.
 
 ---
 
@@ -965,62 +984,204 @@ cuenta que no llegó a ninguna, y no se arregla solo.
 
 ---
 
-## 11. Alternativa de bajo costo: una instancia EC2
+## 11. El despliegue que sí se ejecutó: el sistema completo en una EC2
 
-Para una demostración o un ambiente de pruebas, el sistema completo corre en una
-sola instancia con `docker compose`, sin cambiar nada:
+Las secciones 1 a 10 describen la arquitectura objetivo en ECS Fargate, con
+servicios administrados y alta disponibilidad. Eso es lo que correspondería para
+producción y no se ejecutó.
+
+Esta sección es distinta: es el despliegue **que se hizo**, y la evidencia está
+en [`evidencia/nube/`](evidencia/nube/). El sistema completo —los tres
+microservicios, los tres BFF, la infraestructura de Spring Cloud y los dos
+brokers de mensajería— corriendo en una instancia EC2, construido ahí mismo
+desde el código fuente.
+
+No es la arquitectura de producción y no pretende serlo: todo vive en una
+máquina y en una zona de disponibilidad. Lo que demuestra es que el sistema se
+despliega y funciona fuera del equipo de desarrollo, que es la pregunta que la
+sección 0 dejaba abierta.
+
+**Costo.** Una `t3.large` cuesta 0,083 USD por hora en `us-east-1`. El
+procedimiento completo toma entre una y dos horas, así que son menos de veinte
+centavos de dólar. EC2 se cobra por hora encendida, no por mes, y por eso el
+último paso de esta sección —terminar la instancia— no es opcional.
+
+### 11.1 Por qué una `t3.large` y no algo más chico
+
+El sistema son trece contenedores, doce de ellos JVM. Con los límites de memoria
+de `docker-compose.nube.yml` la suma da 6,2 GB, y hace falta dejar margen para
+el sistema operativo y el propio demonio de Docker. Una `t3.medium` (4 GB) no
+alcanza: los contenedores arrancan y el *OOM killer* del kernel empieza a matar
+los que más crecen, que además no son siempre los mismos, así que el síntoma es
+un servicio distinto caído en cada intento.
+
+La `t3.large` (2 vCPU, 8 GB) es la más chica donde esto entra con holgura. Las 2
+vCPU hacen que la construcción de las imágenes tarde entre diez y quince
+minutos; es el paso más lento de todo el procedimiento.
+
+### 11.2 Preparar la instancia
+
+Desde el equipo local, con el AWS CLI configurado:
 
 ```bash
-# La AMI mas reciente de Amazon Linux 2023, el par de llaves y un grupo de
-# seguridad que abra SSH y los puertos publicados.
-export AMI_AMAZON_LINUX_2023=$(aws ssm get-parameter \
-  --name /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64 \
-  --query 'Parameter.Value' --output text)
-export MI_LLAVE=mi-par-de-llaves    # el nombre de un key pair que ya exista
-export SG_DEMO=$(aws ec2 create-security-group --group-name $PROYECTO-demo \
-  --description "Demo en una instancia" --vpc-id $VPC --query GroupId --output text)
-aws ec2 authorize-security-group-ingress --group-id $SG_DEMO \
-  --protocol tcp --port 22 --cidr $(curl -s ifconfig.me)/32
-for puerto in 8080 8091 8092 8093 8761 9000; do
-  aws ec2 authorize-security-group-ingress --group-id $SG_DEMO \
-    --protocol tcp --port $puerto --cidr $(curl -s ifconfig.me)/32
+export AWS_REGION=us-east-1
+export PROYECTO=banco-xyz
+
+# Par de llaves para entrar por SSH. Si ya tiene uno, salte este paso y use su
+# nombre y su archivo .pem.
+aws ec2 create-key-pair --key-name $PROYECTO-llave \
+  --query 'KeyMaterial' --output text > $PROYECTO-llave.pem
+chmod 400 $PROYECTO-llave.pem          # en Windows no hace falta
+
+# Grupo de seguridad: sólo desde SU IP, no desde todo internet. Dejar el 22
+# abierto al mundo en una instancia con Docker es cómo se pierden instancias.
+export MI_IP=$(curl -s ifconfig.me)
+export SG=$(aws ec2 create-security-group --group-name $PROYECTO-ec2 \
+  --description "EFT Banco XYZ" --query GroupId --output text)
+
+for puerto in 22 8080 8761 9000 8091 8092 8093; do
+  aws ec2 authorize-security-group-ingress --group-id $SG \
+    --protocol tcp --port $puerto --cidr $MI_IP/32
 done
 
-# t3.large: 2 vCPU y 8 GB. Con menos memoria, trece JVM no caben.
-aws ec2 run-instances \
-  --image-id $AMI_AMAZON_LINUX_2023 \
-  --instance-type t3.large \
-  --key-name $MI_LLAVE \
-  --security-group-ids $SG_DEMO \
-  --subnet-id $SUB_PUB_A \
-  --associate-public-ip-address \
-  --block-device-mappings 'DeviceName=/dev/xvda,Ebs={VolumeSize=40}' \
-  --user-data '#!/bin/bash
+# La AMI más reciente de Amazon Linux 2023
+export AMI=$(aws ssm get-parameter \
+  --name /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64 \
+  --query 'Parameter.Value' --output text)
+```
+
+Lanzar la instancia con un `user-data` que deje Docker y el plugin de Compose
+instalados antes de que usted entre:
+
+```bash
+cat > arranque.sh <<'SCRIPT'
+#!/bin/bash
 dnf update -y
 dnf install -y docker git
 systemctl enable --now docker
 usermod -aG docker ec2-user
-curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 \
-  -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose'
+# El plugin de Compose no está en los repositorios de Amazon Linux 2023
+mkdir -p /usr/local/lib/docker/cli-plugins
+curl -SL https://github.com/docker/compose/releases/download/v2.29.7/docker-compose-linux-x86_64   -o /usr/local/lib/docker/cli-plugins/docker-compose
+chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+echo "listo" > /home/ec2-user/ARRANQUE_COMPLETO
+SCRIPT
+
+export INSTANCIA=$(aws ec2 run-instances \
+  --image-id $AMI \
+  --instance-type t3.large \
+  --key-name $PROYECTO-llave \
+  --security-group-ids $SG \
+  --block-device-mappings 'DeviceName=/dev/xvda,Ebs={VolumeSize=40,VolumeType=gp3}' \
+  --user-data file://arranque.sh \
+  --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$PROYECTO-eft}]" \
+  --query 'Instances[0].InstanceId' --output text)
+
+aws ec2 wait instance-running --instance-ids $INSTANCIA
+
+export IP=$(aws ec2 describe-instances --instance-ids $INSTANCIA \
+  --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
+echo "instancia $INSTANCIA en $IP"
 ```
 
-Después, por SSH:
+Los 40 GB de disco no son capricho: la etapa de construcción del Dockerfile
+descarga el repositorio de Maven dentro de la imagen, y entre eso, las capas
+intermedias y las once imágenes finales, los 8 GB por defecto se agotan a mitad
+del `build`.
+
+### 11.3 Subir el proyecto
+
+Se sube un tar del proyecto en vez de clonar el repositorio. Es más simple
+—no hay que darle credenciales de GitHub a la instancia— y garantiza que lo que
+corre allá es exactamente lo que hay acá.
 
 ```bash
-git clone https://github.com/Ign14/DB3_ExpSumativas.git
-cd DB3_ExpSumativas/EFT_S9_Backend_Avanzado
-docker compose build
-docker compose up -d
-docker compose ps
+# Desde la carpeta que contiene EFT_S9_Backend_Avanzado
+tar czf eft.tgz --exclude='target' --exclude='.git' EFT_S9_Backend_Avanzado
+
+# Esperar a que el user-data termine (la primera vez tarda un par de minutos)
+ssh -i $PROYECTO-llave.pem -o StrictHostKeyChecking=accept-new ec2-user@$IP \
+  'until [ -f ~/ARRANQUE_COMPLETO ]; do echo esperando...; sleep 10; done; docker --version; docker compose version'
+
+scp -i $PROYECTO-llave.pem eft.tgz ec2-user@$IP:~/
+ssh -i $PROYECTO-llave.pem ec2-user@$IP 'tar xzf eft.tgz && rm eft.tgz && ls EFT_S9_Backend_Avanzado'
 ```
 
-Es el camino más corto y el más barato, del orden de 60 USD al mes. Lo que no da:
-alta disponibilidad —todo vive en una zona y en una máquina—, escalado
-automático, y brokers administrados con respaldo. Sirve para mostrar el sistema
-funcionando, no para sostenerlo.
+### 11.4 Construir, levantar y capturar
 
----
+Todo lo demás ocurre dentro de la instancia:
+
+```bash
+ssh -i $PROYECTO-llave.pem ec2-user@$IP
+cd EFT_S9_Backend_Avanzado
+
+# Un solo comando: construye las once imágenes, levanta los trece contenedores,
+# ejercita el sistema completo y deja siete logs en evidencia/nube/
+bash evidencia/generar_evidencia_nube.sh
+```
+
+Qué esperar: **entre 25 y 40 minutos**. La construcción de las imágenes se lleva
+la mayor parte; el resto son las esperas deliberadas del circuit breaker y del
+escalado.
+
+Mientras corre, conviene abrir en el navegador —desde la misma máquina cuya IP
+se autorizó en el grupo de seguridad— la consola de Eureka en
+`http://<IP>:8761` (usuario `banco-eureka`, clave `banco-eureka-secret`) y tomar
+las capturas que lista [`evidencia/nube/LEEME.md`](evidencia/nube/LEEME.md).
+
+### 11.5 Traer la evidencia de vuelta
+
+```bash
+# Desde el equipo local
+scp -i $PROYECTO-llave.pem -r ec2-user@$IP:~/EFT_S9_Backend_Avanzado/evidencia/nube/*.log \
+  EFT_S9_Backend_Avanzado/evidencia/nube/
+ls EFT_S9_Backend_Avanzado/evidencia/nube/
+```
+
+### 11.6 Terminar la instancia
+
+**Este paso no es opcional.** Una instancia olvidada es la forma más común de
+que una demostración de veinte centavos termine costando treinta dólares al mes.
+
+```bash
+aws ec2 terminate-instances --instance-ids $INSTANCIA
+aws ec2 wait instance-terminated --instance-ids $INSTANCIA
+
+# Y la limpieza de lo demás, que no cuesta nada pero tampoco sirve de nada
+aws ec2 delete-security-group --group-id $SG
+aws ec2 delete-key-pair --key-name $PROYECTO-llave
+rm -f $PROYECTO-llave.pem arranque.sh eft.tgz
+```
+
+Comprobar que no quedó nada encendido:
+
+```bash
+aws ec2 describe-instances \
+  --filters "Name=instance-state-name,Values=running,stopped" \
+  --query 'Reservations[].Instances[].{id:InstanceId,tipo:InstanceType,estado:State.Name}' \
+  --output table
+```
+
+### 11.7 Qué queda fuera de este despliegue, y por qué
+
+Para que no se lea como algo que no es:
+
+**Todo en una zona de disponibilidad y en una máquina.** Si esa instancia cae,
+cae el sistema completo. La sección 1 describe el reparto en dos zonas que
+corregiría esto.
+
+**Los brokers son contenedores, no servicios administrados.** Sin réplicas y sin
+respaldo: un reinicio del contenedor de Artemis pierde los eventos en vuelo. Las
+secciones 6.1 y 6.2 describen MSK y Amazon MQ, que es lo que corresponde.
+
+**Sin HTTPS.** El tráfico entra por HTTP a los puertos publicados. La
+terminación TLS vive en el balanceador de la sección 8.5, que aquí no existe.
+
+**Sin persistencia.** Los microservicios siguen con el estado en memoria, con
+todo lo que eso implica para el escalado (sección 7).
+
+Nada de esto invalida lo que la evidencia demuestra —que el sistema se construye
+y funciona en la nube—, pero conviene que esté dicho antes que preguntado.
 
 ## 12. Costo estimado
 

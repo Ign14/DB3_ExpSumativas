@@ -14,10 +14,10 @@ Repositorio: <https://github.com/Ign14/DB3_ExpSumativas> — carpeta `EFT_S9_Bac
 | Documentación del proyecto | `readme.md` (este archivo) |
 | Informe técnico | `informe_tecnico.pdf` — su fuente y los diagramas, en `informe/` |
 | Instrucciones para ejecutar y probar cada componente | `instrucciones.md` |
-| Pasos para desplegar en la nube | `despliegue.md` |
+| Pasos para desplegar en la nube | `despliegue.md` — la sección 11 es el despliegue que se ejecutó, en una instancia EC2 |
 | Video de la presentación | `video/` |
 | Código fuente | los quince módulos de esta misma carpeta |
-| Evidencia de ejecución | `evidencia/` (sobre los jar) y `evidencia/docker/` (sobre contenedores) |
+| Evidencia de ejecución | `evidencia/` — tres entornos: `local/` (los jar), `docker/` (contenedores) y `nube/` (una instancia EC2 en AWS). Índice en `evidencia/LEEME.md` |
 | Recorrido de las nueve semanas | `RESUMEN_APRENDIZAJES.md` |
 
 ---
@@ -165,7 +165,7 @@ particionamiento cada partición lleva su propia cuenta. Con el límite en 200, 
 archivo de movimientos diarios —que trae 608 filas inválidas de 1.000— fallaba
 con una partición y pasaba con cuatro: el mismo archivo, el mismo límite y dos
 resultados distintos según el paralelismo. Está calibrado en 700 justamente para
-que el resultado no dependa del grado de partición, y `evidencia/02` muestra las
+que el resultado no dependa del grado de partición, y `evidencia/local/02` muestra las
 tres configuraciones dando lo mismo.
 
 Un **fallo transitorio** —la base de datos que rechaza una conexión por un
@@ -232,7 +232,7 @@ respuesta a lo que ese canal muestra.
 | Cajero | `GET :8093/cajero/cuentas/{id}/saldo` | Número de cuenta y saldo. Nada más | 1 |
 
 La diferencia de tamaño entre el payload del canal web y el del cajero está
-medida en `evidencia/09_bff_por_canal.log`, y es de dos órdenes de magnitud.
+medida en `evidencia/local/09_bff_por_canal.log`, y es de dos órdenes de magnitud.
 
 ### Autenticación y autorización por canal
 
@@ -526,7 +526,7 @@ de mandar el tráfico interno por el gateway, que también balancea: el gateway 
 la puerta de entrada desde afuera, y hacer pasar por él las llamadas entre
 servicios agrega un salto de red y convierte la puerta en un cuello de botella.
 
-`evidencia/10_escalabilidad_horizontal.log` muestra las dos instancias
+`evidencia/local/10_escalabilidad_horizontal.log` muestra las dos instancias
 registradas en Eureka y el conteo de peticiones que atendió cada una, tomado de
 sus propios logs de acceso.
 
@@ -631,8 +631,17 @@ despliega con credenciales reales, los logs no se publican tal cual.
 
 ## 8. Evidencia de ejecución
 
-`evidencia/` contiene la ejecución sobre los jar, reproducible en cualquier
-máquina con un JDK y sin depender de Docker:
+El sistema se ejecutó y se registró en **tres entornos**, cada uno porque
+demuestra algo que los otros no pueden. El índice de los tres está en
+[`evidencia/LEEME.md`](evidencia/LEEME.md), y conviene empezar por ahí:
+
+| Carpeta | Entorno | Qué demuestra |
+|---|---|---|
+| [`evidencia/local/`](evidencia/local/) | Los jar, con un JDK y sin Docker | Que la lógica funciona y que la evidencia es reproducible en cualquier máquina |
+| [`evidencia/docker/`](evidencia/docker/) | Contenedores en el equipo de desarrollo | Que las imágenes se construyen y la orquestación levanta el ecosistema completo |
+| [`evidencia/nube/`](evidencia/nube/) | Una instancia EC2 en AWS | Que el sistema se despliega y corre en la nube, con los microservicios y los dos brokers fuera del equipo local |
+
+Los once registros de `evidencia/local/`:
 
 | Archivo | Qué demuestra |
 |---|---|
@@ -649,8 +658,13 @@ máquina con un JDK y sin depender de Docker:
 | `11_estado_final.log` | Salud de los doce componentes y de la réplica levantada al escalar, más el registro final de Eureka |
 | `logs/` | Salida completa de cada proceso y los logs de acceso de las instancias escaladas |
 
-`evidencia/docker/` contiene la ejecución sobre contenedores, con su propio
-`LEEME.md`.
+Las otras dos carpetas tienen su propio índice: `evidencia/docker/LEEME.md`
+—ocho registros, con `docker compose build`, `docker image ls` y los
+contenedores en ejecución— y `evidencia/nube/LEEME.md` —siete registros tomados
+dentro de la instancia EC2, empezando por sus metadatos de AWS, que es lo que
+distingue esa ejecución de la del equipo de desarrollo—. Los pasos para
+reproducir el despliegue en la nube están en la sección 11 de
+[`despliegue.md`](despliegue.md).
 
 ---
 

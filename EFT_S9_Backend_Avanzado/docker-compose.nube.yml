@@ -1,0 +1,71 @@
+# Ajustes para correr la orquestación completa en una sola instancia EC2.
+#
+# Se usa como archivo de sobreescritura, no en lugar del principal:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.nube.yml up -d
+#
+# Lo único que cambia es el límite de memoria de cada contenedor, y hace falta
+# por una razón aritmética. En el equipo de desarrollo, cada JVM arranca con
+# -XX:MaxRAMPercentage=75.0 sobre la memoria del host: con trece contenedores
+# sobre 8 GB, cada uno cree que puede tomar 6 GB y el primero que crezca deja al
+# resto sin espacio. Con un límite por contenedor, ese mismo porcentaje se
+# calcula sobre el límite y cada servicio se ajusta solo, sin repetir el número
+# en dos lugares.
+#
+# El reparto no es uniforme a propósito:
+#
+#   Kafka           1200m  es el que más necesita: JVM de Scala y los buffers
+#                          de red y de página de los tópicos
+#   Dominio          512m  cuentas, pagos y clientes cargan los CSV en memoria
+#   Infraestructura  448m  config, discovery, auth y gateway no guardan estado
+#   BFF              384m  sólo agregan y recortan respuestas
+#   Artemis          512m  sin persistencia a disco, todo en memoria
+#
+# Suma 6,2 GB y deja algo menos de 2 GB para el sistema operativo y el propio
+# demonio de Docker. Con una t3.large (8 GB) entra, y queda margen para levantar
+# una réplica de cuentas-service al demostrar el escalado horizontal.
+#
+# Para una instancia más chica, bajar primero los tres BFF y después la
+# infraestructura; los tres microservicios de dominio son los que menos margen
+# tienen porque cada uno mantiene su padrón en memoria.
+
+services:
+
+  kafka:
+    mem_limit: 1200m
+    environment:
+      # La imagen de Kafka no respeta MaxRAMPercentage: usa su propia variable.
+      KAFKA_HEAP_OPTS: -Xmx768m -Xms256m
+
+  broker-artemis:
+    mem_limit: 512m
+
+  config-server:
+    mem_limit: 448m
+
+  discovery-server:
+    mem_limit: 448m
+
+  auth-server:
+    mem_limit: 448m
+
+  api-gateway:
+    mem_limit: 448m
+
+  cuentas-service:
+    mem_limit: 512m
+
+  pagos-service:
+    mem_limit: 512m
+
+  clientes-service:
+    mem_limit: 512m
+
+  bff-web:
+    mem_limit: 384m
+
+  bff-movil:
+    mem_limit: 384m
+
+  bff-cajero:
+    mem_limit: 384m

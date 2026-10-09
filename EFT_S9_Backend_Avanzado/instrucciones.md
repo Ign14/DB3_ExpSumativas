@@ -4,8 +4,10 @@
 Banco XYZ · Ignacio Miño Astorga
 
 Este documento está escrito para que cualquier persona pueda levantar el sistema
-y comprobar que cada pieza funciona, sin conocer el código. Hay dos caminos
-completos: con los jar, que no necesita Docker, y con contenedores.
+y comprobar que cada pieza funciona, sin conocer el código. Hay tres caminos
+completos: con los jar, que no necesita Docker (secciones 1 a 11); con
+contenedores en el equipo de desarrollo (sección 12); y con el sistema completo
+en una instancia EC2 de AWS (sección 13).
 
 ---
 
@@ -18,6 +20,7 @@ completos: con los jar, que no necesita Docker, y con contenedores.
 | `curl` | cualquiera | Probar los endpoints |
 | `python3` | 3.8 o superior | Formatear las respuestas JSON de los ejemplos |
 | Docker Desktop | 4.x | Sólo para el camino de contenedores |
+| AWS CLI v2 + una cuenta con medio de pago | — | Sólo para el camino de la instancia EC2 (sección 13) |
 
 El proyecto compila con `release 21`, así que el bytecode es idéntico en
 cualquier JDK más nuevo. Si la máquina tiene JDK 24, funciona sin cambios.
@@ -138,7 +141,7 @@ bash evidencia/generar_evidencia.sh
 ```
 
 Qué esperar: entre doce y veinte minutos. Al final, los logs numerados en
-`evidencia/` y la salida de cada proceso en `evidencia/logs/`.
+`evidencia/local/` y la salida de cada proceso en `evidencia/local/logs/`.
 
 En Windows, desde Git Bash o WSL. PowerShell no ejecuta este script.
 
@@ -517,7 +520,7 @@ se publica en el tópico de alertas. Buscarla en el log del consumidor:
 
 ```bash
 # Si el ecosistema se levantó con el script de evidencia:
-grep "DEPENDENCIA_DEGRADADA" evidencia/logs/clientes-service.log
+grep "DEPENDENCIA_DEGRADADA" evidencia/local/logs/clientes-service.log
 
 # Si se levantó a mano con "java -jar ... &", el log está en la terminal donde
 # corre clientes-service. Para poder buscarlo, conviene lanzarlo redirigido:
@@ -734,7 +737,81 @@ docker compose down -v --remove-orphans   # si además se quiere limpiar volúme
 
 ---
 
-## 13. Problemas conocidos y qué hacer
+## 13. El sistema completo, en una instancia EC2
+
+Es la parte que demuestra que esto funciona fuera del equipo de desarrollo, con
+los dos brokers de mensajería corriendo en la nube y los microservicios
+conectados a ellos desde dentro de la instancia.
+
+Los pasos completos —crear el par de llaves, el grupo de seguridad limitado a su
+propia IP, la instancia con Docker ya instalado— están en la **sección 11 de
+[`despliegue.md`](despliegue.md)**, con los comandos del AWS CLI uno por uno. Acá
+va el resumen operativo, que asume esos pasos ya hechos y por lo tanto las
+variables `$PROYECTO`, `$IP` e `$INSTANCIA` ya definidas en la terminal.
+
+### 13.1 Subir el proyecto
+
+Desde el equipo local, en la carpeta que contiene `EFT_S9_Backend_Avanzado`:
+
+```bash
+tar czf eft.tgz --exclude='target' --exclude='.git' EFT_S9_Backend_Avanzado
+scp -i $PROYECTO-llave.pem eft.tgz ec2-user@$IP:~/
+ssh -i $PROYECTO-llave.pem ec2-user@$IP 'tar xzf eft.tgz && rm eft.tgz'
+```
+
+Se sube un tar en vez de clonar el repositorio: no hay que darle credenciales de
+GitHub a la instancia, y lo que corre allá es exactamente lo que hay acá.
+
+### 13.2 Construir, levantar y capturar
+
+Dentro de la instancia, por SSH:
+
+```bash
+ssh -i $PROYECTO-llave.pem ec2-user@$IP
+cd EFT_S9_Backend_Avanzado
+bash evidencia/generar_evidencia_nube.sh
+```
+
+Un solo comando construye las once imágenes dentro de la instancia, levanta la
+orquestación con el archivo de sobreescritura `docker-compose.nube.yml` —que pone
+un límite de memoria por contenedor para que los trece entren en los 8 GB de una
+`t3.large`—, espera a que todos reporten `healthy`, ejercita el sistema completo
+y deja siete logs en `evidencia/nube/`.
+
+Qué esperar: **entre veinticinco y cuarenta minutos**. La construcción se lleva
+la mayor parte: la instancia tiene dos vCPU y las dependencias de Maven se
+descargan dentro de la imagen.
+
+Mientras corre conviene tomar las cinco capturas que lista
+`evidencia/nube/LEEME.md`, entre ellas la consola de Eureka en
+`http://$IP:8761` (usuario `banco-eureka`, clave `banco-eureka-secret`), que sólo
+responde desde la IP autorizada en el grupo de seguridad.
+
+### 13.3 Traer la evidencia de vuelta
+
+```bash
+# Desde el equipo local
+scp -i $PROYECTO-llave.pem -r \
+  ec2-user@$IP:~/EFT_S9_Backend_Avanzado/evidencia/nube/*.log \
+  EFT_S9_Backend_Avanzado/evidencia/nube/
+ls EFT_S9_Backend_Avanzado/evidencia/nube/
+```
+
+### 13.4 Terminar la instancia
+
+**Este paso no es opcional.** EC2 se cobra por hora encendida:
+
+```bash
+aws ec2 terminate-instances --instance-ids $INSTANCIA
+aws ec2 wait instance-terminated --instance-ids $INSTANCIA
+```
+
+La limpieza del grupo de seguridad, del par de llaves y la comprobación de que no
+quedó nada encendido están al final de la sección 11 de `despliegue.md`.
+
+---
+
+## 14. Problemas conocidos y qué hacer
 
 **Un microservicio no arranca y el log dice que no pudo conectar con el Config
 Server.** Es lo esperado: los servicios tienen `fail-fast: true`. Levantar
@@ -757,6 +834,19 @@ demonio de Docker en mal estado, no el proyecto. En Windows:
 **Un token deja de funcionar después de reiniciar el `auth-server`.** La clave
 RSA de firma se genera al arrancar, así que los tokens emitidos antes dejan de
 validar. Pedir uno nuevo.
+
+**En la instancia EC2, un contenedor muere con código 137 durante el arranque.**
+Es el kernel matando el proceso por falta de memoria. Verificar que la
+orquestación se levantó con el archivo de sobreescritura
+(`-f docker-compose.yml -f docker-compose.nube.yml`): sin él, cada JVM calcula su
+heap sobre los 8 GB del host en vez de sobre su propio límite, y el primero que
+crezca deja al resto sin espacio.
+
+**En la instancia EC2, `docker compose build` se corta sin mensaje claro.** Casi
+siempre es el disco: la AMI por defecto trae 8 GB y las capas intermedias del
+build multi-etapa necesitan más. Crear la instancia con los 40 GB que indica la
+sección 11.2 de `despliegue.md`, o limpiar con `docker builder prune -af` y
+reintentar.
 
 **Los puertos están ocupados.** El sistema usa 8080, 8081, 8082, 8083, 8091,
 8092, 8093, 8181, 8761, 8888, 9000, 9092, 9094, 61616 y 61617. Para liberar los
