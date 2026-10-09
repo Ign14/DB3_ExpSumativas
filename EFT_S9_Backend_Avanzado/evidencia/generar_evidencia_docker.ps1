@@ -39,6 +39,13 @@ $Nombres = @('config-server','discovery-server','broker-artemis','kafka',
              'kafka-init','auth-server','api-gateway',
              'bff-web','bff-movil','bff-cajero')
 
+# Los doce servicios que tienen que quedar corriendo y sanos. kafka-init no
+# esta: es de un solo uso y su exito se verifica aparte, por su codigo de
+# salida.
+$Servicios = @('config-server','discovery-server','broker-artemis','kafka',
+               'auth-server','api-gateway','cuentas-service','pagos-service',
+               'clientes-service','bff-web','bff-movil','bff-cajero')
+
 $Repos = @('banco-xyz/config-server','banco-xyz/discovery-server',
            'banco-xyz/auth-server','banco-xyz/api-gateway',
            'banco-xyz/cuentas-service','banco-xyz/pagos-service',
@@ -102,24 +109,42 @@ function Token($clientId, $secreto, $scopes) {
     try { ($r | ConvertFrom-Json).access_token } catch { '' }
 }
 
+# Devuelve los servicios de $Servicios que NO estan healthy en este momento.
+# Se compara contra la lista esperada y no contra los contenedores que existen,
+# que es como una corrida anterior se dio por buena con seis de doce: kafka-init
+# habia fallado, los seis servicios que dependen de el nunca se crearon, y los
+# seis que si existian estaban todos healthy.
+function FaltanSanos() {
+    $estados = @()
+    foreach ($linea in @(docker compose ps -a --format json 2>$null)) {
+        if ("$linea".Trim()) {
+            try { $estados += ($linea | ConvertFrom-Json) } catch { }
+        }
+    }
+    $faltan = @()
+    foreach ($s in $Servicios) {
+        $c = @($estados | Where-Object { $_.Service -eq $s })
+        if ($c.Count -eq 0) {
+            $faltan += "$s (no existe)"
+        } elseif (-not ($c | Where-Object { $_.Health -eq 'healthy' })) {
+            $estado = ($c[0].Health, $c[0].State | Where-Object { $_ }) -join '/'
+            $faltan += "$s ($estado)"
+        }
+    }
+    return $faltan
+}
+
 function EsperarSanos($intentos = 40) {
     for ($i = 1; $i -le $intentos; $i++) {
-        $ps = docker compose ps --format json 2>$null
-        if ($ps) {
-            $estados = @()
-            foreach ($linea in $ps) {
-                if ($linea.Trim()) {
-                    try { $estados += ($linea | ConvertFrom-Json) } catch { }
-                }
-            }
-            $servicios = $estados | Where-Object { $_.Service -ne 'kafka-init' }
-            $sanos = ($servicios | Where-Object { $_.Health -eq 'healthy' }).Count
-            $total = $servicios.Count
-            Write-Host "   intento $i : $sanos de $total contenedores healthy"
-            if ($total -gt 0 -and $sanos -eq $total) { return $true }
-        }
+        $faltan = @(FaltanSanos)
+        $sanos = $Servicios.Count - $faltan.Count
+        Write-Host "   intento $i : $sanos de $($Servicios.Count) servicios healthy"
+        if ($faltan.Count -eq 0) { return $true }
         Start-Sleep -Seconds 15
     }
+    ''
+    '   Servicios que no llegaron a healthy:'
+    foreach ($f in @(FaltanSanos)) { "     - $f" }
     return $false
 }
 
@@ -187,19 +212,32 @@ Write-Host '>> 02 levantando la orquestacion'
     "   codigo de salida de 'docker compose up': $script:CodigoUp"
 
     Paso 'Esperando a que todos reporten healthy'
-    $ok = EsperarSanos
+    if ($script:CodigoUp -ne 0) {
+        # Un 'up' que falla casi siempre es una dependencia que no arranco, y
+        # entonces los servicios que la esperan no existen y nunca existiran.
+        # Esperar diez minutos por ellos no cambia nada.
+        "   !! 'docker compose up' termino con codigo $script:CodigoUp; no se espera"
+        $ok = $false
+    } else {
+        $ok = EsperarSanos
+    }
     $script:Orquestado = $ok
     if (-not $ok) {
-        '   !! no todos los contenedores llegaron a healthy'
         ''
-        '   Diagnostico de los que no llegaron:'
+        "   !! la orquestacion no quedo completa ($($Servicios.Count) servicios esperados)"
+        ''
+        '   Servicios que faltan o no estan healthy:'
+        foreach ($f in @(FaltanSanos)) { "     - $f" }
+        ''
+        '   Estado completo, incluidos los que terminaron:'
         cmd /c "docker compose ps -a 2>&1"
-        foreach ($s in @('config-server','discovery-server','auth-server','api-gateway',
-                         'cuentas-service','pagos-service','clientes-service',
-                         'broker-artemis','kafka')) {
+        ''
+        '   Ultimas lineas de kafka-init, que es de quien dependen seis servicios:'
+        cmd /c "docker compose logs --tail 30 kafka-init 2>&1"
+        foreach ($s in $Servicios) {
             ''
             "   --- ultimas lineas de $s ---"
-            cmd /c "docker compose logs --tail 25 $s 2>&1"
+            cmd /c "docker compose logs --tail 20 $s 2>&1"
         }
     }
 
@@ -207,6 +245,9 @@ Write-Host '>> 02 levantando la orquestacion'
     cmd /c "docker compose ps 2>&1"
 
     Paso 'El contenedor de un solo uso que crea los topicos'
+    $salidaInit = @(docker inspect --format "{{.State.ExitCode}}" kafka-init 2>$null)[0]
+    "   codigo de salida de kafka-init: $salidaInit  (0 = los dos topicos quedaron creados)"
+    ''
     cmd /c "docker compose logs kafka-init 2>&1"
 
     Paso 'La red propia del sistema'

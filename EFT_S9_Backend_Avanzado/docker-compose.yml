@@ -162,16 +162,29 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-    command: >
-      bash -c "
-      /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists
-        --topic banco.transacciones-completadas --partitions 3 --replication-factor 1 &&
-      /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists
-        --topic banco.alertas-seguridad --partitions 3 --replication-factor 1 &&
-      echo '>> kafka-init: topicos creados' &&
-      /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --describe
-        --topic banco.transacciones-completadas --topic banco.alertas-seguridad
-      "
+    # El comando va como bloque literal (|) y no plegado (>). En un escalar
+    # plegado, una linea mas indentada que la primera conserva su salto de
+    # linea en vez de unirse con un espacio, y ese salto partia cada
+    # kafka-topics.sh justo antes de su --topic: el primer trozo moria con
+    # "Missing required argument [topic]" y el segundo con codigo 127 porque
+    # --topic no es un comando. Como kafka-init termina mal, los tres
+    # microservicios y los tres BFF -que dependen de su
+    # service_completed_successfully- no arrancaban nunca.
+    command:
+      - bash
+      - -c
+      - |
+        set -e
+        /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 \
+          --create --if-not-exists --topic banco.transacciones-completadas \
+          --partitions 3 --replication-factor 1
+        /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 \
+          --create --if-not-exists --topic banco.alertas-seguridad \
+          --partitions 3 --replication-factor 1
+        echo ">> kafka-init: topicos creados"
+        /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --describe \
+          --topic banco.transacciones-completadas \
+          --topic banco.alertas-seguridad
     networks: [banco]
 
   auth-server:
