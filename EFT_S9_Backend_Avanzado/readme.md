@@ -15,7 +15,7 @@ Repositorio: <https://github.com/Ign14/DB3_ExpSumativas> — carpeta `EFT_S9_Bac
 | Informe técnico | `informe_tecnico.pdf` — su fuente y los diagramas, en `informe/` |
 | Instrucciones para ejecutar y probar cada componente | `instrucciones.md` |
 | Pasos para desplegar en la nube | `despliegue.md` — la sección 11 es el despliegue que se ejecutó, en una instancia EC2 |
-| Video de la presentación | `video/` |
+| Video de la presentación | `video/` — el guion, con los tiempos de cada tramo, en `informe/guion_video.md` |
 | Código fuente | los quince módulos de esta misma carpeta |
 | Evidencia de ejecución | `evidencia/` — tres entornos: `local/` (los jar), `docker/` (contenedores) y `nube/` (una instancia EC2 en AWS). Índice en `evidencia/LEEME.md` |
 | Recorrido de las nueve semanas | `RESUMEN_APRENDIZAJES.md` |

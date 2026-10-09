@@ -33,7 +33,8 @@ editor a 16 o 18 puntos.
 
 **Dos consejos sobre el tiempo.** Cronometrar un ensayo completo antes de la toma
 buena: lo que parecen seis minutos leyendo suelen ser ocho. Y si algo se
-sobrepasa, recortar del punto 1, que es el que más fácil se alarga.
+sobrepasa, recortar del tramo 0:40 – 1:40, como dice la nota de edición al
+final; es el que más fácil se alarga y el que menos cuesta acortar.
 
 ---
 
@@ -103,7 +104,7 @@ Ir señalando con el cursor mientras hablas.
 **Cambiar a:** `evidencia/local/09_bff_por_canal.log`, en el bloque de tamaños.
 
 > Segundo resultado: el patrón BFF. Esta es la misma cuenta pedida por los tres
-> canales. El canal web devuelve 4.918 caracteres, con el historial completo y el
+> canales. El canal web devuelve 4.914 bytes, con el historial completo y el
 > perfil del titular. El móvil, 215. El cajero, 39.
 >
 > Dos órdenes de magnitud de diferencia, para el mismo dato de negocio. Eso es lo
@@ -153,8 +154,9 @@ peticiones.
 > adorno; el historial es lo que vino a buscar.
 >
 > *(bajar hasta las transiciones)* Acá está el ciclo completo: cerrado, abierto,
-> medio abierto, abierto otra vez porque la primera prueba falló mientras el
-> servicio arrancaba, y finalmente cerrado solo.
+> medio abierto y cerrado otra vez. Nadie tocó nada: el circuito esperó diez
+> segundos, probó una vez, vio que el servicio había vuelto y restableció el
+> tráfico solo.
 
 ---
 
@@ -282,8 +284,9 @@ cámara y no leerlo.
 
 **En pantalla:** tú en cámara.
 
-> Eso es el proyecto. El código, los tres documentos y toda la evidencia de
-> ejecución están en el repositorio. Gracias.
+> Eso es el proyecto. El código, la documentación completa —informe técnico,
+> instrucciones de ejecución y guía de despliegue— y toda la evidencia están en
+> el repositorio. Gracias.
 
 ---
 

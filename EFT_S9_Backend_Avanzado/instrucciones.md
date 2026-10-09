@@ -415,7 +415,9 @@ La prueba es que `clientes-service` sabe de la actividad de un titular sin
 preguntarle nada a nadie: se la cuentan los eventos.
 
 ```bash
-# 1. Perfil antes de operar: operacionesRegistradas y alertasRegistradas en 0
+# 1. Perfil antes de operar: anotar operacionesRegistradas y alertasRegistradas.
+#    Si se vino siguiendo la seccion 7, ya estan en 2 y 0: cada retiro de alla
+#    publico su propio evento.
 curl -s -H "Authorization: Bearer $TOKEN_WEB" localhost:8080/api/clientes/101 | python3 -m json.tool
 
 # 2. Un depósito
@@ -440,8 +442,10 @@ curl -s -H "Authorization: Bearer $TOKEN_WEB" localhost:8080/api/clientes/102 | 
 
 Qué debe pasar:
 
-- El cliente 101 queda con `operacionesRegistradas: 2` (el depósito y la
-  transferencia) y `alertasRegistradas: 1` (el intento sobre el límite).
+- El cliente 101 **suma dos operaciones** (el depósito y la transferencia) y
+  **una alerta** (el intento sobre el límite). Viniendo de la sección 7, eso
+  deja `operacionesRegistradas: 4` y `alertasRegistradas: 1`; partiendo de un
+  sistema recién levantado, `2` y `1`.
 - `ultimaOperacion` dice `TRANSFERENCIA de 300 el <fecha>`.
 - El cliente **102 también** queda con una operación: recibió el abono de la
   transferencia.
@@ -476,8 +480,11 @@ done
 ```
 
 Qué debe pasar: las primeras respuestas tardan un par de segundos y devuelven
-`DEGRADADO`; después de cuatro llamadas el circuito pasa a **`OPEN`** y las
-siguientes responden de inmediato, sin esperar a la dependencia.
+`DEGRADADO`; a la **segunda petición** el circuito pasa a **`OPEN`** y las
+siguientes responden de inmediato, sin esperar a la dependencia. Son dos
+peticiones y no cuatro porque cada una hace dos intentos: la ventana del
+circuito necesita cuatro llamadas para decidir, y dos peticiones fallidas ya las
+suman.
 
 La respuesta degradada sigue sirviendo el historial completo, con el campo
 `cuenta` en `null`. Es el punto del fallback: para quien consulta movimientos, el

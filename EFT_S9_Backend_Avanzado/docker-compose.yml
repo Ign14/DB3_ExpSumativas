@@ -265,6 +265,17 @@ services:
       ARTEMIS_USER: ${ARTEMIS_USER:-artemis}
       ARTEMIS_PASSWORD: ${ARTEMIS_PASSWORD:-artemis-secret}
       KAFKA_SERVERS: kafka:9092
+      # Log de acceso de Tomcat a la salida estandar del contenedor. Es lo que
+      # permite contar, al escalar con --scale, cuantas peticiones atendio cada
+      # replica: sin esto Spring Boot no registra la linea de cada peticion y el
+      # conteo de la evidencia daria cero. Va solo en cuentas-service, que es el
+      # servicio que se escala en la demostracion.
+      SERVER_TOMCAT_ACCESSLOG_ENABLED: "true"
+      SERVER_TOMCAT_ACCESSLOG_BUFFERED: "false"
+      SERVER_TOMCAT_ACCESSLOG_DIRECTORY: /dev
+      SERVER_TOMCAT_ACCESSLOG_PREFIX: stdout
+      SERVER_TOMCAT_ACCESSLOG_SUFFIX: ""
+      SERVER_TOMCAT_ACCESSLOG_FILE_DATE_FORMAT: ""
     depends_on:
       config-server:
         condition: service_healthy

@@ -46,8 +46,8 @@ metadatos de la máquina.
 
 ## Capturas de pantalla
 
-Los logs prueban el comportamiento; conviene acompañarlos con capturas, que es
-lo que el enunciado pide. Las cinco que más valen:
+Los logs prueban el comportamiento; conviene acompañarlos con capturas. Las
+cinco que más valen:
 
 1. La consola de EC2 con la instancia en estado `running`, mostrando su tipo y
    su IP pública.
@@ -61,6 +61,6 @@ lo que el enunciado pide. Las cinco que más valen:
 ## Después de capturar
 
 **Terminar la instancia.** EC2 se cobra por hora encendida, y una instancia
-olvidada es la forma más común de que una demostración de veinticinco centavos
-termine costando treinta dólares. El comando está al final de la sección 11 de
+olvidada es la forma más común de que una demostración de veinte centavos
+termine costando sesenta dólares al mes. El comando está al final de la sección 11 de
 `despliegue.md`.

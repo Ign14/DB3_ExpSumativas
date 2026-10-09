@@ -15,8 +15,8 @@ Este documento tiene dos mitades y conviene decir cuál es cuál antes de empeza
 porque una se ejecutó y la otra no.
 
 **Lo que se ejecutó: el sistema completo en una instancia EC2.** Las once
-imágenes se construyen dentro de la instancia, los trece contenedores quedan
-levantados —incluidos los dos brokers de mensajería, Artemis y Kafka—, los
+imágenes se construyen dentro de la instancia, los trece contenedores arrancan
+—doce residentes y el de un solo uso que crea los tópicos de Kafka y termina— —incluidos los dos brokers de mensajería, Artemis y Kafka—, los
 microservicios se conectan a esos brokers por la red privada de Docker en la
 nube, y el escalado horizontal se demuestra con dos réplicas de
 `cuentas-service`. Los pasos están en la **sección 11**, el script que captura la
@@ -29,16 +29,17 @@ que efectivamente corrió en AWS.
 Kafka, Amazon MQ para el broker JMS, RDS para el estado, Secrets Manager para las
 credenciales, ALB con certificado de ACM. Es la forma correcta de operar esto en
 producción, y por eso está escrita con los comandos completos y los valores del
-proyecto, pero levantarla tiene un costo de dos órdenes de magnitud sobre el de
-una instancia que se enciende, se mide y se apaga. Esta entrega no lo justifica.
+proyecto, pero mantenerla cuesta del orden de 600 USD al mes —un orden de
+magnitud sobre la instancia de la sección 11, y tres sobre los veinte centavos
+que costó encenderla, medirla y apagarla—. Esta entrega no lo justifica.
 Donde una decisión sea discutible está dicho por qué, y donde haga falta un paso
 manual está marcado.
 
 La diferencia entre las dos mitades no es sólo de costo. La sección 11 demuestra
 que el sistema funciona fuera del equipo de desarrollo; las secciones 1 a 10
 describen cómo se lo haría tolerante a la caída de una zona de disponibilidad, lo
-que una sola instancia no puede demostrar por definición. Las dos cosas se piden
-en esta evaluación y están separadas a propósito.
+que una sola instancia no puede demostrar por definición. Las dos cosas importan
+y están separadas a propósito.
 
 Las otras dos evidencias del proyecto —los jar con un JDK, y los contenedores en
 el equipo de desarrollo— están en `evidencia/local/` y `evidencia/docker/`, con el
@@ -90,17 +91,18 @@ el equipo de desarrollo— están en `evidencia/local/` y `evidencia/docker/`, c
 ### Por qué Fargate y no EC2 ni EKS
 
 **Fargate** cobra por tarea y no por instancia, y no hay servidores que parchar.
-Para once servicios que escalan por separado, eso es exactamente lo que se
+Para diez servicios que escalan por separado, eso es exactamente lo que se
 quiere: una tarea más de `cuentas-service` no obliga a razonar sobre si cabe en
 la instancia.
 
 **EC2** con `docker compose` sería el camino más corto y el más barato para una
 demostración, pero devuelve el problema que los contenedores vinieron a resolver:
 alguien tiene que mantener el sistema operativo y el escalado deja de ser una
-bandera. Queda descrito en la sección 8 como alternativa de bajo costo.
+bandera. Está descrito en la sección 11, y es el que efectivamente se ejecutó
+para esta entrega.
 
 **EKS** es la respuesta correcta para una plataforma con decenas de equipos.
-Aquí sería pagar el costo operativo de Kubernetes por un sistema de once
+Aquí sería pagar el costo operativo de Kubernetes por un sistema de diez
 servicios que no lo necesita.
 
 ### Qué reemplaza a qué
@@ -369,7 +371,7 @@ variables de entorno necesitan.
 ```bash
 for m in config-server discovery-server auth-server api-gateway \
          cuentas-service pagos-service clientes-service \
-         bff-web bff-movil bff-cajero broker-artemis batch-migracion; do
+         bff-web bff-movil bff-cajero batch-migracion; do
   aws ecr create-repository --repository-name $PROYECTO/$m \
     --image-scanning-configuration scanOnPush=true \
     --region $AWS_REGION || true
@@ -379,7 +381,10 @@ done
 `scanOnPush` deja el escaneo de vulnerabilidades activado desde el primer día.
 No cuesta nada y es la clase de cosa que nadie activa después.
 
-El módulo `broker-kafka` no se publica: en la nube el broker es MSK.
+Los módulos `broker-kafka` y `broker-artemis` no se publican. En la nube los
+dos brokers son servicios administrados —MSK y Amazon MQ—, así que las imágenes
+que los levantan en local no tienen a dónde ir. Quedan once repositorios: los
+diez servicios y el módulo batch.
 
 ### 5.2 Construir, etiquetar y subir
 
@@ -389,7 +394,7 @@ aws ecr get-login-password --region $AWS_REGION \
 
 for m in config-server discovery-server auth-server api-gateway \
          cuentas-service pagos-service clientes-service \
-         bff-web bff-movil bff-cajero broker-artemis batch-migracion; do
+         bff-web bff-movil bff-cajero batch-migracion; do
   echo ">> $m"
   docker build --build-arg MODULE=$m -t $ECR/$PROYECTO/$m:$VERSION .
   docker push $ECR/$PROYECTO/$m:$VERSION
@@ -397,7 +402,7 @@ done
 ```
 
 Qué esperar: la primera imagen tarda varios minutos porque compila el reactor
-completo; las once siguientes reutilizan la etapa de compilación desde la caché
+completo; las diez siguientes reutilizan la etapa de compilación desde la caché
 de Docker y tardan menos de un minuto cada una.
 
 **La etiqueta es `1.0.0`, no `latest`.** Con `latest`, dos despliegues del mismo
@@ -872,10 +877,9 @@ aws elbv2 create-rule --listener-arn $LISTENER --priority 30 \
 ```
 
 El tráfico llega siempre por **HTTPS**, con el certificado en el balanceador y la
-política TLS 1.3. El requerimiento de comunicaciones seguras de la actividad se
-cumple aquí y no en el código: terminar TLS en el balanceador es lo correcto,
-porque es un punto único donde rotar el certificado y porque las tareas no
-necesitan conocerlo.
+política TLS 1.3. Las comunicaciones seguras se resuelven aquí y no en el
+código, y es lo correcto: terminar TLS en el balanceador da un punto único donde
+rotar el certificado, y las tareas no necesitan conocerlo.
 
 **Lo que falta para cerrar el ciclo del issuer.** Los microservicios exigen que
 el claim `iss` del token coincida con `AUTH_ISSUER_URI`. Si los canales piden el
@@ -1120,9 +1124,9 @@ cd EFT_S9_Backend_Avanzado
 bash evidencia/generar_evidencia_nube.sh
 ```
 
-Qué esperar: **entre 25 y 40 minutos**. La construcción de las imágenes se lleva
-la mayor parte; el resto son las esperas deliberadas del circuit breaker y del
-escalado.
+Qué esperar: **entre 25 y 40 minutos**, de los cuales entre diez y quince son la
+construcción de las imágenes; el resto son las esperas deliberadas del arranque,
+del circuit breaker y del escalado.
 
 Mientras corre, conviene abrir en el navegador —desde la misma máquina cuya IP
 se autorizó en el grupo de seguridad— la consola de Eureka en
@@ -1183,6 +1187,8 @@ todo lo que eso implica para el escalado (sección 7).
 Nada de esto invalida lo que la evidencia demuestra —que el sistema se construye
 y funciona en la nube—, pero conviene que esté dicho antes que preguntado.
 
+---
+
 ## 12. Costo estimado
 
 Precios de referencia de `us-east-1`, mensuales y aproximados. Están para
@@ -1190,13 +1196,13 @@ dimensionar, no para cotizar.
 
 | Componente | Configuración | USD/mes |
 |---|---|---|
-| Fargate | 12 servicios, ~20 tareas de 0,5 vCPU y 1 GB | 290 |
+| Fargate | 10 servicios, ~20 tareas de 0,5 vCPU y 1 GB | 290 |
 | Amazon MSK | 2 × kafka.t3.small + 40 GB | 130 |
 | Amazon MQ | mq.t3.micro en activo/standby | 55 |
 | RDS PostgreSQL | db.t4g.micro Multi-AZ, 20 GB | 50 |
 | ALB | 1 balanceador + tráfico bajo | 25 |
 | VPC Endpoints | 4 interface endpoints | 30 |
-| ECR | 12 imágenes, ~5 GB | 1 |
+| ECR | 11 imágenes, ~5 GB | 1 |
 | CloudWatch | logs y métricas, volumen bajo | 15 |
 | **Total aproximado** | | **~600** |
 
@@ -1284,7 +1290,14 @@ una transferencia sin duplicarla y retomar una compensación interrumpida
 **Autenticación del usuario final en los BFF.** Hoy los canales se autentican a
 sí mismos contra el backend, pero nada verifica a la persona detrás del canal.
 
-**Un único issuer, visto igual desde dentro y desde fuera** (sección 8.5).
+**Trazabilidad distribuida.** Hoy, una petición que atraviesa el BFF, el
+gateway y dos microservicios deja cuatro logs sin nada que los enlace, y el
+primer incidente de producción se diagnostica leyendo timestamps a mano.
 
 Ninguna de las cinco es un hallazgo tardío: las cinco están nombradas en el
-código, donde corresponde, con el motivo de por qué no se resolvieron.
+código, donde corresponde, con el motivo de por qué no se resolvieron. Son las
+mismas cinco de la sección 9 del informe técnico.
+
+A esas cinco, el despliegue en AWS agrega una sexta propia: **un único issuer,
+visto igual desde dentro y desde fuera de la VPC** (sección 8.5). No aplica al
+sistema corriendo en una sola red, y por eso no está en la lista del informe.

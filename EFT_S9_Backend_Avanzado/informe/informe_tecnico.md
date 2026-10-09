@@ -39,7 +39,7 @@ Procesan las mismas tres mil filas del sistema legacy —con sus errores
 intencionales— sin detenerse, y dejan registrada cada anomalía con su motivo.
 
 El **patrón Backend for Frontend** da a cada canal su propio backend. La misma
-cuenta se sirve en 4.918 caracteres al navegador, 215 a la aplicación móvil y 39
+cuenta se sirve en 4.914 bytes al navegador, 215 a la aplicación móvil y 39
 al cajero, y cada canal tiene credenciales y permisos distintos.
 
 Los **microservicios** parten el dominio en tres servicios independientes, con
@@ -454,13 +454,13 @@ gateway se repartieron 15 y 15, y veinte llamadas entre servicios se repartieron
 | **Ante un dato sucio** | Comportamiento del sistema antiguo, no auditable | Se omite, se registra la anomalía con su motivo y el proceso sigue |
 | **Ante un fallo crítico** | Intervención manual | Reejecución automática y código de salida que un cron puede detectar |
 | **Canales** | Un backend para los tres | Un backend por canal, desplegable por separado |
-| **Payload para la misma cuenta** | El mismo para todos | 4.918 / 215 / 39 caracteres según el canal |
+| **Payload para la misma cuenta** | El mismo para todos | 4.914 / 215 / 39 bytes según el canal |
 | **Seguridad** | Centralizada | OAuth 2.0 con JWT, seis scopes, validación en dos capas |
 | **Ante la caída de un módulo** | Afecta al sistema completo | El circuito se abre, la respuesta se degrada y el evento espera en la cola |
 | **Escalar** | Toda la plataforma | Un servicio, con una bandera |
 | **Despliegue** | Proceso del mainframe | `docker compose up -d`, once imágenes construidas desde el repositorio |
 | **Configuración** | En cada programa | Centralizada, versionada y autenticada |
-| **Pruebas automatizadas** | No documentadas | 136, sin librerías de mocks |
+| **Pruebas automatizadas** | No documentadas | 168, sin librerías de mocks |
 
 ### 6.2 Resultados medidos
 
@@ -484,7 +484,7 @@ Con el límite en 200, este archivo fallaba con una partición y pasaba con cuat
 Quedó en 700 para que el resultado sea el mismo con cualquier grado de
 paralelismo, que es lo mínimo que se le pide a un proceso por lotes.
 
-**Diferenciación por canal.** Para la cuenta 101, el canal web devuelve 4.918
+**Diferenciación por canal.** Para la cuenta 101, el canal web devuelve 4.914
 caracteres con el historial completo, el perfil del titular y los totales; el
 móvil, 215 con el saldo y tres movimientos de tres campos cada uno; el cajero,
 39 con el número de cuenta y el saldo. Dos órdenes de magnitud entre los
@@ -497,11 +497,15 @@ escribir, y ningún canal puede liquidar saldo directamente.
 **Tolerancia a fallos.** Con `cuentas-service` detenido, el circuito pasó a
 `OPEN` tras la segunda petición y las siguientes respondieron de inmediato en
 modo degradado, sirviendo el historial completo. Al volver a levantar el
-servicio, el circuito recorrió `OPEN → HALF_OPEN → OPEN → HALF_OPEN → CLOSED`: la
-primera prueba en medio abierto falló porque el servicio todavía estaba
-arrancando, y el circuito volvió a abrirse antes de cerrarse definitivamente. Esa
-secuencia con un reintento fallido es más representativa de un incidente real que
-un ciclo limpio.
+servicio, el circuito recorrió `CLOSED → OPEN → HALF_OPEN → CLOSED` y volvió a
+cerrarse solo, sin intervención: diez segundos en abierto, una prueba en medio
+abierto que pasó, y el tráfico restablecido.
+
+Sobre contenedores, donde el servicio tarda más en estar listo, es normal ver una
+variante: `HALF_OPEN → OPEN → HALF_OPEN → CLOSED`, porque la prueba en medio
+abierto llega mientras el contenedor todavía descarga su configuración y se
+registra en Eureka. Es el mismo mecanismo y, si aparece, es mejor evidencia que
+un ciclo limpio, porque es lo que pasaría en un incidente real.
 
 **Mensajería.** Un retiro bajó el saldo en `cuentas-service` y apareció en el
 historial de `pagos-service` sin que un servicio llamara al otro. Con el
@@ -674,6 +678,9 @@ buscando en el lugar equivocado.
 escritos a mano, y la razón es concreta: las librerías de mocks instrumentan
 bytecode y se rompen al cambiar de versión del JDK. Este proyecto se desarrolló
 con JDK 24 y compila con `release 21`, y tiene que correr igual donde se revise.
+La evidencia de `evidencia/local/` se generó con JDK 21 sobre Linux —así lo
+declara la cabecera de `01_compilacion_y_pruebas.log`—, lo que es la
+comprobación de que el bytecode es el mismo en los dos.
 Una subclase de tres líneas no tiene ese problema.
 
 | Módulo | Pruebas | Qué cubren |
@@ -853,12 +860,14 @@ CloudWatch, que es lo que hace que un batch fallido se sepa el mismo día.
 
 **El despliegue que sí se ejecutó.** La arquitectura administrada que describen
 los párrafos anteriores —Fargate, MSK, Amazon MQ, RDS— está escrita con los
-comandos completos pero no se levantó: su costo es de dos órdenes de magnitud
-sobre el de esta entrega. Lo que sí se ejecutó, y es lo que `evidencia/nube/`
-registra, es el **sistema completo sobre una instancia EC2**: las once imágenes
-construidas dentro de la instancia, los trece contenedores en `healthy`
-—incluidos Artemis y Kafka, es decir los dos brokers corriendo en la nube y no en
-el equipo de desarrollo—, los microservicios conectados a ellos, el ciclo del
+comandos completos pero no se levantó: mantenerla cuesta del orden de 600 USD al
+mes, un orden de magnitud sobre la instancia única y tres sobre los veinte
+centavos que costó esta demostración. Lo que sí se ejecutó, y es lo que
+`evidencia/nube/` registra, es el **sistema completo sobre una instancia EC2**:
+las once imágenes construidas dentro de la instancia, los trece contenedores en
+`healthy` —doce residentes, incluidos Artemis y Kafka, es decir los dos brokers
+corriendo en la nube y no en el equipo de desarrollo, más el de un solo uso que
+crea los tópicos y termina—, los microservicios conectados a ellos, el ciclo del
 circuit breaker sobre contenedores reales y dos réplicas de `cuentas-service`
 registradas en Eureka. Los pasos están en la sección 11 de `despliegue.md`.
 

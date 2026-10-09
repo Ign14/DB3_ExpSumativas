@@ -32,7 +32,7 @@ baja al terminar. Deja ocho logs en esta carpeta:
 | `04_apis_y_mensajeria.log` | Los tres microservicios por el gateway, un retiro que viaja por la cola JMS entre dos contenedores, y los dos tópicos de Kafka con productores y consumidores reales |
 | `05_tolerancia_a_fallos.log` | El ciclo completo del circuit breaker sobre contenedores: `CLOSED → OPEN → HALF_OPEN → CLOSED`, con respuesta degradada y la alerta publicada en el tópico |
 | `06_bff_por_canal.log` | Los tres canales devolviendo payloads de tamaños muy distintos para la misma cuenta |
-| `07_escalabilidad_horizontal.log` | `--scale cuentas-service=2 --scale pagos-service=2`, las réplicas registradas en Eureka y el reparto de peticiones |
+| `07_escalabilidad_horizontal.log` | `--scale cuentas-service=2 --scale pagos-service=2`, las réplicas registradas en Eureka y cuántas peticiones atendió cada una, contadas en su propio log de acceso |
 | `08_estado_final.log` | Salud de cada componente consultada dentro de la red y registro final de Eureka |
 
 La primera ejecución tarda bastante: la construcción descarga las dependencias de

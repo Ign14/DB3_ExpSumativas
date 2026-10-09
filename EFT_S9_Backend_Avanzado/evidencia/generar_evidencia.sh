@@ -221,11 +221,23 @@ trap bajar_todo EXIT
     wc -l "$RAIZ"/batch-migracion/src/main/resources/data/*.csv | sed "s|$RAIZ/||"
     echo
     paso "Ejecucion de los tres jobs"
-    java $JVM_OPTS -jar "$RAIZ/batch-migracion/target/batch-migracion.jar" --job=all 2>&1 \
-        | grep -E "INICIO job|FIN job|step \[|RESULTADO|particion|batch:|Registro omitido" \
-        | head -120
+    # La salida completa va a un archivo y de ahi se sacan las dos vistas. Antes
+    # esto era un grep con head -120 directo sobre la tuberia, y como el primer
+    # job solo ya emite 119 lineas de "Registro omitido", el corte se comia los
+    # otros dos jobs enteros: el log decia "los tres jobs" y mostraba uno.
+    SALIDA_JOBS=$(mktemp)
+    java $JVM_OPTS -jar "$RAIZ/batch-migracion/target/batch-migracion.jar" --job=all \
+        > "$SALIDA_JOBS" 2>&1
+    CODIGO_JOBS=$?
+    grep -E "INICIO job|FIN job|step \[|RESULTADO|particion|batch:" "$SALIDA_JOBS"
     echo
-    echo "Codigo de salida del proceso: ${PIPESTATUS[0]}"
+    echo "Codigo de salida del proceso: $CODIGO_JOBS"
+    echo
+    paso "Las filas que se omitieron, y por que"
+    echo "Omitidas en total por los tres jobs: $(grep -c 'Registro omitido' "$SALIDA_JOBS")"
+    echo "Las primeras quince, cada una con su motivo:"
+    grep "Registro omitido" "$SALIDA_JOBS" | head -15 | sed 's/^/   /'
+    rm -f "$SALIDA_JOBS"
     echo
     paso "Politica de finalizacion: un argumento invalido termina con codigo distinto de cero"
     java $JVM_OPTS -jar "$RAIZ/batch-migracion/target/batch-migracion.jar" --job=inexistente > /dev/null 2>&1

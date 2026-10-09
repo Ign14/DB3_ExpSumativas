@@ -395,12 +395,21 @@ apps=[apps] if isinstance(apps,dict) else apps;
     }
     Start-Sleep -Seconds 3
     'Peticiones atendidas por cada replica, contadas en su propio log de acceso:'
-    cmd /c "docker compose logs --no-log-prefix cuentas-service 2>&1" |
-        Select-String 'GET /cuentas/101' | Measure-Object | ForEach-Object { "   total en las dos replicas: $($_.Count) lineas de acceso" }
+    $total = 0
+    foreach ($id in (cmd /c "docker compose ps -q cuentas-service 2>&1")) {
+        if (-not $id) { continue }
+        $nombre = cmd /c "docker inspect --format `"{{.Name}}`" $id 2>&1"
+        $nombre = "$nombre".TrimStart('/')
+        $n = (cmd /c "docker logs $id 2>&1" | Select-String 'GET /cuentas/101' | Measure-Object).Count
+        $total += $n
+        '   {0,-45} {1} peticiones' -f $nombre, $n
+    }
+    "   total repartido entre las replicas: $total"
     ''
-    'El detalle por replica se ve con:'
-    '   docker compose logs cuentas-service | Select-String "GET /cuentas/101"'
-    'donde el prefijo de cada linea es el nombre del contenedor que la atendio.'
+    'El reparto lo hace el balanceador del gateway sobre el registro de Eureka.'
+    'No hubo que tocar la configuracion de ningun componente: basto levantar la'
+    'replica. El log de acceso que permite este conteo viene de las variables'
+    'SERVER_TOMCAT_ACCESSLOG_* que docker-compose.yml le pasa a cuentas-service.'
 
     Paso 'Volviendo a una replica de cada uno'
     cmd /c "docker compose up -d --scale cuentas-service=1 --scale pagos-service=1 2>&1"
