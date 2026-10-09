@@ -11,6 +11,11 @@ subdirectorio.
 | [`docker/`](docker/) | Contenedores en el equipo de desarrollo | Que las **imágenes se construyen** y que la **orquestación** levanta el ecosistema completo | 8 logs + capturas |
 | [`nube/`](nube/) | Una instancia EC2 en AWS | Que el sistema **se despliega y corre en la nube**, con los microservicios y los brokers fuera del equipo local | 7 logs + capturas |
 
+> Cada carpeta se genera con su propio script, y los tres están al final de este
+> archivo. Si alguna contiene únicamente su `LEEME.md`, esa ejecución todavía no
+> se corrió: no es que la evidencia falte, es que ese entorno no se ha levantado
+> aún.
+
 Si sólo va a mirar una cosa de cada carpeta:
 
 - `local/01_compilacion_y_pruebas.log` — los quince módulos y las 168 pruebas.
