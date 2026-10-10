@@ -660,7 +660,7 @@ Los once registros de `evidencia/local/`:
 
 Las otras dos carpetas tienen su propio índice: `evidencia/docker/LEEME.md`
 —nueve registros y seis capturas, con `docker compose build`, `docker image ls`
-y los contenedores en ejecución— y `evidencia/nube/LEEME.md` —siete registros y cinco
+y los contenedores en ejecución— y `evidencia/nube/LEEME.md` —siete registros y seis
 capturas tomados dentro de una instancia EC2, empezando por sus metadatos de
 AWS, que es lo que distingue esa ejecución de la del equipo de desarrollo—. Los pasos para
 reproducir el despliegue en la nube están en la sección 11 de

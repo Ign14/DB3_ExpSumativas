@@ -862,14 +862,33 @@ CloudWatch, que es lo que hace que un batch fallido se sepa el mismo día.
 los párrafos anteriores —Fargate, MSK, Amazon MQ, RDS— está escrita con los
 comandos completos pero no se levantó: mantenerla cuesta del orden de 600 USD al
 mes, un orden de magnitud sobre la instancia única y tres sobre los veinte
-centavos que costó esta demostración. Lo que sí se ejecutó, y es lo que
-`evidencia/nube/` registra, es el **sistema completo sobre una instancia EC2**:
-las once imágenes construidas dentro de la instancia, los trece contenedores en
-`healthy` —doce residentes, incluidos Artemis y Kafka, es decir los dos brokers
-corriendo en la nube y no en el equipo de desarrollo, más el de un solo uso que
-crea los tópicos y termina—, los microservicios conectados a ellos, el ciclo del
-circuit breaker sobre contenedores reales y dos réplicas de `cuentas-service`
-registradas en Eureka. Los pasos están en la sección 11 de `despliegue.md`.
+centavos que costó esta demostración.
+
+Lo que sí se ejecutó, y es lo que `evidencia/nube/` registra, es el **sistema
+completo sobre una instancia EC2** —una `t3.large` en `us-east-1a`, identificada
+como `i-0edce5f77c07f3f19` en los metadatos que abren el primer registro—. Las
+once imágenes se construyeron dentro de la instancia desde el código fuente, y
+los trece contenedores quedaron arriba: doce residentes, **incluidos Artemis y
+Kafka, es decir los dos brokers de mensajería corriendo en la nube y no en el
+equipo de desarrollo**, más el de un solo uso que crea los tópicos y termina.
+
+Sobre esa instancia se repitió el ejercicio completo: un retiro que bajó el saldo
+en `cuentas-service` y apareció en el historial de `pagos-service` por la cola
+JMS, tres operaciones y una alerta propagadas por Kafka entre dos titulares, el
+ciclo completo del circuit breaker, y treinta peticiones repartidas quince y
+quince entre dos réplicas de `cuentas-service` registradas en Eureka. Los pasos
+para reproducirlo están en la sección 11 de `despliegue.md`.
+
+Dos mediciones de ese despliegue que no se ven en el entorno local y valen por
+sí solas. La primera: el gateway tardó **cinco segundos** en poder enrutar hacia
+`pagos-service` después de que el contenedor reportara `healthy`, y la cadena
+interna `pagos-service → cuentas-service` otro segundo más. Estar sano y estar
+en el registro de servicios no son lo mismo, y un sistema distribuido tiene una
+ventana de convergencia que hay que esperar en vez de suponer. La segunda: la
+consola de Eureka servida desde la instancia informa `num-of-cpus: 2`, las dos
+vCPU de la `t3.large`; la misma consola en el equipo de desarrollo informa 16.
+Es el tipo de detalle que distingue una captura de otra sin depender de lo que
+diga el pie de foto.
 
 Una instancia única no demuestra tolerancia a la caída de una zona de
 disponibilidad: eso es precisamente lo que aporta la arquitectura administrada, y

@@ -21,9 +21,9 @@ no buscar nada en vivo:
    - `evidencia/local/09_bff_por_canal.log`
    - `evidencia/local/08_tolerancia_a_fallos.log`
    - `evidencia/local/10_escalabilidad_horizontal.log`
-5. La evidencia del despliegue en la nube: `evidencia/nube/02_orquestacion_en_ec2.log`
-   abierto en una pestaña, y al lado la captura de la consola de EC2 con la
-   instancia corriendo
+5. Las dos capturas del despliegue en la nube abiertas y listas:
+   `evidencia/nube/05_metadatos_de_la_instancia.png` y
+   `evidencia/nube/04_eureka_en_ec2.png`
 6. Una terminal limpia, lista para pegar comandos
 
 **Comprobar antes de grabar:** que el micrófono se escuche, que la webcam esté
@@ -162,22 +162,28 @@ peticiones.
 
 ## Minuto 3:30 – 4:00 · El sistema desplegado en la nube
 
-**En pantalla:** la captura de la consola de EC2 con la instancia en `running`, y
-enseguida `evidencia/nube/02_orquestacion_en_ec2.log`.
+**En pantalla:** `evidencia/nube/05_metadatos_de_la_instancia.png`, y enseguida
+`evidencia/nube/04_eureka_en_ec2.png`.
 
 > Todo lo que mostré hasta acá también corre fuera de mi equipo. Este es el
-> sistema completo desplegado en una instancia EC2 de Amazon: las once imágenes
-> construidas dentro de la instancia y los trece contenedores en healthy.
+> sistema completo desplegado en una instancia EC2 de Amazon: una t3.large en
+> us-east-1, con las once imágenes construidas dentro de la instancia y los doce
+> servicios en healthy.
 >
-> *(señalar el encabezado del log)* Y esto de arriba importa más de lo que
-> parece. Son los metadatos de la instancia, leídos del servicio de metadatos de
-> AWS, que sólo responde desde dentro de una máquina de Amazon. Sin esa cabecera,
-> un `docker compose ps` es idéntico en cualquier computador y no probaría nada.
+> *(señalar los metadatos)* Esto de acá importa más de lo que parece. Son los
+> metadatos de la instancia —el identificador, el tipo, la zona de
+> disponibilidad— leídos del servicio de metadatos de AWS, que sólo responde
+> desde dentro de una máquina de Amazon. Sin esa cabecera, un `docker compose
+> ps` es idéntico en cualquier computador y no probaría nada.
 >
-> *(señalar los dos brokers en la lista)* Lo que más quería demostrar acá son
-> estos dos: Artemis y Kafka. Los brokers de mensajería no están en mi portátil,
-> están en la nube, y los microservicios se conectan a ellos desde dentro de la
-> misma red privada.
+> *(cambiar a la captura de Eureka)* Y acá está Eureka, pero fíjense en dos
+> cosas. La barra de direcciones: una IP pública de Amazon, no localhost. Y este
+> campo de abajo, num-of-cpus, dice dos: son las dos vCPU de la instancia. En mi
+> equipo ese mismo campo dice dieciséis.
+>
+> Lo que más quería demostrar acá son los dos brokers. Artemis y Kafka no están
+> en mi portátil, están en la nube, y los microservicios se conectan a ellos
+> desde dentro de la misma red privada de la instancia.
 
 ---
 
