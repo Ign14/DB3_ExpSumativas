@@ -1076,10 +1076,15 @@ el laboratorio se cerró: hay que volver a abrirlo y copiar las credenciales de
 nuevo.
 
 **Grupo de seguridad.** Sólo desde su IP, no desde todo internet. Dejar el 22
-abierto al mundo en una instancia con Docker es cómo se pierden instancias:
+abierto al mundo en una instancia con Docker es cómo se pierden instancias.
+
+El `-4` de `curl` no es decorativo: en una conexión con IPv6 —cada vez más
+comunes— `ifconfig.me` devuelve por defecto la dirección IPv6, y `--cidr`
+espera notación IPv4. Sin forzarlo, la autorización falla o, peor, se concede
+sobre un rango que no es el suyo.
 
 ```bash
-export MI_IP=$(curl -s ifconfig.me)
+export MI_IP=$(curl -4 -s ifconfig.me)
 export SG=$(aws ec2 create-security-group --group-name $PROYECTO-ec2 \
   --description "EFT Banco XYZ" --query GroupId --output text)
 
