@@ -81,16 +81,24 @@ pasaría en un incidente real, y es mejor evidencia que un ciclo limpio.
 
 ## Capturas de pantalla
 
-Los logs prueban el comportamiento, pero conviene acompañarlos con capturas de
-pantalla. Las cinco que más valen:
+Los logs prueban el comportamiento; estas seis lo muestran. Están en esta misma
+carpeta.
 
-1. `docker compose ps` con todos los contenedores en `healthy`.
-2. `docker image ls` con las once imágenes `banco-xyz/*`.
-3. La consola de Eureka en <http://localhost:8761> con los cinco servicios
-   registrados (usuario `banco-eureka`, clave `banco-eureka-secret`).
-4. La ficha respondiendo `origenDatosCuenta: DEGRADADO` con `cuentas-service`
-   detenido, y volviendo a `SERVICIO` después de levantarlo.
-5. `docker compose ps` después de `--scale cuentas-service=2`, con las dos
-   réplicas visibles.
+| Captura | Qué se ve |
+|---|---|
+| `01_contenedores_healthy.png` | `docker compose ps` con los doce servicios en `healthy` y los puertos publicados. `cuentas-service` y `pagos-service` son los únicos sin puerto al host, que es la condición para poder replicarlos |
+| `02_imagenes_construidas.png` | Las once imágenes `banco-xyz/*` con su identificador y su tamaño. Incluye la eliminación de una imagen homónima de una entrega anterior, para que el conteo de la captura coincida con el del log |
+| `03_eureka_servicios_registrados.png` | La consola de Eureka pidiendo credenciales y listando los cinco servicios en `UP` con su identificador de instancia |
+| `04_circuit_breaker_degradado_y_recuperado.png` | **La más completa.** La misma petición en tres momentos: con el sistema sano (`origenDatosCuenta: SERVICIO`), con `cuentas-service` detenido (`cuenta: null`, `DEGRADADO`, pero el resumen de 37 movimientos intacto) y después de levantarlo, cerrado el circuito solo |
+| `05_escalado_dos_replicas.png` | `docker compose ps` tras `--scale cuentas-service=2`, con las dos réplicas en `healthy` |
+| `06_orquestacion_bajada.png` | `docker compose down` retirando los catorce contenedores y la red |
 
-Los comandos exactos están en la sección 12 de `instrucciones.md`.
+Sobre la tercera: el texto rojo de *self preservation mode turned off* no es un
+error. Ese modo hace que Eureka deje de dar de baja instancias cuando pierde
+muchos latidos a la vez, por si el problema es la red y no los servicios. En una
+demostración estorba —una instancia detenida a propósito seguiría figurando como
+viva varios minutos y ni la degradación ni el escalado se verían—, así que está
+apagado. En producción va encendido.
+
+Los comandos exactos para reproducir las seis están en la sección 12 de
+`instrucciones.md`.

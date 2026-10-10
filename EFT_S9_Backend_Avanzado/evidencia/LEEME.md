@@ -8,7 +8,7 @@ subdirectorio.
 | Carpeta | Entorno | Qué demuestra | Archivos |
 |---|---|---|---|
 | [`local/`](local/) | Los jar, con un JDK y sin Docker | Que la **lógica del sistema** funciona y que la evidencia es reproducible en cualquier máquina | 11 logs |
-| [`docker/`](docker/) | Contenedores en el equipo de desarrollo | Que las **imágenes se construyen** y que la **orquestación** levanta el ecosistema completo | 9 logs + capturas |
+| [`docker/`](docker/) | Contenedores en el equipo de desarrollo | Que las **imágenes se construyen** y que la **orquestación** levanta el ecosistema completo | 9 logs + 6 capturas |
 | [`nube/`](nube/) | Una instancia EC2 en AWS | Que el sistema **se despliega y corre en la nube**, con los microservicios y los brokers fuera del equipo local | 7 logs + capturas |
 
 > Cada carpeta se genera con su propio script, y los tres están al final de este
