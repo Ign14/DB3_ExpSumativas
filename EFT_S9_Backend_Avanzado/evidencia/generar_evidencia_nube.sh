@@ -167,6 +167,24 @@ echo ">> 02 construyendo las imagenes en la instancia (tarda varios minutos)"
         fi
     done
 
+    paso "La cadena pagos-service -> cuentas-service, lista"
+    echo "Que el gateway alcance a pagos-service no implica que pagos-service"
+    echo "alcance a cuentas-service: esa llamada es servicio a servicio, con su"
+    echo "propio balanceador sobre Eureka, y converge despues. La ficha de la"
+    echo "cuenta es la sonda exacta, porque la compone pagos-service llamando a"
+    echo "cuentas-service: mientras esa pata no este lista responde"
+    echo "origenDatosCuenta=DEGRADADO."
+    echo
+    for ((i = 1; i <= 60; i++)); do
+        if curl -s -H "Authorization: Bearer $TK_SONDA" --max-time 20 \
+               "$GW/api/movimientos/101/ficha" | grep -qE '"origenDatosCuenta" *: *"SERVICIO"'; then
+            echo "   origenDatosCuenta=SERVICIO tras ${i}s: la cadena interna ya resuelve"
+            break
+        fi
+        [[ "$i" -eq 60 ]] && echo "   !! la ficha sigue en DEGRADADO: pagos-service no alcanza a cuentas-service"
+        sleep 1
+    done
+
     paso "docker compose ps"
     $COMPOSE ps 2>&1
 

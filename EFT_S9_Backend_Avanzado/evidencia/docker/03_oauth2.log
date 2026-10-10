@@ -5,7 +5,7 @@
 
 --- Emision de token por client_credentials (canal web) ---
 {
-    "access_token": "eyJraWQiOiIyNDUwMjQ5OS0yMTZmLTRhNTMtOTRmNy1jYjdlY2RmNmM4NjEiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJiYW5jby13ZWItY2xpZW50IiwiYXVkIjoiYmFuY28td2ViLWNsaWVudCIsIm5iZiI6MTc5MTU5MzM5NCwic2NvcGUiOlsiY3VlbnRhcy5yZWFkIiwibW92aW1pZW50b3Mud3JpdGUiLCJjbGllbnRlcy53cml0ZSIsIm1vdmltaWVudG9zLnJlYWQiLCJjdWVudGFzLndyaXRlIiwiY2xpZW50ZXMucmVhZCJdLCJpc3MiOiJodHRwOi8vYXV0aC1zZXJ2ZXI6OTAwMCIsImV4cCI6MTc5MTU5NTE5NCwiaWF0IjoxNzkxNTkzMzk0LCJqdGkiOiIyYjJjMDhiNC1jZjNjLTRlNjUtOTFiMy1mOGZjNDNmNWUzNjQifQ.gCYbSgqU-GSaouy_73PZsPJK7GnZ-E8NtXTCAC2dTuleCsJAVWqf4r9ggdmb8SqrWd7Lh5p7x0mGclNtp3SC3RY1BhucF_CxJblx3-ipX5GplbmIdyJkP67gGmvlMCX8fPTt9YF_RGNHbu9mem3xABBi4A4k4N2GdHlUEtNxS9hj1ZDQBCBay131msk35ffxyDNeNjOpjaQkxwIyRTk-ZWbKpBbfjvdnhTexc288yuqC-LGHyHwuUYj09MxTv3FLT8Tf_S-xgQ2sQDjGX-BOqpdO71BxTbo8Dsd0gvBOLNDHIbEwPW6wP64aH5ccVu1mNYq6LScmNFdzrfRLiNe4Qg",
+    "access_token": "eyJraWQiOiI1NjljYzhkNC0xMjZlLTQ4YjctYmY1Ni0zMDhhNjM3NzBiODAiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJiYW5jby13ZWItY2xpZW50IiwiYXVkIjoiYmFuY28td2ViLWNsaWVudCIsIm5iZiI6MTc5MTY0OTkyMSwic2NvcGUiOlsiY3VlbnRhcy5yZWFkIiwibW92aW1pZW50b3Mud3JpdGUiLCJjbGllbnRlcy53cml0ZSIsIm1vdmltaWVudG9zLnJlYWQiLCJjdWVudGFzLndyaXRlIiwiY2xpZW50ZXMucmVhZCJdLCJpc3MiOiJodHRwOi8vYXV0aC1zZXJ2ZXI6OTAwMCIsImV4cCI6MTc5MTY1MTcyMSwiaWF0IjoxNzkxNjQ5OTIxLCJqdGkiOiJmNDZiMTNmOC1jMGE3LTQ5ZjUtYTdmNC03MWM0OGQ0Zjc1OTAifQ.VIc2C3cZl-wNrH0B2VDW2I7r_3iXBdd3gO_Eu6H_grlTeoI3fZaN7E491cL-DMpowclNDmkZN-OLMeC7MBtN4bMpRGeuUKXnLNBXx0QiLBnljvEyjRJ3sL3ePFJCZ48Lpr6vQs7KPWtisgTyI0fi0hvWJB0pxbfSzqD4pDPuQ9arO9yUcu3RD4cM9-C0Ze_OPHZ5qQLKtOt9wk0QWr8OlBOWI-rsUZI290R9XLAWIdnY8t1hgKUFxFgK0tvfkyvY1CQrgFyHsATqqraO7Fpxnm_-aKjXxfJr4QrOluyqe4odUG2_DJBzIUSpUMYCQPtXgn2OpsitR4-B6GrJex7itw",
     "scope": "cuentas.read movimientos.write clientes.write movimientos.read cuentas.write clientes.read",
     "token_type": "Bearer",
     "expires_in": 1799
@@ -14,11 +14,11 @@
 --- Contenido del token del canal web ---
 {
   "aud": "banco-web-client",
-  "exp": 1791595194,
-  "iat": 1791593394,
+  "exp": 1791651721,
+  "iat": 1791649921,
   "iss": "http://auth-server:9000",
-  "jti": "58ff762c-b502-463c-af40-3971e977e190",
-  "nbf": 1791593394,
+  "jti": "c799df54-e00a-40e3-bc16-c93050a325c1",
+  "nbf": 1791649921,
   "scope": [
     "cuentas.read",
     "movimientos.write",
@@ -36,8 +36,8 @@
         {
             "kty": "RSA",
             "e": "AQAB",
-            "kid": "24502499-216f-4a53-94f7-cb7ecdf6c861",
-            "n": "2qwro9Wt8phUnC-9irn5eqGIs-PvU-9MmTKMkeT0C_O-Qc9gWbmzNmlG9DYrfiL12ncNg7IlGFrwaq1Zrubb6nEFclpjD-7aLCf_06J9hG4WJqPxVRscHo22xoEg0aalA9j9_NXcBPpW542Q-OGe-wSLZxSu2D2EgeggOfKfrfMf-s-t2mo8gTv4SrE3bCEU2CTlovQp00PnNTxKy04zYbCXL4a8f3RW6KBPO5b3-DB4KXLeEFEybJzynt3RLBxoDnN_udbbB0G393jSs29K7uZwYEeSMdcIAAw4lBU4xl1PKE3H0dIrxvqjakyf6pmX2DAO1XnOsY0ue72SNTsLHQ"
+            "kid": "569cc8d4-126e-48b7-bf56-308a63770b80",
+            "n": "neO1m5cqnD-Tl8JupzTmLE4_S6ewyOv9R6Go0fuobHBTPiS7G2UO1CDz2Lm2m0mZaAderCD4h68FSaNMFn1uv1d6dn8RnrDtJGTSBvua5ZwWnMLoffbKzUmro18PFEtoo8JU3Iaa228jFO5gu0SnomRN66CwJH7fuIc4iYhOtK2IwBY1kI0frxP_KOWG1QGYauWGml4BrYHgHAXOdySqwa8lSzrXhiMGrkv5NqXkg1y1fO8npRudiyjJwog8rTCYCCai_oU67AUU6qId3aZ6VSdrSjv2tMbk4gGpDms1rfSmIjACJaidbVdXXVX3MLqnu_axb2TQvrhXQZ0QoNhSkw"
         }
     ]
 }
@@ -61,13 +61,13 @@
 --- Minimo privilegio por canal: el mismo token no sirve para todo ---
    CANAL      RECURSO                     HTTP
    web        GET /api/cuentas/101        200
-   web        GET /api/movimientos/101    503
+   web        GET /api/movimientos/101    200
    web        GET /api/clientes/101       200
    movil      GET /api/cuentas/101        200
-   movil      GET /api/movimientos/101    503
+   movil      GET /api/movimientos/101    200
    movil      GET /api/clientes/101       200
    cajero     GET /api/cuentas/101        200
-   cajero     GET /api/movimientos/101    503
+   cajero     GET /api/movimientos/101    403
    cajero     GET /api/clientes/101       403
 
    El cajero recibe 403 en movimientos y clientes con un token de firma

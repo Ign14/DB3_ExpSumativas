@@ -27,16 +27,17 @@
 
 --- Reporte de transacciones diarias (salida del proceso batch 1) ---
 {
-    "timestamp": "2026-10-10T00:49:56.633+00:00",
-    "path": "/api/transacciones-diarias/resumen",
-    "status": 503,
-    "error": "Service Unavailable",
-    "requestId": "17d5a906-21"
+    "cantidadTotal": 392,
+    "montoTotal": 529400,
+    "cantidadCreditos": 176,
+    "cantidadDebitos": 216,
+    "montoCreditos": 244500,
+    "montoDebitos": 284900
 }
 
 --- Estado antes del retiro ---
    saldo de la cuenta 101: 5000
-   movimientos en el historial: 
+   movimientos en el historial: 37
 
 --- Retiro de 250 por el canal cajero (viaja por la cola JMS) ---
 {
@@ -45,13 +46,13 @@
     "saldoResultante": 4750,
     "aprobado": true,
     "motivoRechazo": null,
-    "eventoId": "15ef1236-1772-4986-a71e-e50976f826c2",
+    "eventoId": "1f60243f-08f3-461d-8835-f1d89da9e45e",
     "eventoPublicado": true
 }
 
 --- Estado despues: el saldo bajo en un contenedor y el historial subio en otro ---
    saldo:       5000 -> 4750
-   movimientos:  -> 
+   movimientos: 37 -> 38
 
 --- Deposito por el canal web (Kafka) ---
 (sin respuesta)
@@ -97,15 +98,15 @@
 }
 
 --- Topicos de Kafka en el broker ---
-Topic: banco.alertas-seguridad	TopicId: 4h7DYccJRaypBLfSdz244w	PartitionCount: 3	ReplicationFactor: 1	Configs: 
+Topic: banco.alertas-seguridad	TopicId: cYnNEN8FS4CdgG0Hamk7Kw	PartitionCount: 3	ReplicationFactor: 1	Configs: 
 	Topic: banco.alertas-seguridad	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
 	Topic: banco.alertas-seguridad	Partition: 1	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
 	Topic: banco.alertas-seguridad	Partition: 2	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
-Topic: banco.transacciones-completadas	TopicId: XRbkA6QKTRChm07Q8D7pDA	PartitionCount: 3	ReplicationFactor: 1	Configs: 
+Topic: banco.transacciones-completadas	TopicId: _ClB61jPSp-DP5UJXWn_BQ	PartitionCount: 3	ReplicationFactor: 1	Configs: 
 	Topic: banco.transacciones-completadas	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
 	Topic: banco.transacciones-completadas	Partition: 1	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
 	Topic: banco.transacciones-completadas	Partition: 2	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
-Topic: __consumer_offsets	TopicId: gs7QQ1v3QzCutFk_uy2H2g	PartitionCount: 50	ReplicationFactor: 1	Configs: compression.type=producer,cleanup.policy=compact,segment.bytes=104857600
+Topic: __consumer_offsets	TopicId: J2FgfQIsQqGImHrxotBtvg	PartitionCount: 50	ReplicationFactor: 1	Configs: compression.type=producer,cleanup.policy=compact,segment.bytes=104857600
 	Topic: __consumer_offsets	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
 	Topic: __consumer_offsets	Partition: 1	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
 	Topic: __consumer_offsets	Partition: 2	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
@@ -160,17 +161,17 @@ Topic: __consumer_offsets	TopicId: gs7QQ1v3QzCutFk_uy2H2g	PartitionCount: 50	Rep
 --- Lo que publicaron y consumieron los contenedores ---
 -- cuentas-service (productor)
 
-2026-10-10T00:49:56.863Z  INFO 1 --- [cuentas-service] [nio-8081-exec-1] c.d.b.c.mensajeria.PublicadorRetiros     : >> cuentas-service: evento 15ef1236-1772-4986-a71e-e50976f826c2 publicado en la cola 
+2026-10-10T16:32:03.257Z  INFO 1 --- [cuentas-service] [nio-8081-exec-3] c.d.b.c.mensajeria.PublicadorRetiros     : >> cuentas-service: evento 1f60243f-08f3-461d-8835-f1d89da9e45e publicado en la cola 
 banco.retiros (cuenta 101, monto 250)
-2026-10-10T00:49:57.320Z  INFO 1 --- [cuentas-service] [nio-8081-exec-1] c.d.b.c.m.PublicadorEventosKafka         : >> cuentas-service: evento 15ef1236-1772-4986-a71e-e50976f826c2 publicado en el topico 
+2026-10-10T16:32:03.772Z  INFO 1 --- [cuentas-service] [nio-8081-exec-3] c.d.b.c.m.PublicadorEventosKafka         : >> cuentas-service: evento 1f60243f-08f3-461d-8835-f1d89da9e45e publicado en el topico 
 banco.transacciones-completadas (RETIRO de 250 en la cuenta 101)
 -- pagos-service (consumidor JMS y productor Kafka)
-2026-10-10T00:49:56.875Z  INFO 1 --- [pagos-service] [ntContainer#0-1] c.d.b.p.mensajeria.ConsumidorRetiros     : >> pagos-service: evento 15ef1236-1772-4986-a71e-e50976f826c2 consumido, retiro de 250 
+2026-10-10T16:32:03.267Z  INFO 1 --- [pagos-service] [ntContainer#0-1] c.d.b.p.mensajeria.ConsumidorRetiros     : >> pagos-service: evento 1f60243f-08f3-461d-8835-f1d89da9e45e consumido, retiro de 250 
 agregado al historial de la cuenta 101
 -- clientes-service (consumidor Kafka)
-2026-10-10T00:49:57.332Z  INFO 1 --- [clientes-service] [ntainer#0-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: evento 15ef1236-1772-4986-a71e-e50976f826c2 de Kafka anotado - RETIRO 
+2026-10-10T16:32:03.787Z  INFO 1 --- [clientes-service] [ntainer#0-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: evento 1f60243f-08f3-461d-8835-f1d89da9e45e de Kafka anotado - RETIRO 
 sobre cuenta origen 101 y destino null
-2026-10-10T00:50:08.991Z  WARN 1 --- [clientes-service] [ntainer#1-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: alerta RETIRO_SOBRE_LIMITE (MEDIA) sobre la cuenta 101 - Intento de 
+2026-10-10T16:32:15.687Z  WARN 1 --- [clientes-service] [ntainer#1-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: alerta RETIRO_SOBRE_LIMITE (MEDIA) sobre la cuenta 101 - Intento de 
 retiro por 900000 sobre el limite de 500000 desde el canal cajero
 
 

@@ -2,12 +2,12 @@
 ==============================================================
   08 - ESTADO FINAL DE LA ORQUESTACION
 ==============================================================
-Fecha: 2026-10-09T21:53:59.8168475-03:00
+Fecha: 2026-10-10T13:36:01.3166328-03:00
 
 --- Contenedores ---
 NAME                               IMAGE                              COMMAND                  SERVICE            CREATED         STATUS                   PORTS
 api-gateway                        banco-xyz/api-gateway:1.0.0        "java -XX:MaxRAMPercÔÇª"   api-gateway        5 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
-auth-server                        banco-xyz/auth-server:1.0.0        "java -XX:MaxRAMPercÔÇª"   auth-server        5 minutes ago   Up 4 minutes (healthy)   0.0.0.0:9000->9000/tcp, [::]:9000->9000/tcp
+auth-server                        banco-xyz/auth-server:1.0.0        "java -XX:MaxRAMPercÔÇª"   auth-server        5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:9000->9000/tcp, [::]:9000->9000/tcp
 bff-cajero                         banco-xyz/bff-cajero:1.0.0         "java -XX:MaxRAMPercÔÇª"   bff-cajero         5 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8093->8093/tcp, [::]:8093->8093/tcp
 bff-movil                          banco-xyz/bff-movil:1.0.0          "java -XX:MaxRAMPercÔÇª"   bff-movil          5 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8092->8092/tcp, [::]:8092->8092/tcp
 bff-web                            banco-xyz/bff-web:1.0.0            "java -XX:MaxRAMPercÔÇª"   bff-web            5 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8091->8091/tcp, [::]:8091->8091/tcp
@@ -41,16 +41,16 @@ kafka                              apache/kafka:3.8.1                 "/__cacert
 
 --- Imagenes del sistema ---
 REPOSITORIO                      ID / TAMANO
-banco-xyz/config-server          0898dd07ee88  641MB
-banco-xyz/discovery-server       742382c02566  693MB
-banco-xyz/auth-server            7f2a7d61d2d0  678MB
-banco-xyz/api-gateway            2d25cc7a0de5  689MB
-banco-xyz/cuentas-service        23bb283764f1  794MB
-banco-xyz/pagos-service          7b3e34cb0726  802MB
-banco-xyz/clientes-service       9f36a17ae986  744MB
-banco-xyz/bff-web                7d7cb3f7a41a  575MB
-banco-xyz/bff-movil              2a03e2abca97  575MB
-banco-xyz/bff-cajero             05c8af419a47  575MB
-banco-xyz/broker-artemis         6ba7b2a2ccbd  651MB
+banco-xyz/config-server          bc8bb95b0d34  641MB
+banco-xyz/discovery-server       6bec708de2e2  693MB
+banco-xyz/auth-server            dbd7fe37e083  678MB
+banco-xyz/api-gateway            1587eade0526  689MB
+banco-xyz/cuentas-service        577477f70187  794MB
+banco-xyz/pagos-service          0ef18de76327  802MB
+banco-xyz/clientes-service       fcd7ee536644  744MB
+banco-xyz/bff-web                0b22576b989c  575MB
+banco-xyz/bff-movil              e2e075f4b3c0  575MB
+banco-xyz/bff-cajero             cf481cd3ffa1  575MB
+banco-xyz/broker-artemis         30646e6c7969  651MB
 
    11 de 11 imagenes del proyecto presentes

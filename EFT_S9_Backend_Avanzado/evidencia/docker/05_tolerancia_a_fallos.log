@@ -30,27 +30,27 @@
 
 --- La apertura del circuito salio al topico de alertas ---
 
-2026-10-10T00:50:36.182Z ERROR 1 --- [clientes-service] [ntainer#1-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: ALERTA ALTA DEPENDENCIA_DEGRADADA sobre la cuenta null - El circuito 
+2026-10-10T16:32:41.535Z ERROR 1 --- [clientes-service] [ntainer#1-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: ALERTA ALTA DEPENDENCIA_DEGRADADA sobre la cuenta null - El circuito 
 hacia cuentas se abrio: las llamadas se responden degradadas sin intentar la dependencia.
 
 --- Se vuelve a levantar el contenedor ---
  Container discovery-server Waiting 
  Container config-server Waiting 
  Container kafka Waiting 
- Container config-server Healthy 
  Container kafka Healthy 
  Container kafka-init Starting 
  Container discovery-server Healthy 
+ Container config-server Healthy 
  Container kafka-init Started 
- Container config-server Waiting 
  Container discovery-server Waiting 
  Container auth-server Waiting 
  Container broker-artemis Waiting 
  Container kafka-init Waiting 
- Container auth-server Healthy 
- Container config-server Healthy 
+ Container config-server Waiting 
  Container broker-artemis Healthy 
+ Container config-server Healthy 
  Container discovery-server Healthy 
+ Container auth-server Healthy 
  Container kafka-init Exited 
  Container eft-banco-xyz-cuentas-service-1 Starting 
  Container eft-banco-xyz-cuentas-service-1 Started 
@@ -66,8 +66,8 @@ hacia cuentas se abrio: las llamadas se responden degradadas sin intentar la dep
    peticion 8: origenDatosCuenta=SERVICIO   circuito=CLOSED
 
 --- Transiciones registradas por Resilience4j ---
-   2026-10-10T00:50:35 CLOSED_TO_OPEN
-   2026-10-10T00:50:45 OPEN_TO_HALF_OPEN
-   2026-10-10T00:51:44 HALF_OPEN_TO_CLOSED
+   2026-10-10T16:32:41 CLOSED_TO_OPEN
+   2026-10-10T16:32:51 OPEN_TO_HALF_OPEN
+   2026-10-10T16:33:46 HALF_OPEN_TO_CLOSED
 
 

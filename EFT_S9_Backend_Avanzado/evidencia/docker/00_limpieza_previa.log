@@ -2,86 +2,19 @@
 ==============================================================
   00 - LIMPIEZA PREVIA
 ==============================================================
-Fecha: 2026-10-09T21:48:13.3546600-03:00
+Fecha: 2026-10-10T13:30:36.8814216-03:00
 
 --- Contenedores presentes antes de empezar ---
-bff-web  |  banco-xyz/bff-web:1.0.0  |  Created
-bff-movil  |  banco-xyz/bff-movil:1.0.0  |  Created
-eft-banco-xyz-pagos-service-1  |  banco-xyz/pagos-service:1.0.0  |  Created
-bff-cajero  |  banco-xyz/bff-cajero:1.0.0  |  Created
-eft-banco-xyz-cuentas-service-1  |  banco-xyz/cuentas-service:1.0.0  |  Created
-eft-banco-xyz-clientes-service-1  |  banco-xyz/clientes-service:1.0.0  |  Created
-api-gateway  |  banco-xyz/api-gateway:1.0.0  |  Exited (255) 3 hours ago
-kafka-init  |  apache/kafka:3.8.1  |  Exited (1) 3 hours ago
-auth-server  |  banco-xyz/auth-server:1.0.0  |  Exited (255) 3 hours ago
-kafka  |  apache/kafka:3.8.1  |  Exited (255) 3 hours ago
-broker-artemis  |  banco-xyz/broker-artemis:1.0.0  |  Exited (255) 3 hours ago
-discovery-server  |  banco-xyz/discovery-server:1.0.0  |  Exited (255) 3 hours ago
-config-server  |  banco-xyz/config-server:1.0.0  |  Exited (255) 3 hours ago
-movimientos-service  |  d3527f2fc6e1  |  Exited (255) 7 hours ago
-cuentas-service  |  d98cbe778283  |  Exited (255) 7 hours ago
+movimientos-service  |  d3527f2fc6e1  |  Exited (255) 22 hours ago
+cuentas-service  |  d98cbe778283  |  Exited (255) 22 hours ago
 bancoxyz-postgres  |  postgres:16-alpine  |  Exited (255) 4 days ago
 
 --- Bajando cualquier orquestacion previa de este proyecto ---
- Container bff-cajero Stopping 
- Container eft-banco-xyz-pagos-service-1 Stopping 
- Container eft-banco-xyz-cuentas-service-1 Stopping 
- Container bff-web Stopping 
- Container bff-movil Stopping 
- Container eft-banco-xyz-clientes-service-1 Stopping 
- Container eft-banco-xyz-pagos-service-1 Stopped 
- Container eft-banco-xyz-pagos-service-1 Removing 
- Container bff-cajero Stopped 
- Container bff-cajero Removing 
- Container eft-banco-xyz-clientes-service-1 Stopped 
- Container eft-banco-xyz-clientes-service-1 Removing 
- Container eft-banco-xyz-cuentas-service-1 Stopped 
- Container eft-banco-xyz-cuentas-service-1 Removing 
- Container bff-movil Stopped 
- Container bff-movil Removing 
- Container bff-web Stopped 
- Container bff-web Removing 
- Container eft-banco-xyz-clientes-service-1 Removed 
- Container eft-banco-xyz-pagos-service-1 Removed 
- Container eft-banco-xyz-cuentas-service-1 Removed 
- Container bff-movil Removed 
- Container bff-cajero Removed 
- Container kafka-init Stopping 
- Container broker-artemis Stopping 
- Container bff-web Removed 
- Container api-gateway Stopping 
- Container kafka-init Stopped 
- Container kafka-init Removing 
- Container api-gateway Stopped 
- Container api-gateway Removing 
- Container broker-artemis Stopped 
- Container broker-artemis Removing 
- Container api-gateway Removed 
- Container auth-server Stopping 
- Container auth-server Stopped 
- Container auth-server Removing 
- Container kafka-init Removed 
- Container kafka Stopping 
- Container kafka Stopped 
- Container kafka Removing 
- Container broker-artemis Removed 
- Container auth-server Removed 
- Container discovery-server Stopping 
- Container config-server Stopping 
- Container discovery-server Stopped 
- Container discovery-server Removing 
- Container config-server Stopped 
- Container config-server Removing 
- Container kafka Removed 
- Container discovery-server Removed 
- Container config-server Removed 
- Network eft-banco-xyz_banco Removing 
- Network eft-banco-xyz_banco Removed 
 
 --- Nombres en conflicto dejados por otros proyectos ---
    ninguno: los once nombres fijos de este compose estan libres
 
 --- Estado despues de la limpieza ---
-movimientos-service  |  d3527f2fc6e1  |  Exited (255) 7 hours ago
-cuentas-service  |  d98cbe778283  |  Exited (255) 7 hours ago
+movimientos-service  |  d3527f2fc6e1  |  Exited (255) 22 hours ago
+cuentas-service  |  d98cbe778283  |  Exited (255) 22 hours ago
 bancoxyz-postgres  |  postgres:16-alpine  |  Exited (255) 4 days ago

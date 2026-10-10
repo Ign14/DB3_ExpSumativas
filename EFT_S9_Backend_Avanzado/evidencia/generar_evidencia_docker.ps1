@@ -97,10 +97,55 @@ function Json($url, $token) {
     if ($r) { $r | python -m json.tool } else { '(sin respuesta)' }
 }
 
+# El cuerpo JSON va por archivo y no como argumento de curl. Un argumento con
+# comillas y espacios atraviesa dos capas de quoting -PowerShell y el parser de
+# linea de comandos de Windows- y ninguna de las dos esta de nuestro lado; por
+# archivo no hay nada que citar, y de paso los cuerpos se escriben como JSON
+# normal en vez de con comillas escapadas.
+#
+# Y cuando curl no devuelve cuerpo, el log dice POR QUE. Antes imprimia un
+# "(sin respuesta)" mudo que no distinguia un timeout de una respuesta vacia,
+# y eso costo dos corridas completas de diagnostico.
 function PostJson($url, $token, $cuerpo) {
-    $r = curl.exe -s -X POST -H "Authorization: Bearer $token" `
-        -H "Content-Type: application/json" -d $cuerpo --max-time 25 $url
-    if ($r) { $r | python -m json.tool } else { '(sin respuesta)' }
+    $tmp = Join-Path $env:TEMP "eft-cuerpo-$([guid]::NewGuid().ToString('N')).json"
+    [IO.File]::WriteAllText($tmp, $cuerpo, (New-Object Text.UTF8Encoding $false))
+    try {
+        # -w deja el codigo HTTP y el tiempo en la ultima linea, para poder
+        # explicar una respuesta vacia en vez de solo constatarla.
+        $marca = "`n--HTTP %{http_code} EN %{time_total}s--"
+        if ($token) {
+            $salida = curl.exe -s -S -X POST -H "Authorization: Bearer $token" `
+                -H "Content-Type: application/json" --data-binary "@$tmp" `
+                -w $marca --max-time 90 $url 2>&1
+        } else {
+            # El BFF del cajero es el unico que no exige token: mandar un
+            # Authorization vacio ahi daria 401 por un header malformado.
+            $salida = curl.exe -s -S -X POST `
+                -H "Content-Type: application/json" --data-binary "@$tmp" `
+                -w $marca --max-time 90 $url 2>&1
+        }
+        $texto = ($salida | Out-String)
+        $lineas = $texto -split "`r?`n"
+        $meta = @($lineas | Where-Object { $_ -match '^--HTTP ' })[0]
+        $cuerpoResp = ($lineas | Where-Object { $_ -notmatch '^--HTTP ' }) -join "`n"
+        $codigo = if ("$meta" -match 'HTTP (\d+)') { $Matches[1] } else { '000' }
+        $resumen = if ($meta) { $meta.Trim('-').Trim() } else { 'sin datos de curl' }
+        if ($codigo -eq '000') {
+            # 000 significa que no hubo respuesta HTTP: timeout, conexion
+            # rechazada o DNS. El texto de curl dice cual de las tres.
+            "(curl no obtuvo respuesta -> $($cuerpoResp.Trim()))"
+            "   $resumen"
+        } elseif ($cuerpoResp.Trim()) {
+            $json = $cuerpoResp | python -m json.tool 2>$null
+            if ($json) { $json } else { $cuerpoResp.Trim() }
+            "   $resumen"
+        } else {
+            "(el servicio respondio sin cuerpo)"
+            "   $resumen"
+        }
+    } finally {
+        Remove-Item $tmp -ErrorAction SilentlyContinue
+    }
 }
 
 # Que un contenedor este healthy no basta para pedirle algo POR EL GATEWAY. El
@@ -294,6 +339,29 @@ Write-Host '>> 02 levantando la orquestacion'
         }
     }
 
+    Paso 'La cadena pagos-service -> cuentas-service, lista'
+    'Que el gateway alcance a pagos-service no implica que pagos-service alcance'
+    'a cuentas-service: esa llamada es servicio a servicio, con su propio'
+    'balanceador sobre Eureka, y converge despues. La ficha de la cuenta es la'
+    'sonda exacta, porque la compone pagos-service llamando a cuentas-service:'
+    'mientras esa pata no este lista responde origenDatosCuenta=DEGRADADO.'
+    ''
+    $listo = $false
+    for ($i = 1; $i -le 60; $i++) {
+        $ficha = curl.exe -s -H "Authorization: Bearer $tkSonda" --max-time 20 `
+            "$Gw/api/movimientos/101/ficha"
+        if ("$ficha" -match '"origenDatosCuenta"\s*:\s*"SERVICIO"') {
+            "   origenDatosCuenta=SERVICIO tras ${i}s: la cadena interna ya resuelve"
+            $listo = $true
+            break
+        }
+        Start-Sleep -Seconds 1
+    }
+    if (-not $listo) {
+        '   !! la ficha sigue en DEGRADADO: pagos-service no alcanza a cuentas-service'
+        $script:Orquestado = $false
+    }
+
     Paso 'Servicios registrados en Eureka'
     cmd /c "docker compose exec -T api-gateway curl -s -u ${EurekaUser}:${EurekaPass} -H ""Accept: application/json"" http://discovery-server:8761/eureka/apps 2>&1" |
         python -c "import sys,json;
@@ -403,7 +471,7 @@ Write-Host '>> 04 APIs, mensajeria JMS y Kafka'
     "   movimientos en el historial: $movsAntes"
 
     Paso 'Retiro de 250 por el canal cajero (viaja por la cola JMS)'
-    PostJson "$Gw/api/cuentas/101/retiro" $TkCajero '{\"monto\":250,\"canal\":\"cajero\"}'
+    PostJson "$Gw/api/cuentas/101/retiro" $TkCajero '{"monto":250,"canal":"cajero"}'
 
     Start-Sleep -Seconds 6
 
@@ -414,13 +482,13 @@ Write-Host '>> 04 APIs, mensajeria JMS y Kafka'
     "   movimientos: $movsAntes -> $movsDespues"
 
     Paso 'Deposito por el canal web (Kafka)'
-    PostJson "$Gw/api/pagos/deposito/101" $TkWeb '{\"monto\":1200,\"canal\":\"web\",\"descripcion\":\"Abono de sueldo\"}'
+    PostJson "$Gw/api/pagos/deposito/101" $TkWeb '{"monto":1200,"canal":"web","descripcion":"Abono de sueldo"}'
 
     Paso 'Transferencia de la cuenta 101 a la 102 (Kafka)'
-    PostJson "$Gw/api/pagos/transferencia/101" $TkWeb '{\"cuentaDestino\":102,\"monto\":300,\"canal\":\"web\",\"descripcion\":\"Pago de arriendo\"}'
+    PostJson "$Gw/api/pagos/transferencia/101" $TkWeb '{"cuentaDestino":102,"monto":300,"canal":"web","descripcion":"Pago de arriendo"}'
 
     Paso 'Intento de retiro sobre el limite: genera alerta, no transaccion'
-    PostJson "$Gw/api/cuentas/101/retiro" $TkCajero '{\"monto\":900000,\"canal\":\"cajero\"}'
+    PostJson "$Gw/api/cuentas/101/retiro" $TkCajero '{"monto":900000,"canal":"cajero"}'
 
     Start-Sleep -Seconds 10
 
@@ -528,8 +596,7 @@ Write-Host '>> 06 los tres BFF'
     '   {0,-10} {1,8} caracteres' -f 'cajero', $tCajero
 
     Paso 'Retiro por el canal cajero: una sola llamada'
-    curl.exe -s -X POST -H "Content-Type: application/json" -d '{\"monto\":150}' `
-        "http://localhost:8093/cajero/cuentas/101/retiro" | python -m json.tool
+    PostJson "http://localhost:8093/cajero/cuentas/101/retiro" '' '{"monto":150}'
 
     Paso 'Panel administrativo, exclusivo del canal web'
     curl.exe -s "http://localhost:8091/web/banco/resumen-diario" | python -m json.tool
