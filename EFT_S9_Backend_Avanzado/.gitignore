@@ -7,3 +7,7 @@ target/
 .DS_Store
 # Los .pid que deja el script de evidencia al levantar los procesos
 evidencia/logs/*.pid
+
+# Claves privadas. Nunca entran al repositorio ni al zip de la entrega.
+*.pem
+*.ppk
