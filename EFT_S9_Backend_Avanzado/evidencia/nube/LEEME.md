@@ -46,17 +46,16 @@ metadatos de la máquina.
 
 ## Capturas de pantalla
 
-Los logs prueban el comportamiento; conviene acompañarlos con capturas. Las
-cinco que más valen:
+Los logs prueban el comportamiento; estas cinco lo muestran. Están en esta misma
+carpeta.
 
-1. La consola de EC2 con la instancia en estado `running`, mostrando su tipo y
-   su IP pública.
-2. La sesión SSH con `docker compose ps` y todos los contenedores `healthy`.
-3. `docker image ls` dentro de la instancia, con las once imágenes.
-4. La consola de Eureka abierta en el navegador contra la IP pública
-   (`http://<IP>:8761`), con los cinco servicios registrados.
-5. `docker compose ps` después de `--scale cuentas-service=2`, con las dos
-   réplicas.
+| Captura | Qué se ve |
+|---|---|
+| `01_instancia_en_consola_ec2.png` | La consola de EC2 con `banco-xyz-eft` en `running`: el tipo `t3.large`, la zona y la IP pública, desde el panel de AWS |
+| `02_contenedores_healthy_en_ec2.png` | `docker compose ps` dentro de la instancia, con los doce servicios en `healthy` |
+| `03_imagenes_construidas_en_ec2.png` | Las once imágenes `banco-xyz/*`, construidas en la instancia y no copiadas desde ningún registro |
+| `04_eureka_en_ec2.png` | **La más completa.** La consola de Eureka abierta contra la IP pública de la instancia, con los cinco servicios en `UP`. La barra de direcciones muestra `54.152.129.196:8761`, y el campo `num-of-cpus` dice **2**: son las dos vCPU de la `t3.large`. En la captura equivalente del entorno local ese mismo campo dice 16 |
+| `05_metadatos_de_la_instancia.png` | La cabecera de `01_instancia_ec2.log`, con el `instance-id`, el tipo, la zona, las dos IP y la AMI leídos del servicio de metadatos de AWS |
 
 ## Después de capturar
 

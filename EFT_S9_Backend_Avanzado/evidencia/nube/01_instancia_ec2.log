@@ -1,0 +1,42 @@
+
+==============================================================
+  01 - LA INSTANCIA EN LA QUE CORRE TODO ESTO
+==============================================================
+Fecha: 2026-10-10T19:23:44+00:00
+
+Lo que sigue sale del servicio de metadatos de EC2 (169.254.169.254),
+que solo responde desde dentro de una instancia de AWS. Es la forma de
+distinguir este log del que saldria en cualquier equipo de desarrollo.
+
+--- Identidad de la instancia ---
+   instance-id:           i-0edce5f77c07f3f19
+   tipo:                  t3.large
+   zona:                  us-east-1a
+   region:                us-east-1
+   IP privada:            172.31.41.212
+   IP publica:            54.152.129.196
+   AMI:                   ami-03c3da4cfa8e8943a
+
+--- Recursos de la maquina ---
+   CPU:
+     Architecture:                            x86_64
+     CPU(s):                                  2
+     Model name:                              Intel(R) Xeon(R) Platinum 8259CL CPU @ 2.50GHz
+   Memoria:
+                    total        used        free      shared  buff/cache   available
+     Mem:           7.6Gi       249Mi       6.5Gi       0.0Ki       889Mi       7.1Gi
+     Swap:             0B          0B          0B
+   Disco:
+     Filesystem      Size  Used Avail Use% Mounted on
+     /dev/nvme0n1p1   40G  2.4G   38G   6% /
+
+--- Sistema operativo y herramientas ---
+   NAME="Amazon Linux"
+   VERSION="2023"
+   docker:  Docker version 25.0.14, build 0bab007
+   compose: Docker Compose version v2.29.7
+
+   Nota: no hay JDK ni Maven instalados en esta maquina. La
+   compilacion ocurre dentro de la imagen, en la etapa de build del
+   Dockerfile multi-etapa:
+     (ni java ni mvn en el PATH, como se esperaba)

@@ -1,0 +1,77 @@
+
+==============================================================
+  07 - ESTADO FINAL DEL DESPLIEGUE EN LA NUBE
+==============================================================
+Fecha: 2026-10-10T19:34:19+00:00
+Instancia: i-0edce5f77c07f3f19  tipo: t3.large  zona: us-east-1a
+
+--- Contenedores ---
+NAME                               IMAGE                              COMMAND                  SERVICE            CREATED         STATUS                   PORTS
+api-gateway                        banco-xyz/api-gateway:1.0.0        "java -XX:MaxRAMPerc…"   api-gateway        7 minutes ago   Up 6 minutes (healthy)   0.0.0.0:8080->8080/tcp, :::8080->8080/tcp
+auth-server                        banco-xyz/auth-server:1.0.0        "java -XX:MaxRAMPerc…"   auth-server        7 minutes ago   Up 7 minutes (healthy)   0.0.0.0:9000->9000/tcp, :::9000->9000/tcp
+bff-cajero                         banco-xyz/bff-cajero:1.0.0         "java -XX:MaxRAMPerc…"   bff-cajero         7 minutes ago   Up 5 minutes (healthy)   0.0.0.0:8093->8093/tcp, :::8093->8093/tcp
+bff-movil                          banco-xyz/bff-movil:1.0.0          "java -XX:MaxRAMPerc…"   bff-movil          7 minutes ago   Up 5 minutes (healthy)   0.0.0.0:8092->8092/tcp, :::8092->8092/tcp
+bff-web                            banco-xyz/bff-web:1.0.0            "java -XX:MaxRAMPerc…"   bff-web            7 minutes ago   Up 5 minutes (healthy)   0.0.0.0:8091->8091/tcp, :::8091->8091/tcp
+broker-artemis                     banco-xyz/broker-artemis:1.0.0     "java -XX:MaxRAMPerc…"   broker-artemis     7 minutes ago   Up 7 minutes (healthy)   0.0.0.0:61617->61617/tcp, :::61617->61617/tcp
+config-server                      banco-xyz/config-server:1.0.0      "java -XX:MaxRAMPerc…"   config-server      7 minutes ago   Up 7 minutes (healthy)   0.0.0.0:8888->8888/tcp, :::8888->8888/tcp
+discovery-server                   banco-xyz/discovery-server:1.0.0   "java -XX:MaxRAMPerc…"   discovery-server   7 minutes ago   Up 7 minutes (healthy)   0.0.0.0:8761->8761/tcp, :::8761->8761/tcp
+eft-banco-xyz-clientes-service-1   banco-xyz/clientes-service:1.0.0   "java -XX:MaxRAMPerc…"   clientes-service   7 minutes ago   Up 6 minutes (healthy)   
+eft-banco-xyz-cuentas-service-1    banco-xyz/cuentas-service:1.0.0    "java -XX:MaxRAMPerc…"   cuentas-service    7 minutes ago   Up 3 minutes (healthy)   
+eft-banco-xyz-pagos-service-1      banco-xyz/pagos-service:1.0.0      "java -XX:MaxRAMPerc…"   pagos-service      7 minutes ago   Up 5 minutes (healthy)   
+kafka                              apache/kafka:3.8.1                 "/__cacert_entrypoin…"   kafka              7 minutes ago   Up 7 minutes (healthy)   0.0.0.0:9092->9092/tcp, :::9092->9092/tcp
+
+--- Salud de cada componente, consultada dentro de la red ---
+   config-server        {"status":"UP","groups":["liveness","readiness"]}
+   discovery-server     {"status":"UP","groups":["liveness","readiness"]}
+   auth-server          {"status":"UP","groups":["liveness","readiness"]}
+   api-gateway          {"status":"UP","groups":["liveness","readiness"]}
+   cuentas-service      {"status":"UP","groups":["liveness","readiness"]}
+   pagos-service        {"status":"UP","groups":["liveness","readiness"]}
+   clientes-service     {"status":"UP","groups":["liveness","readiness"]}
+   broker-artemis       {"status":"UP","groups":["liveness","readiness"]}
+   bff-web              {"status":"UP","groups":["liveness","readiness"]}
+   bff-movil            {"status":"UP","groups":["liveness","readiness"]}
+   bff-cajero           {"status":"UP","groups":["liveness","readiness"]}
+
+--- Registro final de Eureka ---
+   API-GATEWAY : 1 instancia(s)
+   AUTH-SERVER : 1 instancia(s)
+   CLIENTES-SERVICE : 1 instancia(s)
+   CUENTAS-SERVICE : 2 instancia(s)
+   PAGOS-SERVICE : 1 instancia(s)
+   total de instancias registradas: 6
+
+--- Imagenes construidas en esta instancia ---
+REPOSITORY                   TAG       IMAGE ID       CREATED         SIZE
+banco-xyz/bff-movil          1.0.0     0206d991b143   8 minutes ago   384MB
+banco-xyz/bff-cajero         1.0.0     c1e2768eafe9   8 minutes ago   384MB
+banco-xyz/pagos-service      1.0.0     03060d8f158b   8 minutes ago   503MB
+banco-xyz/bff-web            1.0.0     b70f3c9b7dda   8 minutes ago   384MB
+banco-xyz/api-gateway        1.0.0     32a31842b85d   8 minutes ago   445MB
+banco-xyz/clientes-service   1.0.0     9afa7a702bd8   8 minutes ago   472MB
+banco-xyz/cuentas-service    1.0.0     21315a21b597   8 minutes ago   498MB
+banco-xyz/auth-server        1.0.0     0863ee03bb41   8 minutes ago   438MB
+banco-xyz/config-server      1.0.0     56a1a006ceaa   8 minutes ago   419MB
+banco-xyz/discovery-server   1.0.0     170de17d0379   8 minutes ago   447MB
+banco-xyz/broker-artemis     1.0.0     17260c739a82   8 minutes ago   424MB
+
+--- Uso de recursos al terminar ---
+NAME                               CPU %     MEM USAGE / LIMIT     MEM %
+bff-cajero                         0.10%     144.1MiB / 384MiB     37.52%
+bff-movil                          0.21%     144.1MiB / 384MiB     37.53%
+eft-banco-xyz-pagos-service-1      0.39%     291.4MiB / 512MiB     56.91%
+bff-web                            0.19%     141.6MiB / 384MiB     36.88%
+eft-banco-xyz-cuentas-service-1    0.47%     242.6MiB / 512MiB     47.38%
+eft-banco-xyz-clientes-service-1   0.40%     217.7MiB / 512MiB     42.53%
+api-gateway                        0.07%     253.4MiB / 448MiB     56.56%
+auth-server                        0.15%     210.8MiB / 448MiB     47.06%
+kafka                              41.91%    334.8MiB / 1.172GiB   27.90%
+discovery-server                   8.15%     216.6MiB / 448MiB     48.34%
+broker-artemis                     5.11%     186.4MiB / 512MiB     36.41%
+config-server                      0.10%     170.1MiB / 448MiB     37.96%
+
+                  total        used        free      shared  buff/cache   available
+   Mem:           7.6Gi       3.0Gi       452Mi       1.0Mi       4.2Gi       4.4Gi
+   Swap:             0B          0B          0B
+   Filesystem      Size  Used Avail Use% Mounted on
+   /dev/nvme0n1p1   40G  4.8G   36G  12% /

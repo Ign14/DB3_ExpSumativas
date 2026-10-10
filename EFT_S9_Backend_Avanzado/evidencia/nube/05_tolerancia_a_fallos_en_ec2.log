@@ -1,0 +1,69 @@
+
+==============================================================
+  05 - TOLERANCIA A FALLOS SOBRE CONTENEDORES EN LA NUBE
+==============================================================
+
+--- La ficha con cuentas-service arriba ---
+   origenDatosCuenta: SERVICIO
+   cuenta: {"cuentaId": 101, "nombreTitular": "John Doe", "edad": 40, "tipoCuenta": "prestamo", "saldo": 5650}
+
+--- Se detiene el contenedor de cuentas-service ---
+ Container eft-banco-xyz-cuentas-service-1  Stopping
+ Container eft-banco-xyz-cuentas-service-1  Stopped
+
+--- Seis peticiones: el circuito se abre y la respuesta se degrada ---
+   peticion 1: origenDatosCuenta=DEGRADADO  circuito=CLOSED
+   peticion 2: origenDatosCuenta=DEGRADADO  circuito=CLOSED
+   peticion 3: origenDatosCuenta=DEGRADADO  circuito=OPEN
+   peticion 4: origenDatosCuenta=DEGRADADO  circuito=OPEN
+   peticion 5: origenDatosCuenta=DEGRADADO  circuito=OPEN
+   peticion 6: origenDatosCuenta=DEGRADADO  circuito=OPEN
+
+--- La respuesta degradada sigue sirviendo el historial ---
+   origenDatosCuenta: DEGRADADO
+   cuenta: None
+   movimientos entregados: 40
+
+--- Una transferencia con la dependencia caida se rechaza, no se degrada ---
+   POST /api/pagos/transferencia/101 -> HTTP 500
+   No hay version degradada de mover dinero.
+
+--- La apertura del circuito salio al topico de alertas ---
+2026-10-10T19:30:31.108Z ERROR 1 --- [clientes-service] [ntainer#1-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: ALERTA ALTA DEPENDENCIA_DEGRADADA sobre la cuenta null - El circuito hacia cuentas se abrio: las llamadas se responden degradadas sin intentar la dependencia.
+
+--- Se vuelve a levantar el contenedor ---
+ Container config-server  Waiting
+ Container discovery-server  Waiting
+ Container kafka  Waiting
+ Container kafka  Healthy
+ Container kafka-init  Starting
+ Container discovery-server  Healthy
+ Container config-server  Healthy
+ Container kafka-init  Started
+ Container discovery-server  Waiting
+ Container auth-server  Waiting
+ Container broker-artemis  Waiting
+ Container kafka-init  Waiting
+ Container config-server  Waiting
+ Container config-server  Healthy
+ Container auth-server  Healthy
+ Container broker-artemis  Healthy
+ Container discovery-server  Healthy
+ Container kafka-init  Exited
+ Container eft-banco-xyz-cuentas-service-1  Starting
+ Container eft-banco-xyz-cuentas-service-1  Started
+
+--- El circuito pasa a HALF_OPEN y se cierra solo ---
+   peticion 1: origenDatosCuenta=SERVICIO   circuito=HALF_OPEN
+   peticion 2: origenDatosCuenta=SERVICIO   circuito=HALF_OPEN
+   peticion 3: origenDatosCuenta=SERVICIO   circuito=CLOSED
+   peticion 4: origenDatosCuenta=SERVICIO   circuito=CLOSED
+   peticion 5: origenDatosCuenta=SERVICIO   circuito=CLOSED
+   peticion 6: origenDatosCuenta=SERVICIO   circuito=CLOSED
+   peticion 7: origenDatosCuenta=SERVICIO   circuito=CLOSED
+   peticion 8: origenDatosCuenta=SERVICIO   circuito=CLOSED
+
+--- Transiciones registradas por Resilience4j ---
+   2026-10-10T19:30:31 CLOSED_TO_OPEN
+   2026-10-10T19:30:41 OPEN_TO_HALF_OPEN
+   2026-10-10T19:31:53 HALF_OPEN_TO_CLOSED

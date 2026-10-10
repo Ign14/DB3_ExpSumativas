@@ -9,12 +9,7 @@ subdirectorio.
 |---|---|---|---|
 | [`local/`](local/) | Los jar, con un JDK y sin Docker | Que la **lógica del sistema** funciona y que la evidencia es reproducible en cualquier máquina | 11 logs |
 | [`docker/`](docker/) | Contenedores en el equipo de desarrollo | Que las **imágenes se construyen** y que la **orquestación** levanta el ecosistema completo | 9 logs + 6 capturas |
-| [`nube/`](nube/) | Una instancia EC2 en AWS | Que el sistema **se despliega y corre en la nube**, con los microservicios y los brokers fuera del equipo local | 7 logs + capturas |
-
-> Cada carpeta se genera con su propio script, y los tres están al final de este
-> archivo. Si alguna contiene únicamente su `LEEME.md`, esa ejecución todavía no
-> se corrió: no es que la evidencia falte, es que ese entorno no se ha levantado
-> aún.
+| [`nube/`](nube/) | Una instancia EC2 en AWS | Que el sistema **se despliega y corre en la nube**, con los microservicios y los brokers fuera del equipo local | 7 logs + 5 capturas |
 
 Si sólo va a mirar una cosa de cada carpeta:
 

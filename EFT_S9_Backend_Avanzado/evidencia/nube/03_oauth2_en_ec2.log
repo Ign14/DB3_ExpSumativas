@@ -1,0 +1,54 @@
+
+==============================================================
+  03 - OAUTH 2.0 Y CONTROL DE ACCESO, SOBRE LA INSTANCIA EC2
+==============================================================
+
+--- Token por client_credentials ---
+{
+    "access_token": "eyJraWQiOiJmNzhlNWQwMi0yOWY3LTQzNjQtOTFjNC1hNTU4MTJhOWE4ZmEiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJiYW5jby13ZWItY2xpZW50IiwiYXVkIjoiYmFuY28td2ViLWNsaWVudCIsIm5iZiI6MTc5MTY2MDU4MCwic2NvcGUiOlsiY3VlbnRhcy5yZWFkIiwibW92aW1pZW50b3Mud3JpdGUiLCJjbGllbnRlcy53cml0ZSIsIm1vdmltaWVudG9zLnJlYWQiLCJjdWVudGFzLndyaXRlIiwiY2xpZW50ZXMucmVhZCJdLCJpc3MiOiJodHRwOi8vYXV0aC1zZXJ2ZXI6OTAwMCIsImV4cCI6MTc5MTY2MjM4MCwiaWF0IjoxNzkxNjYwNTgwLCJqdGkiOiJkMGRiYWE5Ni1hYjEwLTQ2YTUtODIwNC00MmRiYTBiZTk0NWYifQ.G2pnwTX0X_uuOdQQjcaZ3kUEAC8DTe3NKdTJ5ltqjmkIdP8_TYkAYBcqiOd3xFRkSqPY0l8aLbfNIJKismuRsqUWcbg4nPZublsinLpm0okJUpm7mTA6V6tz8D8sXpmjA6is0hY05RUYYt8Y0un13VgnbJ-YmcOlYm67a_NPxAHdybgKAHGuPG6V1G6qzaZvRQuqc6flAd5xB3EwfHu5uACwkUw7snb4Zjevp5MHWDnmcxUwZZc6aB9Iw5rxe583bsH2caBCpdohBUaE9RbK5cnUJtOg0TbKZXdCTcKChC6PbHpAxmcHkHzIrspIFiPq1k5DtusRyJhqKNdP8muVMA",
+    "scope": "cuentas.read movimientos.write clientes.write movimientos.read cuentas.write clientes.read",
+    "token_type": "Bearer",
+    "expires_in": 1799
+}
+
+--- Contenido del token ---
+{
+  "aud": "banco-web-client",
+  "exp": 1791662380,
+  "iat": 1791660580,
+  "iss": "http://auth-server:9000",
+  "jti": "d7a03940-425d-4345-b5a5-2da57127a64c",
+  "nbf": 1791660580,
+  "scope": [
+    "cuentas.read",
+    "movimientos.write",
+    "clientes.write",
+    "movimientos.read",
+    "cuentas.write",
+    "clientes.read"
+  ],
+  "sub": "banco-web-client"
+}
+
+--- Sin token, el gateway rechaza antes de enrutar ---
+   GET /api/cuentas/101 sin token -> HTTP 401
+   GET /api/movimientos/101 sin token -> HTTP 401
+   GET /api/clientes/101 sin token -> HTTP 401
+
+--- Minimo privilegio por canal ---
+   CANAL      RECURSO                      HTTP
+   web        GET /api/cuentas/101         200
+   web        GET /api/movimientos/101     200
+   web        GET /api/clientes/101        200
+   movil      GET /api/cuentas/101         200
+   movil      GET /api/movimientos/101     200
+   movil      GET /api/clientes/101        200
+   cajero     GET /api/cuentas/101         200
+   cajero     GET /api/movimientos/101     403
+   cajero     GET /api/clientes/101        403
+
+   El cajero recibe 403 en movimientos y clientes con un token de firma
+   valida: la autorizacion por scope la aplica cada microservicio.
+
+--- Las primitivas de liquidacion exigen un scope que ningun canal tiene ---
+   POST /api/cuentas/101/abono con token web -> HTTP 403

@@ -1,0 +1,578 @@
+
+==============================================================
+  02 - CONSTRUCCION Y ORQUESTACION EN LA NUBE
+==============================================================
+
+--- Construccion de las imagenes dentro de la instancia ---
+
+#299 [bff-cajero build 10/21] COPY auth-server/pom.xml auth-server/
+#299 CACHED
+
+#300 [bff-cajero build  9/21] COPY discovery-server/pom.xml discovery-server/
+#300 CACHED
+
+#301 [bff-cajero build 12/21] COPY cuentas-service/pom.xml cuentas-service/
+#301 CACHED
+
+#302 [bff-cajero runtime 4/5] COPY --from=build /build/bff-cajero/target/bff-cajero.jar app.jar
+#302 DONE 0.1s
+
+#303 [bff-movil runtime 5/5] RUN groupadd --system banco     && useradd --system --gid banco --uid 1001 banco     && chown -R banco:banco /app
+#303 ...
+
+#260 [bff-web runtime 5/5] RUN groupadd --system banco     && useradd --system --gid banco --uid 1001 banco     && chown -R banco:banco /app
+#260 0.813 useradd warning: banco's uid 1001 is greater than SYS_UID_MAX 999
+#260 DONE 0.9s
+
+#304 [pagos-service runtime 5/5] RUN groupadd --system banco     && useradd --system --gid banco --uid 1001 banco     && chown -R banco:banco /app
+#304 1.039 useradd warning: banco's uid 1001 is greater than SYS_UID_MAX 999
+#304 DONE 1.1s
+
+#303 [bff-movil runtime 5/5] RUN groupadd --system banco     && useradd --system --gid banco --uid 1001 banco     && chown -R banco:banco /app
+#303 0.905 useradd warning: banco's uid 1001 is greater than SYS_UID_MAX 999
+#303 DONE 1.0s
+
+#305 [pagos-service] exporting to image
+#305 exporting layers
+#305 ...
+
+#306 [bff-web] exporting to image
+#306 exporting layers 0.6s done
+#306 writing image sha256:b70f3c9b7ddabec5c69797fb84f5d06ffd14d7a7f7646a18b7c5ae6e7183a13a done
+#306 naming to docker.io/banco-xyz/bff-web:1.0.0 0.1s done
+#306 DONE 0.6s
+
+#307 [bff-web] resolving provenance for metadata file
+#307 DONE 0.1s
+
+#308 [bff-movil] exporting to image
+#308 ...
+
+#309 [bff-cajero runtime 5/5] RUN groupadd --system banco     && useradd --system --gid banco --uid 1001 banco     && chown -R banco:banco /app
+#309 1.356 useradd warning: banco's uid 1001 is greater than SYS_UID_MAX 999
+#309 DONE 1.4s
+
+#310 [bff-cajero] exporting to image
+#310 ...
+
+#308 [bff-movil] exporting to image
+#308 exporting layers 0.7s done
+#308 writing image sha256:0206d991b1436d00b91b7b38bddc0eae103028f75a6b97197edecd37a036932d done
+#308 naming to docker.io/banco-xyz/bff-movil:1.0.0 0.0s done
+#308 DONE 0.8s
+
+#311 [bff-movil] resolving provenance for metadata file
+#311 DONE 0.1s
+
+#305 [pagos-service] exporting to image
+#305 ...
+
+#310 [bff-cajero] exporting to image
+#310 exporting layers 0.6s done
+#310 writing image sha256:c1e2768eafe93bf7164bdeca13c9431494afb8631984236a332baa09764c7f21 done
+#310 naming to docker.io/banco-xyz/bff-cajero:1.0.0 done
+#310 DONE 0.6s
+
+#312 [bff-cajero] resolving provenance for metadata file
+#312 DONE 0.1s
+
+#305 [pagos-service] exporting to image
+#305 exporting layers 1.6s done
+#305 writing image sha256:03060d8f158bc52f66c300ebbb2321439267d445438191e6b4ebb55b1a68e409 done
+#305 naming to docker.io/banco-xyz/pagos-service:1.0.0 done
+#305 DONE 1.6s
+
+#313 [pagos-service] resolving provenance for metadata file
+#313 DONE 0.0s
+
+--- Imagenes construidas ---
+REPOSITORY                   TAG       IMAGE ID       CREATED          SIZE
+banco-xyz/bff-cajero         1.0.0     c1e2768eafe9   1 second ago     384MB
+banco-xyz/bff-movil          1.0.0     0206d991b143   1 second ago     384MB
+banco-xyz/pagos-service      1.0.0     03060d8f158b   1 second ago     503MB
+banco-xyz/bff-web            1.0.0     b70f3c9b7dda   2 seconds ago    384MB
+banco-xyz/api-gateway        1.0.0     32a31842b85d   19 seconds ago   445MB
+banco-xyz/clientes-service   1.0.0     9afa7a702bd8   20 seconds ago   472MB
+banco-xyz/cuentas-service    1.0.0     21315a21b597   20 seconds ago   498MB
+banco-xyz/auth-server        1.0.0     0863ee03bb41   32 seconds ago   438MB
+banco-xyz/config-server      1.0.0     56a1a006ceaa   41 seconds ago   419MB
+banco-xyz/discovery-server   1.0.0     170de17d0379   41 seconds ago   447MB
+banco-xyz/broker-artemis     1.0.0     17260c739a82   41 seconds ago   424MB
+
+--- Levantando la orquestacion completa ---
+ kafka-init Pulling 
+ kafka Pulling 
+ 43c4264eed91 Pulling fs layer 
+ 4fb0eeeb44ea Pulling fs layer 
+ 6be5feca48e3 Pulling fs layer 
+ 0efe887b0486 Pulling fs layer 
+ c4d7b64b67a4 Pulling fs layer 
+ 60756e0c14ce Pulling fs layer 
+ 2a405d968122 Pulling fs layer 
+ bf937160a439 Pulling fs layer 
+ fef81e99f8f4 Pulling fs layer 
+ 25f62819a77f Pulling fs layer 
+ 60756e0c14ce Waiting 
+ 2a405d968122 Waiting 
+ bf937160a439 Waiting 
+ fef81e99f8f4 Waiting 
+ 25f62819a77f Waiting 
+ 0efe887b0486 Waiting 
+ c4d7b64b67a4 Waiting 
+ 43c4264eed91 Pulling fs layer 
+ 4fb0eeeb44ea Pulling fs layer 
+ 6be5feca48e3 Pulling fs layer 
+ 0efe887b0486 Pulling fs layer 
+ c4d7b64b67a4 Pulling fs layer 
+ 60756e0c14ce Pulling fs layer 
+ 2a405d968122 Pulling fs layer 
+ bf937160a439 Pulling fs layer 
+ fef81e99f8f4 Pulling fs layer 
+ 25f62819a77f Pulling fs layer 
+ 25f62819a77f Waiting 
+ 0efe887b0486 Waiting 
+ c4d7b64b67a4 Waiting 
+ 60756e0c14ce Waiting 
+ 2a405d968122 Waiting 
+ bf937160a439 Waiting 
+ fef81e99f8f4 Waiting 
+ 43c4264eed91 Downloading [>                                                  ]  50.65kB/3.624MB
+ 43c4264eed91 Downloading [>                                                  ]  50.65kB/3.624MB
+ 43c4264eed91 Verifying Checksum 
+ 43c4264eed91 Verifying Checksum 
+ 43c4264eed91 Download complete 
+ 43c4264eed91 Download complete 
+ 43c4264eed91 Extracting [>                                                  ]  65.54kB/3.624MB
+ 43c4264eed91 Extracting [>                                                  ]  65.54kB/3.624MB
+ 4fb0eeeb44ea Downloading [>                                                  ]  102.9kB/9.389MB
+ 4fb0eeeb44ea Downloading [>                                                  ]  102.9kB/9.389MB
+ 0efe887b0486 Downloading [==================================================>]     139B/139B
+ 0efe887b0486 Downloading [==================================================>]     139B/139B
+ 0efe887b0486 Verifying Checksum 
+ 0efe887b0486 Download complete 
+ 0efe887b0486 Verifying Checksum 
+ 0efe887b0486 Download complete 
+ 6be5feca48e3 Downloading [>                                                  ]  539.7kB/53.69MB
+ 6be5feca48e3 Downloading [>                                                  ]  539.7kB/53.69MB
+ 4fb0eeeb44ea Verifying Checksum 
+ 4fb0eeeb44ea Verifying Checksum 
+ 4fb0eeeb44ea Download complete 
+ 4fb0eeeb44ea Download complete 
+ 43c4264eed91 Extracting [===============>                                   ]  1.114MB/3.624MB
+ 43c4264eed91 Extracting [===============>                                   ]  1.114MB/3.624MB
+ c4d7b64b67a4 Downloading [==================================================>]  2.106kB/2.106kB
+ c4d7b64b67a4 Downloading [==================================================>]  2.106kB/2.106kB
+ c4d7b64b67a4 Verifying Checksum 
+ c4d7b64b67a4 Verifying Checksum 
+ c4d7b64b67a4 Download complete 
+ c4d7b64b67a4 Download complete 
+ 6be5feca48e3 Downloading [==========>                                        ]  11.29MB/53.69MB
+ 6be5feca48e3 Downloading [==========>                                        ]  11.29MB/53.69MB
+ 43c4264eed91 Extracting [==================================================>]  3.624MB/3.624MB
+ 60756e0c14ce Downloading [>                                                  ]  538.1kB/125MB
+ 43c4264eed91 Extracting [==================================================>]  3.624MB/3.624MB
+ 60756e0c14ce Downloading [>                                                  ]  538.1kB/125MB
+ 6be5feca48e3 Downloading [====================>                              ]  21.52MB/53.69MB
+ 6be5feca48e3 Downloading [====================>                              ]  21.52MB/53.69MB
+ 43c4264eed91 Pull complete 
+ 43c4264eed91 Pull complete 
+ 2a405d968122 Downloading [>                                                  ]  137.7kB/12.59MB
+ 2a405d968122 Downloading [>                                                  ]  137.7kB/12.59MB
+ 4fb0eeeb44ea Extracting [>                                                  ]   98.3kB/9.389MB
+ 4fb0eeeb44ea Extracting [>                                                  ]   98.3kB/9.389MB
+ 60756e0c14ce Downloading [====>                                              ]  11.33MB/125MB
+ 60756e0c14ce Downloading [====>                                              ]  11.33MB/125MB
+ 6be5feca48e3 Downloading [===========================>                       ]  29.57MB/53.69MB
+ 6be5feca48e3 Downloading [===========================>                       ]  29.57MB/53.69MB
+ 60756e0c14ce Downloading [=======>                                           ]  19.97MB/125MB
+ 2a405d968122 Downloading [======================>                            ]  5.569MB/12.59MB
+ 60756e0c14ce Downloading [=======>                                           ]  19.97MB/125MB
+ 4fb0eeeb44ea Extracting [=>                                                 ]  196.6kB/9.389MB
+ 2a405d968122 Downloading [======================>                            ]  5.569MB/12.59MB
+ 4fb0eeeb44ea Extracting [=>                                                 ]  196.6kB/9.389MB
+ 6be5feca48e3 Downloading [=================================>                 ]  35.44MB/53.69MB
+ 6be5feca48e3 Downloading [=================================>                 ]  35.44MB/53.69MB
+ 2a405d968122 Verifying Checksum 
+ 2a405d968122 Download complete 
+ 2a405d968122 Verifying Checksum 
+ 2a405d968122 Download complete 
+ 60756e0c14ce Downloading [==========>                                        ]  26.44MB/125MB
+ 60756e0c14ce Downloading [==========>                                        ]  26.44MB/125MB
+ 4fb0eeeb44ea Extracting [==>                                                ]  491.5kB/9.389MB
+ 4fb0eeeb44ea Extracting [==>                                                ]  491.5kB/9.389MB
+ 6be5feca48e3 Downloading [============================================>      ]   47.3MB/53.69MB
+ 6be5feca48e3 Downloading [============================================>      ]   47.3MB/53.69MB
+ 6be5feca48e3 Download complete 
+ 6be5feca48e3 Verifying Checksum 
+ 6be5feca48e3 Download complete 
+ 60756e0c14ce Downloading [=============>                                     ]  33.98MB/125MB
+ 60756e0c14ce Downloading [=============>                                     ]  33.98MB/125MB
+ 4fb0eeeb44ea Extracting [=========>                                         ]  1.769MB/9.389MB
+ 4fb0eeeb44ea Extracting [=========>                                         ]  1.769MB/9.389MB
+ fef81e99f8f4 Downloading [==================================================>]  2.284kB/2.284kB
+ fef81e99f8f4 Downloading [==================================================>]  2.284kB/2.284kB
+ fef81e99f8f4 Verifying Checksum 
+ fef81e99f8f4 Verifying Checksum 
+ fef81e99f8f4 Download complete 
+ fef81e99f8f4 Download complete 
+ bf937160a439 Downloading [>                                                  ]  50.65kB/4.4MB
+ bf937160a439 Downloading [>                                                  ]  50.65kB/4.4MB
+ 25f62819a77f Downloading [==================================================>]  1.574kB/1.574kB
+ 25f62819a77f Downloading [==================================================>]  1.574kB/1.574kB
+ 25f62819a77f Verifying Checksum 
+ 25f62819a77f Verifying Checksum 
+ 25f62819a77f Download complete 
+ 25f62819a77f Download complete 
+ 60756e0c14ce Downloading [=================>                                 ]  43.68MB/125MB
+ 60756e0c14ce Downloading [=================>                                 ]  43.68MB/125MB
+ 4fb0eeeb44ea Extracting [=================>                                 ]  3.342MB/9.389MB
+ 4fb0eeeb44ea Extracting [=================>                                 ]  3.342MB/9.389MB
+ bf937160a439 Verifying Checksum 
+ bf937160a439 Download complete 
+ bf937160a439 Verifying Checksum 
+ bf937160a439 Download complete 
+ 60756e0c14ce Downloading [=====================>                             ]  53.94MB/125MB
+ 60756e0c14ce Downloading [=====================>                             ]  53.94MB/125MB
+ 4fb0eeeb44ea Extracting [=============================>                     ]  5.603MB/9.389MB
+ 4fb0eeeb44ea Extracting [=============================>                     ]  5.603MB/9.389MB
+ 60756e0c14ce Downloading [=========================>                         ]  62.54MB/125MB
+ 60756e0c14ce Downloading [=========================>                         ]  62.54MB/125MB
+ 4fb0eeeb44ea Extracting [================================================>  ]  9.142MB/9.389MB
+ 4fb0eeeb44ea Extracting [================================================>  ]  9.142MB/9.389MB
+ 4fb0eeeb44ea Extracting [==================================================>]  9.389MB/9.389MB
+ 4fb0eeeb44ea Extracting [==================================================>]  9.389MB/9.389MB
+ 60756e0c14ce Downloading [==========================>                        ]  67.39MB/125MB
+ 60756e0c14ce Downloading [==========================>                        ]  67.39MB/125MB
+ 60756e0c14ce Downloading [===============================>                   ]  78.14MB/125MB
+ 4fb0eeeb44ea Pull complete 
+ 4fb0eeeb44ea Pull complete 
+ 60756e0c14ce Downloading [===============================>                   ]  78.14MB/125MB
+ 6be5feca48e3 Extracting [>                                                  ]  557.1kB/53.69MB
+ 6be5feca48e3 Extracting [>                                                  ]  557.1kB/53.69MB
+ 60756e0c14ce Downloading [====================================>              ]  90.56MB/125MB
+ 60756e0c14ce Downloading [====================================>              ]  90.56MB/125MB
+ 6be5feca48e3 Extracting [===>                                               ]  3.899MB/53.69MB
+ 6be5feca48e3 Extracting [===>                                               ]  3.899MB/53.69MB
+ 60756e0c14ce Downloading [=======================================>           ]  98.63MB/125MB
+ 60756e0c14ce Downloading [=======================================>           ]  98.63MB/125MB
+ 6be5feca48e3 Extracting [=====>                                             ]  5.571MB/53.69MB
+ 6be5feca48e3 Extracting [=====>                                             ]  5.571MB/53.69MB
+ 60756e0c14ce Downloading [===========================================>       ]  107.8MB/125MB
+ 60756e0c14ce Downloading [===========================================>       ]  107.8MB/125MB
+ 60756e0c14ce Downloading [==============================================>    ]  115.8MB/125MB
+ 60756e0c14ce Downloading [==============================================>    ]  115.8MB/125MB
+ 6be5feca48e3 Extracting [=======>                                           ]  8.356MB/53.69MB
+ 6be5feca48e3 Extracting [=======>                                           ]  8.356MB/53.69MB
+ 60756e0c14ce Downloading [=================================================> ]  123.4MB/125MB
+ 60756e0c14ce Downloading [=================================================> ]  123.4MB/125MB
+ 60756e0c14ce Verifying Checksum 
+ 60756e0c14ce Download complete 
+ 60756e0c14ce Verifying Checksum 
+ 60756e0c14ce Download complete 
+ 6be5feca48e3 Extracting [==========>                                        ]   11.7MB/53.69MB
+ 6be5feca48e3 Extracting [==========>                                        ]   11.7MB/53.69MB
+ 6be5feca48e3 Extracting [==============>                                    ]   15.6MB/53.69MB
+ 6be5feca48e3 Extracting [==============>                                    ]   15.6MB/53.69MB
+ 6be5feca48e3 Extracting [==================>                                ]  20.05MB/53.69MB
+ 6be5feca48e3 Extracting [==================>                                ]  20.05MB/53.69MB
+ 6be5feca48e3 Extracting [=====================>                             ]  22.84MB/53.69MB
+ 6be5feca48e3 Extracting [=====================>                             ]  22.84MB/53.69MB
+ 6be5feca48e3 Extracting [========================>                          ]  26.74MB/53.69MB
+ 6be5feca48e3 Extracting [========================>                          ]  26.74MB/53.69MB
+ 6be5feca48e3 Extracting [============================>                      ]  30.64MB/53.69MB
+ 6be5feca48e3 Extracting [============================>                      ]  30.64MB/53.69MB
+ 6be5feca48e3 Extracting [===============================>                   ]  33.98MB/53.69MB
+ 6be5feca48e3 Extracting [===============================>                   ]  33.98MB/53.69MB
+ 6be5feca48e3 Extracting [==================================>                ]  37.32MB/53.69MB
+ 6be5feca48e3 Extracting [==================================>                ]  37.32MB/53.69MB
+ 6be5feca48e3 Extracting [=====================================>             ]  40.67MB/53.69MB
+ 6be5feca48e3 Extracting [=====================================>             ]  40.67MB/53.69MB
+ 6be5feca48e3 Extracting [========================================>          ]  44.01MB/53.69MB
+ 6be5feca48e3 Extracting [========================================>          ]  44.01MB/53.69MB
+ 6be5feca48e3 Extracting [============================================>      ]  47.91MB/53.69MB
+ 6be5feca48e3 Extracting [============================================>      ]  47.91MB/53.69MB
+ 6be5feca48e3 Extracting [================================================>  ]  52.36MB/53.69MB
+ 6be5feca48e3 Extracting [================================================>  ]  52.36MB/53.69MB
+ 6be5feca48e3 Extracting [==================================================>]  53.69MB/53.69MB
+ 6be5feca48e3 Extracting [==================================================>]  53.69MB/53.69MB
+ 6be5feca48e3 Pull complete 
+ 6be5feca48e3 Pull complete 
+ 0efe887b0486 Extracting [==================================================>]     139B/139B
+ 0efe887b0486 Extracting [==================================================>]     139B/139B
+ 0efe887b0486 Extracting [==================================================>]     139B/139B
+ 0efe887b0486 Extracting [==================================================>]     139B/139B
+ 0efe887b0486 Pull complete 
+ 0efe887b0486 Pull complete 
+ c4d7b64b67a4 Extracting [==================================================>]  2.106kB/2.106kB
+ c4d7b64b67a4 Extracting [==================================================>]  2.106kB/2.106kB
+ c4d7b64b67a4 Extracting [==================================================>]  2.106kB/2.106kB
+ c4d7b64b67a4 Extracting [==================================================>]  2.106kB/2.106kB
+ c4d7b64b67a4 Pull complete 
+ c4d7b64b67a4 Pull complete 
+ 60756e0c14ce Extracting [>                                                  ]  557.1kB/125MB
+ 60756e0c14ce Extracting [>                                                  ]  557.1kB/125MB
+ 60756e0c14ce Extracting [==>                                                ]  5.571MB/125MB
+ 60756e0c14ce Extracting [==>                                                ]  5.571MB/125MB
+ 60756e0c14ce Extracting [======>                                            ]   15.6MB/125MB
+ 60756e0c14ce Extracting [======>                                            ]   15.6MB/125MB
+ 60756e0c14ce Extracting [==========>                                        ]  25.62MB/125MB
+ 60756e0c14ce Extracting [==========>                                        ]  25.62MB/125MB
+ 60756e0c14ce Extracting [==============>                                    ]  35.65MB/125MB
+ 60756e0c14ce Extracting [==============>                                    ]  35.65MB/125MB
+ 60756e0c14ce Extracting [==================>                                ]  46.24MB/125MB
+ 60756e0c14ce Extracting [==================>                                ]  46.24MB/125MB
+ 60756e0c14ce Extracting [======================>                            ]  55.71MB/125MB
+ 60756e0c14ce Extracting [======================>                            ]  55.71MB/125MB
+ 60756e0c14ce Extracting [==========================>                        ]   67.4MB/125MB
+ 60756e0c14ce Extracting [==========================>                        ]   67.4MB/125MB
+ 60756e0c14ce Extracting [===============================>                   ]  79.66MB/125MB
+ 60756e0c14ce Extracting [===============================>                   ]  79.66MB/125MB
+ 60756e0c14ce Extracting [====================================>              ]  91.36MB/125MB
+ 60756e0c14ce Extracting [====================================>              ]  91.36MB/125MB
+ 60756e0c14ce Extracting [========================================>          ]  101.9MB/125MB
+ 60756e0c14ce Extracting [========================================>          ]  101.9MB/125MB
+ 60756e0c14ce Extracting [============================================>      ]    112MB/125MB
+ 60756e0c14ce Extracting [============================================>      ]    112MB/125MB
+ 60756e0c14ce Extracting [=================================================> ]  122.6MB/125MB
+ 60756e0c14ce Extracting [=================================================> ]  122.6MB/125MB
+ 60756e0c14ce Extracting [==================================================>]    125MB/125MB
+ 60756e0c14ce Extracting [==================================================>]    125MB/125MB
+ 60756e0c14ce Pull complete 
+ 60756e0c14ce Pull complete 
+ 2a405d968122 Extracting [>                                                  ]  131.1kB/12.59MB
+ 2a405d968122 Extracting [>                                                  ]  131.1kB/12.59MB
+ 2a405d968122 Extracting [======>                                            ]  1.573MB/12.59MB
+ 2a405d968122 Extracting [======>                                            ]  1.573MB/12.59MB
+ 2a405d968122 Extracting [==================>                                ]  4.719MB/12.59MB
+ 2a405d968122 Extracting [==================>                                ]  4.719MB/12.59MB
+ 2a405d968122 Extracting [==================================>                ]  8.651MB/12.59MB
+ 2a405d968122 Extracting [==================================>                ]  8.651MB/12.59MB
+ 2a405d968122 Extracting [==================================================>]  12.59MB/12.59MB
+ 2a405d968122 Extracting [==================================================>]  12.59MB/12.59MB
+ 2a405d968122 Pull complete 
+ 2a405d968122 Pull complete 
+ bf937160a439 Extracting [>                                                  ]  65.54kB/4.4MB
+ bf937160a439 Extracting [>                                                  ]  65.54kB/4.4MB
+ bf937160a439 Extracting [========================>                          ]  2.163MB/4.4MB
+ bf937160a439 Extracting [========================>                          ]  2.163MB/4.4MB
+ bf937160a439 Extracting [==================================================>]    4.4MB/4.4MB
+ bf937160a439 Extracting [==================================================>]    4.4MB/4.4MB
+ bf937160a439 Pull complete 
+ bf937160a439 Pull complete 
+ fef81e99f8f4 Extracting [==================================================>]  2.284kB/2.284kB
+ fef81e99f8f4 Extracting [==================================================>]  2.284kB/2.284kB
+ fef81e99f8f4 Extracting [==================================================>]  2.284kB/2.284kB
+ fef81e99f8f4 Extracting [==================================================>]  2.284kB/2.284kB
+ fef81e99f8f4 Pull complete 
+ fef81e99f8f4 Pull complete 
+ 25f62819a77f Extracting [==================================================>]  1.574kB/1.574kB
+ 25f62819a77f Extracting [==================================================>]  1.574kB/1.574kB
+ 25f62819a77f Extracting [==================================================>]  1.574kB/1.574kB
+ 25f62819a77f Extracting [==================================================>]  1.574kB/1.574kB
+ 25f62819a77f Pull complete 
+ 25f62819a77f Pull complete 
+ kafka-init Pulled 
+ kafka Pulled 
+ Network eft-banco-xyz_banco  Creating
+ Network eft-banco-xyz_banco  Created
+ Container broker-artemis  Creating
+ Container discovery-server  Creating
+ Container config-server  Creating
+ Container kafka  Creating
+ Container config-server  Created
+ Container discovery-server  Created
+ Container auth-server  Creating
+ Container broker-artemis  Created
+ Container kafka  Created
+ Container kafka-init  Creating
+ Container auth-server  Created
+ Container api-gateway  Creating
+ Container kafka-init  Created
+ Container eft-banco-xyz-cuentas-service-1  Creating
+ Container eft-banco-xyz-clientes-service-1  Creating
+ Container api-gateway  Created
+ Container eft-banco-xyz-pagos-service-1  Creating
+ Container bff-movil  Creating
+ Container bff-cajero  Creating
+ Container bff-web  Creating
+ Container eft-banco-xyz-cuentas-service-1  Created
+ Container eft-banco-xyz-clientes-service-1  Created
+ Container eft-banco-xyz-pagos-service-1  Created
+ Container bff-cajero  Created
+ Container bff-movil  Created
+ Container bff-web  Created
+ Container config-server  Starting
+ Container broker-artemis  Starting
+ Container kafka  Starting
+ Container discovery-server  Starting
+ Container discovery-server  Started
+ Container config-server  Started
+ Container discovery-server  Waiting
+ Container config-server  Waiting
+ Container kafka  Started
+ Container kafka  Waiting
+ Container broker-artemis  Started
+ Container config-server  Healthy
+ Container kafka  Healthy
+ Container kafka-init  Starting
+ Container kafka-init  Started
+ Container discovery-server  Healthy
+ Container auth-server  Starting
+ Container auth-server  Started
+ Container config-server  Waiting
+ Container discovery-server  Waiting
+ Container auth-server  Waiting
+ Container discovery-server  Waiting
+ Container auth-server  Waiting
+ Container kafka-init  Waiting
+ Container config-server  Waiting
+ Container discovery-server  Waiting
+ Container auth-server  Waiting
+ Container broker-artemis  Waiting
+ Container kafka-init  Waiting
+ Container config-server  Waiting
+ Container broker-artemis  Healthy
+ Container config-server  Healthy
+ Container config-server  Healthy
+ Container config-server  Healthy
+ Container discovery-server  Healthy
+ Container discovery-server  Healthy
+ Container discovery-server  Healthy
+ Container kafka-init  Exited
+ Container kafka-init  Exited
+ Container auth-server  Healthy
+ Container eft-banco-xyz-cuentas-service-1  Starting
+ Container auth-server  Healthy
+ Container api-gateway  Starting
+ Container auth-server  Healthy
+ Container eft-banco-xyz-clientes-service-1  Starting
+ Container eft-banco-xyz-clientes-service-1  Started
+ Container api-gateway  Started
+ Container config-server  Waiting
+ Container discovery-server  Waiting
+ Container auth-server  Waiting
+ Container broker-artemis  Waiting
+ Container api-gateway  Waiting
+ Container kafka-init  Waiting
+ Container api-gateway  Waiting
+ Container api-gateway  Waiting
+ Container api-gateway  Waiting
+ Container eft-banco-xyz-cuentas-service-1  Started
+ Container auth-server  Healthy
+ Container broker-artemis  Healthy
+ Container config-server  Healthy
+ Container discovery-server  Healthy
+ Container kafka-init  Exited
+ Container api-gateway  Healthy
+ Container bff-web  Starting
+ Container api-gateway  Healthy
+ Container eft-banco-xyz-pagos-service-1  Starting
+ Container api-gateway  Healthy
+ Container bff-movil  Starting
+ Container api-gateway  Healthy
+ Container bff-cajero  Starting
+ Container eft-banco-xyz-pagos-service-1  Started
+ Container bff-cajero  Started
+ Container bff-movil  Started
+ Container bff-web  Started
+
+--- Esperando a que todos reporten healthy ---
+   intento 1: 8 de 12 contenedores healthy
+   intento 2: 8 de 12 contenedores healthy
+   intento 3: 8 de 12 contenedores healthy
+   intento 4: 11 de 12 contenedores healthy
+   intento 5: 12 de 12 contenedores healthy
+
+--- El gateway enrutando hacia cada microservicio ---
+Estar healthy no es lo mismo que ser alcanzable por el gateway: el
+gateway enruta con su copia del registro de Eureka, y hasta refrescarla
+responde 503. Se pregunta por una ruta de cada microservicio hasta que
+conteste 200.
+
+   cuentas-service    enrutando tras 1s
+   pagos-service      enrutando tras 5s
+   clientes-service   enrutando tras 1s
+
+--- La cadena pagos-service -> cuentas-service, lista ---
+Que el gateway alcance a pagos-service no implica que pagos-service
+alcance a cuentas-service: esa llamada es servicio a servicio, con su
+propio balanceador sobre Eureka, y converge despues. La ficha de la
+cuenta es la sonda exacta, porque la compone pagos-service llamando a
+cuentas-service: mientras esa pata no este lista responde
+origenDatosCuenta=DEGRADADO.
+
+   origenDatosCuenta=SERVICIO tras 1s: la cadena interna ya resuelve
+
+--- docker compose ps ---
+NAME                               IMAGE                              COMMAND                  SERVICE            CREATED         STATUS                        PORTS
+api-gateway                        banco-xyz/api-gateway:1.0.0        "java -XX:MaxRAMPerc…"   api-gateway        3 minutes ago   Up 2 minutes (healthy)        0.0.0.0:8080->8080/tcp, :::8080->8080/tcp
+auth-server                        banco-xyz/auth-server:1.0.0        "java -XX:MaxRAMPerc…"   auth-server        3 minutes ago   Up 2 minutes (healthy)        0.0.0.0:9000->9000/tcp, :::9000->9000/tcp
+bff-cajero                         banco-xyz/bff-cajero:1.0.0         "java -XX:MaxRAMPerc…"   bff-cajero         3 minutes ago   Up About a minute (healthy)   0.0.0.0:8093->8093/tcp, :::8093->8093/tcp
+bff-movil                          banco-xyz/bff-movil:1.0.0          "java -XX:MaxRAMPerc…"   bff-movil          3 minutes ago   Up About a minute (healthy)   0.0.0.0:8092->8092/tcp, :::8092->8092/tcp
+bff-web                            banco-xyz/bff-web:1.0.0            "java -XX:MaxRAMPerc…"   bff-web            3 minutes ago   Up About a minute (healthy)   0.0.0.0:8091->8091/tcp, :::8091->8091/tcp
+broker-artemis                     banco-xyz/broker-artemis:1.0.0     "java -XX:MaxRAMPerc…"   broker-artemis     3 minutes ago   Up 3 minutes (healthy)        0.0.0.0:61617->61617/tcp, :::61617->61617/tcp
+config-server                      banco-xyz/config-server:1.0.0      "java -XX:MaxRAMPerc…"   config-server      3 minutes ago   Up 3 minutes (healthy)        0.0.0.0:8888->8888/tcp, :::8888->8888/tcp
+discovery-server                   banco-xyz/discovery-server:1.0.0   "java -XX:MaxRAMPerc…"   discovery-server   3 minutes ago   Up 3 minutes (healthy)        0.0.0.0:8761->8761/tcp, :::8761->8761/tcp
+eft-banco-xyz-clientes-service-1   banco-xyz/clientes-service:1.0.0   "java -XX:MaxRAMPerc…"   clientes-service   3 minutes ago   Up 2 minutes (healthy)        
+eft-banco-xyz-cuentas-service-1    banco-xyz/cuentas-service:1.0.0    "java -XX:MaxRAMPerc…"   cuentas-service    3 minutes ago   Up 2 minutes (healthy)        
+eft-banco-xyz-pagos-service-1      banco-xyz/pagos-service:1.0.0      "java -XX:MaxRAMPerc…"   pagos-service      3 minutes ago   Up About a minute (healthy)   
+kafka                              apache/kafka:3.8.1                 "/__cacert_entrypoin…"   kafka              3 minutes ago   Up 3 minutes (healthy)        0.0.0.0:9092->9092/tcp, :::9092->9092/tcp
+
+--- El contenedor de un solo uso que crea los topicos de Kafka ---
+kafka-init  | WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+kafka-init  | Created topic banco.transacciones-completadas.
+kafka-init  | WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+kafka-init  | Created topic banco.alertas-seguridad.
+kafka-init  | >> kafka-init: topicos creados
+kafka-init  | Topic: banco.transacciones-completadas	TopicId: tSZzCKcxTf-RNp0t6_8zPw	PartitionCount: 3	ReplicationFactor: 1	Configs: 
+kafka-init  | 	Topic: banco.transacciones-completadas	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+kafka-init  | 	Topic: banco.transacciones-completadas	Partition: 1	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+kafka-init  | 	Topic: banco.transacciones-completadas	Partition: 2	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+kafka-init  | Topic: banco.alertas-seguridad	TopicId: kTtFgJJDRf-kr47-o0rKoQ	PartitionCount: 3	ReplicationFactor: 1	Configs: 
+kafka-init  | 	Topic: banco.alertas-seguridad	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+kafka-init  | 	Topic: banco.alertas-seguridad	Partition: 1	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+kafka-init  | 	Topic: banco.alertas-seguridad	Partition: 2	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+kafka-init  | >> kafka-init: listo
+
+--- Consumo de recursos de la instancia con todo arriba ---
+NAME                               CPU %     MEM USAGE / LIMIT   MEM %
+bff-cajero                         0.18%     142.5MiB / 384MiB   37.10%
+bff-movil                          5.68%     142.5MiB / 384MiB   37.12%
+eft-banco-xyz-pagos-service-1      1.88%     263.5MiB / 512MiB   51.46%
+bff-web                            5.27%     140.1MiB / 384MiB   36.48%
+eft-banco-xyz-cuentas-service-1    0.56%     238.8MiB / 512MiB   46.64%
+eft-banco-xyz-clientes-service-1   2.12%     213.9MiB / 512MiB   41.78%
+api-gateway                        5.23%     242.1MiB / 448MiB   54.04%
+auth-server                        0.10%     207.1MiB / 448MiB   46.22%
+kafka                              1.89%     319MiB / 1.172GiB   26.58%
+discovery-server                   29.14%    210.4MiB / 448MiB   46.97%
+broker-artemis                     0.45%     182.2MiB / 512MiB   35.58%
+config-server                      0.12%     166.6MiB / 448MiB   37.19%
+
+                  total        used        free      shared  buff/cache   available
+   Mem:           7.6Gi       2.9Gi       272Mi       1.0Mi       4.5Gi       4.5Gi
+   Swap:             0B          0B          0B
+
+--- La red privada de la orquestacion ---
+NETWORK ID     NAME                  DRIVER    SCOPE
+e71dc2ad58f3   eft-banco-xyz_banco   bridge    local
+bff-cajero 172.18.0.11/16
+eft-banco-xyz-pagos-service-1 172.18.0.10/16
+eft-banco-xyz-clientes-service-1 172.18.0.6/16
+api-gateway 172.18.0.9/16
+kafka 172.18.0.5/16
+auth-server 172.18.0.7/16
+eft-banco-xyz-cuentas-service-1 172.18.0.8/16
+config-server 172.18.0.3/16
+bff-movil 172.18.0.12/16
+broker-artemis 172.18.0.4/16
+bff-web 172.18.0.13/16
+discovery-server 172.18.0.2/16
+
+
+--- Servicios registrados en Eureka, consultado dentro de la red ---
+   API-GATEWAY : 1 instancia(s)
+   AUTH-SERVER : 1 instancia(s)
+   CLIENTES-SERVICE : 1 instancia(s)
+   CUENTAS-SERVICE : 1 instancia(s)
+   PAGOS-SERVICE : 1 instancia(s)
