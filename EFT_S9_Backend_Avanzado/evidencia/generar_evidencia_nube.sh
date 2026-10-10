@@ -91,6 +91,39 @@ esperar_sanos() {
 }
 
 # --------------------------------------------------------------------------
+# 00 - Negarse a correr fuera de EC2
+# --------------------------------------------------------------------------
+# Esta comprobacion existe porque la alternativa ya ocurrio: el script se lanzo
+# por accidente en el equipo de desarrollo -una sesion SSH que se corto y dejo
+# las lineas siguientes en la terminal local- y genero siete registros
+# titulados "en EC2" sobre un portatil, con los metadatos en "(no disponible)"
+# y el disco montado en C:/Program Files/Git. Evidencia que afirma algo que no
+# ocurrio es peor que no tener evidencia, asi que el script se niega a producir
+# nada si no esta dentro de una instancia.
+ID_INSTANCIA=$(meta instance-id)
+if [[ -z "$ID_INSTANCIA" || "$ID_INSTANCIA" == "(no disponible)" ]]; then
+    echo
+    echo "=============================================================="
+    echo "  ESTO NO ES UNA INSTANCIA EC2. No se genera evidencia."
+    echo "=============================================================="
+    echo
+    echo "El servicio de metadatos de AWS (169.254.169.254) no responde, asi"
+    echo "que esta maquina no es una instancia de EC2. Los registros que este"
+    echo "script produce se titulan 'en EC2' y afirman cosas sobre una"
+    echo "instancia: generarlos aca seria documentar algo que no paso."
+    echo
+    echo "Si buscaba la evidencia sobre contenedores en su propio equipo, el"
+    echo "script es evidencia/generar_evidencia_docker.ps1."
+    echo
+    echo "Si esta intentando correrlo en una instancia y ve este mensaje, lo"
+    echo "mas probable es que la sesion SSH se haya cerrado y el comando se"
+    echo "haya ejecutado en la terminal local. Compruebe con 'hostname' donde"
+    echo "esta parado antes de volver a lanzarlo."
+    echo
+    exit 1
+fi
+
+# --------------------------------------------------------------------------
 # 01 - La instancia
 # --------------------------------------------------------------------------
 {
