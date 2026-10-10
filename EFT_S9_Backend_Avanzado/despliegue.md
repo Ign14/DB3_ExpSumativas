@@ -997,8 +997,8 @@ producción y no se ejecutó.
 Esta sección es distinta: es el despliegue **que se hizo**, y la evidencia está
 en [`evidencia/nube/`](evidencia/nube/). El sistema completo —los tres
 microservicios, los tres BFF, la infraestructura de Spring Cloud y los dos
-brokers de mensajería— corriendo en una instancia EC2, construido ahí mismo
-desde el código fuente.
+brokers de mensajería— corriendo en una instancia EC2 de un **AWS Academy
+Learner Lab**, construido ahí mismo desde el código fuente.
 
 No es la arquitectura de producción y no pretende serlo: todo vive en una
 máquina y en una zona de disponibilidad. Lo que demuestra es que el sistema se
@@ -1007,8 +1007,9 @@ sección 0 dejaba abierta.
 
 **Costo.** Una `t3.large` cuesta 0,083 USD por hora en `us-east-1`. El
 procedimiento completo toma entre una y dos horas, así que son menos de veinte
-centavos de dólar. EC2 se cobra por hora encendida, no por mes, y por eso el
-último paso de esta sección —terminar la instancia— no es opcional.
+centavos de dólar, que salen del presupuesto de 50 USD del laboratorio. EC2 se
+cobra por hora encendida, no por mes, y por eso el último paso de esta sección
+—terminar la instancia— no es opcional.
 
 ### 11.1 Por qué una `t3.large` y no algo más chico
 
@@ -1023,22 +1024,61 @@ La `t3.large` (2 vCPU, 8 GB) es la más chica donde esto entra con holgura. Las 
 vCPU hacen que la construcción de las imágenes tarde entre diez y quince
 minutos; es el paso más lento de todo el procedimiento.
 
-### 11.2 Preparar la instancia
+### 11.2 El entorno: AWS Academy Learner Lab
 
-Desde el equipo local, con el AWS CLI configurado:
+El despliegue se hizo sobre un **AWS Academy Learner Lab**, que es una cuenta de
+AWS real con restricciones. Importan cinco, y las cinco están satisfechas por lo
+que este despliegue necesita:
+
+| Restricción del Learner Lab | Lo que este despliegue usa |
+|---|---|
+| Tipos de instancia hasta tamaño `large` | `t3.large` |
+| Regiones `us-east-1` y `us-west-2` | `us-east-1` |
+| Volúmenes de hasta 100 GB, `gp2`/`gp3`/`sc1`/`standard` | 40 GB `gp3` |
+| No se pueden crear usuarios ni roles de IAM | no hace falta ninguno |
+| Credenciales temporales, sesión de cuatro horas | el procedimiento toma entre una y hora y media |
+
+Dos diferencias de operación respecto de una cuenta propia. La primera: las
+credenciales vienen con un **token de sesión** que caduca al cerrar el
+laboratorio, así que hay que copiarlas al empezar y volver a copiarlas si la
+sesión se renueva. La segunda: el laboratorio trae un **par de llaves ya creado**
+—`vockey`, disponible sólo en `us-east-1`—, de modo que no se crea uno nuevo.
+
+En una cuenta propia el procedimiento es el mismo cambiando esas dos cosas: las
+credenciales van con `aws configure` sin token, y el par de llaves se crea con
+`aws ec2 create-key-pair`.
+
+**Credenciales.** En el laboratorio, botón *AWS Details* → *AWS CLI: Show*. Eso
+entrega un bloque con tres valores que va tal cual en `~/.aws/credentials`:
+
+```ini
+[default]
+aws_access_key_id=...
+aws_secret_access_key=...
+aws_session_token=...
+```
+
+Y la llave: *AWS Details* → *Download PEM*, que baja `labsuser.pem`.
+
+Comprobar antes de seguir:
 
 ```bash
 export AWS_REGION=us-east-1
 export PROYECTO=banco-xyz
+export LLAVE=~/labsuser.pem          # donde haya quedado el .pem descargado
+chmod 400 "$LLAVE"
 
-# Par de llaves para entrar por SSH. Si ya tiene uno, salte este paso y use su
-# nombre y su archivo .pem.
-aws ec2 create-key-pair --key-name $PROYECTO-llave \
-  --query 'KeyMaterial' --output text > $PROYECTO-llave.pem
-chmod 400 $PROYECTO-llave.pem          # en Windows no hace falta
+aws sts get-caller-identity
+```
 
-# Grupo de seguridad: sólo desde SU IP, no desde todo internet. Dejar el 22
-# abierto al mundo en una instancia con Docker es cómo se pierden instancias.
+Tiene que devolver la cuenta del laboratorio. Si responde que el token expiró,
+el laboratorio se cerró: hay que volver a abrirlo y copiar las credenciales de
+nuevo.
+
+**Grupo de seguridad.** Sólo desde su IP, no desde todo internet. Dejar el 22
+abierto al mundo en una instancia con Docker es cómo se pierden instancias:
+
+```bash
 export MI_IP=$(curl -s ifconfig.me)
 export SG=$(aws ec2 create-security-group --group-name $PROYECTO-ec2 \
   --description "EFT Banco XYZ" --query GroupId --output text)
@@ -1047,14 +1087,30 @@ for puerto in 22 8080 8761 9000 8091 8092 8093; do
   aws ec2 authorize-security-group-ingress --group-id $SG \
     --protocol tcp --port $puerto --cidr $MI_IP/32
 done
+echo "grupo $SG abierto para $MI_IP"
+```
 
-# La AMI más reciente de Amazon Linux 2023
+**La AMI.** Amazon Linux 2023, que es una de las imágenes provistas por Amazon
+—las únicas que el laboratorio permite—:
+
+```bash
 export AMI=$(aws ssm get-parameter \
   --name /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64 \
   --query 'Parameter.Value' --output text)
+echo "AMI $AMI"
 ```
 
-Lanzar la instancia con un `user-data` que deje Docker y el plugin de Compose
+Si el laboratorio no diera acceso a Systems Manager, el mismo identificador sale
+preguntándole a EC2:
+
+```bash
+export AMI=$(aws ec2 describe-images --owners amazon \
+  --filters 'Name=name,Values=al2023-ami-2023.*-kernel-6.1-x86_64' \
+            'Name=state,Values=available' \
+  --query 'sort_by(Images,&CreationDate)[-1].ImageId' --output text)
+```
+
+**La instancia**, con un `user-data` que deja Docker y el plugin de Compose
 instalados antes de que usted entre:
 
 ```bash
@@ -1066,7 +1122,8 @@ systemctl enable --now docker
 usermod -aG docker ec2-user
 # El plugin de Compose no está en los repositorios de Amazon Linux 2023
 mkdir -p /usr/local/lib/docker/cli-plugins
-curl -SL https://github.com/docker/compose/releases/download/v2.29.7/docker-compose-linux-x86_64   -o /usr/local/lib/docker/cli-plugins/docker-compose
+curl -SL https://github.com/docker/compose/releases/download/v2.29.7/docker-compose-linux-x86_64 \
+  -o /usr/local/lib/docker/cli-plugins/docker-compose
 chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
 echo "listo" > /home/ec2-user/ARRANQUE_COMPLETO
 SCRIPT
@@ -1074,7 +1131,7 @@ SCRIPT
 export INSTANCIA=$(aws ec2 run-instances \
   --image-id $AMI \
   --instance-type t3.large \
-  --key-name $PROYECTO-llave \
+  --key-name vockey \
   --security-group-ids $SG \
   --block-device-mappings 'DeviceName=/dev/xvda,Ebs={VolumeSize=40,VolumeType=gp3}' \
   --user-data file://arranque.sh \
@@ -1093,6 +1150,9 @@ descarga el repositorio de Maven dentro de la imagen, y entre eso, las capas
 intermedias y las once imágenes finales, los 8 GB por defecto se agotan a mitad
 del `build`.
 
+Conviene anotar el identificador de la instancia en algún lado. Es lo único que
+hace falta para apagarla si algo sale mal y se pierde la terminal.
+
 ### 11.3 Subir el proyecto
 
 Se sube un tar del proyecto en vez de clonar el repositorio. Es más simple
@@ -1104,11 +1164,11 @@ corre allá es exactamente lo que hay acá.
 tar czf eft.tgz --exclude='target' --exclude='.git' EFT_S9_Backend_Avanzado
 
 # Esperar a que el user-data termine (la primera vez tarda un par de minutos)
-ssh -i $PROYECTO-llave.pem -o StrictHostKeyChecking=accept-new ec2-user@$IP \
+ssh -i "$LLAVE" -o StrictHostKeyChecking=accept-new ec2-user@$IP \
   'until [ -f ~/ARRANQUE_COMPLETO ]; do echo esperando...; sleep 10; done; docker --version; docker compose version'
 
-scp -i $PROYECTO-llave.pem eft.tgz ec2-user@$IP:~/
-ssh -i $PROYECTO-llave.pem ec2-user@$IP 'tar xzf eft.tgz && rm eft.tgz && ls EFT_S9_Backend_Avanzado'
+scp -i "$LLAVE" eft.tgz ec2-user@$IP:~/
+ssh -i "$LLAVE" ec2-user@$IP 'tar xzf eft.tgz && rm eft.tgz && ls EFT_S9_Backend_Avanzado'
 ```
 
 ### 11.4 Construir, levantar y capturar
@@ -1116,7 +1176,7 @@ ssh -i $PROYECTO-llave.pem ec2-user@$IP 'tar xzf eft.tgz && rm eft.tgz && ls EFT
 Todo lo demás ocurre dentro de la instancia:
 
 ```bash
-ssh -i $PROYECTO-llave.pem ec2-user@$IP
+ssh -i "$LLAVE" ec2-user@$IP
 cd EFT_S9_Backend_Avanzado
 
 # Un solo comando: construye las once imágenes, levanta los trece contenedores,
@@ -1137,27 +1197,31 @@ las capturas que lista [`evidencia/nube/LEEME.md`](evidencia/nube/LEEME.md).
 
 ```bash
 # Desde el equipo local
-scp -i $PROYECTO-llave.pem -r ec2-user@$IP:~/EFT_S9_Backend_Avanzado/evidencia/nube/*.log \
+scp -i "$LLAVE" -r ec2-user@$IP:~/EFT_S9_Backend_Avanzado/evidencia/nube/*.log \
   EFT_S9_Backend_Avanzado/evidencia/nube/
 ls EFT_S9_Backend_Avanzado/evidencia/nube/
 ```
 
 ### 11.6 Terminar la instancia
 
-**Este paso no es opcional.** Una instancia olvidada es la forma más común de
-que una demostración de veinte centavos termine costando treinta dólares al mes.
+**Este paso no es opcional**, y en un Learner Lab tampoco es automático. Al
+cerrar la sesión el laboratorio *detiene* las instancias, no las elimina: una
+instancia detenida deja de cobrar cómputo, pero su volumen sigue descontando del
+presupuesto de 50 USD, y al reabrir el laboratorio vuelve a encenderse con otra
+IP pública. Terminarla a mano es lo que cierra la cuenta de verdad.
 
 ```bash
 aws ec2 terminate-instances --instance-ids $INSTANCIA
 aws ec2 wait instance-terminated --instance-ids $INSTANCIA
 
-# Y la limpieza de lo demás, que no cuesta nada pero tampoco sirve de nada
+# Y la limpieza de lo demas, que no cuesta nada pero tampoco sirve de nada.
+# El par de llaves NO se borra: vockey lo provee el laboratorio y lo comparten
+# todas sus sesiones.
 aws ec2 delete-security-group --group-id $SG
-aws ec2 delete-key-pair --key-name $PROYECTO-llave
-rm -f $PROYECTO-llave.pem arranque.sh eft.tgz
+rm -f arranque.sh eft.tgz
 ```
 
-Comprobar que no quedó nada encendido:
+Comprobar que no quedó nada encendido **ni detenido**:
 
 ```bash
 aws ec2 describe-instances \
