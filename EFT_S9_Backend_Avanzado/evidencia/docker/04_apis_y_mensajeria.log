@@ -46,19 +46,42 @@
     "saldoResultante": 4750,
     "aprobado": true,
     "motivoRechazo": null,
-    "eventoId": "1f60243f-08f3-461d-8835-f1d89da9e45e",
+    "eventoId": "81672af1-678c-4bf0-bea7-2e31dc849e08",
     "eventoPublicado": true
 }
+   HTTP 200 EN 0.596559s
 
 --- Estado despues: el saldo bajo en un contenedor y el historial subio en otro ---
    saldo:       5000 -> 4750
    movimientos: 37 -> 38
 
 --- Deposito por el canal web (Kafka) ---
-(sin respuesta)
+{
+    "operacionId": "9fc78da2-d670-42a5-bd80-0d4ba0e9841f",
+    "tipoOperacion": "DEPOSITO",
+    "cuentaOrigen": 101,
+    "cuentaDestino": 101,
+    "monto": 1200,
+    "saldoResultante": 5950,
+    "aprobada": true,
+    "motivoRechazo": null,
+    "eventoPublicado": true
+}
+   HTTP 200 EN 0.482605s
 
 --- Transferencia de la cuenta 101 a la 102 (Kafka) ---
-(sin respuesta)
+{
+    "operacionId": "1fa309b5-4c18-4fc9-91ca-5ca05d35e910",
+    "tipoOperacion": "TRANSFERENCIA",
+    "cuentaOrigen": 101,
+    "cuentaDestino": 102,
+    "monto": 300,
+    "saldoResultante": 5650,
+    "aprobada": true,
+    "motivoRechazo": null,
+    "eventoPublicado": true
+}
+   HTTP 200 EN 0.063776s
 
 --- Intento de retiro sobre el limite: genera alerta, no transaccion ---
 {
@@ -70,6 +93,7 @@
     "eventoId": null,
     "eventoPublicado": false
 }
+   HTTP 200 EN 0.034372s
 
 --- Perfil del cliente 101: la actividad la trajo Kafka ---
 {
@@ -79,9 +103,9 @@
     "edad": 40,
     "tipoCuentaPrincipal": "prestamo",
     "saldoReferencial": 5000,
-    "operacionesRegistradas": 1,
+    "operacionesRegistradas": 3,
     "alertasRegistradas": 1,
-    "ultimaOperacion": "RETIRO de 250 el 2026-10-10"
+    "ultimaOperacion": "TRANSFERENCIA de 300 el 2026-10-10"
 }
 
 --- Perfil del cliente 102: recibio el abono de la transferencia ---
@@ -92,21 +116,21 @@
     "edad": 40,
     "tipoCuentaPrincipal": "ahorro",
     "saldoReferencial": 10000,
-    "operacionesRegistradas": 0,
+    "operacionesRegistradas": 1,
     "alertasRegistradas": 0,
-    "ultimaOperacion": null
+    "ultimaOperacion": "TRANSFERENCIA de 300 el 2026-10-10"
 }
 
 --- Topicos de Kafka en el broker ---
-Topic: banco.alertas-seguridad	TopicId: cYnNEN8FS4CdgG0Hamk7Kw	PartitionCount: 3	ReplicationFactor: 1	Configs: 
+Topic: banco.alertas-seguridad	TopicId: COjWK-k4Riqyo7ZZbNaaXA	PartitionCount: 3	ReplicationFactor: 1	Configs: 
 	Topic: banco.alertas-seguridad	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
 	Topic: banco.alertas-seguridad	Partition: 1	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
 	Topic: banco.alertas-seguridad	Partition: 2	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
-Topic: banco.transacciones-completadas	TopicId: _ClB61jPSp-DP5UJXWn_BQ	PartitionCount: 3	ReplicationFactor: 1	Configs: 
+Topic: banco.transacciones-completadas	TopicId: oXuwEd1dRBiYqfPcuNWabA	PartitionCount: 3	ReplicationFactor: 1	Configs: 
 	Topic: banco.transacciones-completadas	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
 	Topic: banco.transacciones-completadas	Partition: 1	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
 	Topic: banco.transacciones-completadas	Partition: 2	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
-Topic: __consumer_offsets	TopicId: J2FgfQIsQqGImHrxotBtvg	PartitionCount: 50	ReplicationFactor: 1	Configs: compression.type=producer,cleanup.policy=compact,segment.bytes=104857600
+Topic: __consumer_offsets	TopicId: MAaSuVsORlGWzCsVdIFY8w	PartitionCount: 50	ReplicationFactor: 1	Configs: compression.type=producer,cleanup.policy=compact,segment.bytes=104857600
 	Topic: __consumer_offsets	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
 	Topic: __consumer_offsets	Partition: 1	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
 	Topic: __consumer_offsets	Partition: 2	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
@@ -161,17 +185,25 @@ Topic: __consumer_offsets	TopicId: J2FgfQIsQqGImHrxotBtvg	PartitionCount: 50	Rep
 --- Lo que publicaron y consumieron los contenedores ---
 -- cuentas-service (productor)
 
-2026-10-10T16:32:03.257Z  INFO 1 --- [cuentas-service] [nio-8081-exec-3] c.d.b.c.mensajeria.PublicadorRetiros     : >> cuentas-service: evento 1f60243f-08f3-461d-8835-f1d89da9e45e publicado en la cola 
+2026-10-10T17:39:36.576Z  INFO 1 --- [cuentas-service] [nio-8081-exec-3] c.d.b.c.mensajeria.PublicadorRetiros     : >> cuentas-service: evento 81672af1-678c-4bf0-bea7-2e31dc849e08 publicado en la cola 
 banco.retiros (cuenta 101, monto 250)
-2026-10-10T16:32:03.772Z  INFO 1 --- [cuentas-service] [nio-8081-exec-3] c.d.b.c.m.PublicadorEventosKafka         : >> cuentas-service: evento 1f60243f-08f3-461d-8835-f1d89da9e45e publicado en el topico 
+2026-10-10T17:39:37.090Z  INFO 1 --- [cuentas-service] [nio-8081-exec-3] c.d.b.c.m.PublicadorEventosKafka         : >> cuentas-service: evento 81672af1-678c-4bf0-bea7-2e31dc849e08 publicado en el topico 
 banco.transacciones-completadas (RETIRO de 250 en la cuenta 101)
 -- pagos-service (consumidor JMS y productor Kafka)
-2026-10-10T16:32:03.267Z  INFO 1 --- [pagos-service] [ntContainer#0-1] c.d.b.p.mensajeria.ConsumidorRetiros     : >> pagos-service: evento 1f60243f-08f3-461d-8835-f1d89da9e45e consumido, retiro de 250 
+2026-10-10T17:39:36.587Z  INFO 1 --- [pagos-service] [ntContainer#0-1] c.d.b.p.mensajeria.ConsumidorRetiros     : >> pagos-service: evento 81672af1-678c-4bf0-bea7-2e31dc849e08 consumido, retiro de 250 
 agregado al historial de la cuenta 101
+2026-10-10T17:39:43.747Z  INFO 1 --- [pagos-service] [nio-8082-exec-2] c.d.b.p.m.PublicadorEventosKafka         : >> pagos-service: evento 9fc78da2-d670-42a5-bd80-0d4ba0e9841f publicado en 
+banco.transacciones-completadas (DEPOSITO de 1200 de la cuenta 101 a la 101)
+2026-10-10T17:39:43.904Z  INFO 1 --- [pagos-service] [nio-8082-exec-3] c.d.b.p.m.PublicadorEventosKafka         : >> pagos-service: evento 1fa309b5-4c18-4fc9-91ca-5ca05d35e910 publicado en 
+banco.transacciones-completadas (TRANSFERENCIA de 300 de la cuenta 101 a la 102)
 -- clientes-service (consumidor Kafka)
-2026-10-10T16:32:03.787Z  INFO 1 --- [clientes-service] [ntainer#0-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: evento 1f60243f-08f3-461d-8835-f1d89da9e45e de Kafka anotado - RETIRO 
+2026-10-10T17:39:37.102Z  INFO 1 --- [clientes-service] [ntainer#0-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: evento 81672af1-678c-4bf0-bea7-2e31dc849e08 de Kafka anotado - RETIRO 
 sobre cuenta origen 101 y destino null
-2026-10-10T16:32:15.687Z  WARN 1 --- [clientes-service] [ntainer#1-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: alerta RETIRO_SOBRE_LIMITE (MEDIA) sobre la cuenta 101 - Intento de 
+2026-10-10T17:39:43.743Z  INFO 1 --- [clientes-service] [ntainer#0-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: evento 9fc78da2-d670-42a5-bd80-0d4ba0e9841f de Kafka anotado - 
+DEPOSITO sobre cuenta origen 101 y destino 101
+2026-10-10T17:39:43.905Z  INFO 1 --- [clientes-service] [ntainer#0-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: evento 1fa309b5-4c18-4fc9-91ca-5ca05d35e910 de Kafka anotado - 
+TRANSFERENCIA sobre cuenta origen 101 y destino 102
+2026-10-10T17:39:44.050Z  WARN 1 --- [clientes-service] [ntainer#1-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: alerta RETIRO_SOBRE_LIMITE (MEDIA) sobre la cuenta 101 - Intento de 
 retiro por 900000 sobre el limite de 500000 desde el canal cajero
 
 

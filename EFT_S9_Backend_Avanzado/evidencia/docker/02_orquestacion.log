@@ -2,17 +2,17 @@
 ==============================================================
   02 - ORQUESTACION CON DOCKER COMPOSE
 ==============================================================
-Fecha: 2026-10-10T13:30:44.5640666-03:00
+Fecha: 2026-10-10T14:38:31.6568384-03:00
 
 --- Levantando los contenedores ---
  Network eft-banco-xyz_banco Creating 
  Network eft-banco-xyz_banco Creating 
  Network eft-banco-xyz_banco Created 
  Network eft-banco-xyz_banco Created 
- Container discovery-server Creating 
+ Container broker-artemis Creating 
  Container kafka Creating 
  Container config-server Creating 
- Container broker-artemis Creating 
+ Container discovery-server Creating 
  Container discovery-server Created 
  Container broker-artemis Created 
  Container config-server Created 
@@ -22,30 +22,30 @@ Fecha: 2026-10-10T13:30:44.5640666-03:00
  Container auth-server Created 
  Container api-gateway Creating 
  Container kafka-init Created 
- Container eft-banco-xyz-cuentas-service-1 Creating 
  Container eft-banco-xyz-clientes-service-1 Creating 
+ Container eft-banco-xyz-cuentas-service-1 Creating 
  Container api-gateway Created 
- Container bff-web Creating 
  Container bff-movil Creating 
- Container eft-banco-xyz-pagos-service-1 Creating 
+ Container bff-web Creating 
  Container bff-cajero Creating 
+ Container eft-banco-xyz-pagos-service-1 Creating 
  Container eft-banco-xyz-clientes-service-1 Created 
  Container bff-web Created 
- Container bff-cajero Created 
  Container bff-movil Created 
+ Container bff-cajero Created 
  Container eft-banco-xyz-pagos-service-1 Created 
  Container eft-banco-xyz-cuentas-service-1 Created 
- Container discovery-server Starting 
  Container kafka Starting 
- Container config-server Starting 
  Container broker-artemis Starting 
- Container discovery-server Started 
+ Container discovery-server Starting 
+ Container config-server Starting 
  Container kafka Started 
  Container kafka Waiting 
- Container config-server Started 
- Container config-server Waiting 
- Container discovery-server Waiting 
  Container broker-artemis Started 
+ Container discovery-server Started 
+ Container config-server Started 
+ Container discovery-server Waiting 
+ Container config-server Waiting 
  Container kafka Healthy 
  Container kafka-init Starting 
  Container kafka-init Started 
@@ -54,29 +54,29 @@ Fecha: 2026-10-10T13:30:44.5640666-03:00
  Container auth-server Starting 
  Container auth-server Started 
  Container auth-server Waiting 
+ Container kafka-init Waiting 
+ Container config-server Waiting 
+ Container config-server Waiting 
+ Container discovery-server Waiting 
+ Container discovery-server Waiting 
+ Container discovery-server Waiting 
+ Container auth-server Waiting 
+ Container auth-server Waiting 
+ Container config-server Waiting 
  Container broker-artemis Waiting 
- Container discovery-server Waiting 
  Container kafka-init Waiting 
- Container config-server Waiting 
- Container auth-server Waiting 
- Container discovery-server Waiting 
- Container auth-server Waiting 
- Container kafka-init Waiting 
- Container config-server Waiting 
- Container config-server Waiting 
- Container discovery-server Waiting 
- Container config-server Healthy 
- Container config-server Healthy 
- Container config-server Healthy 
- Container discovery-server Healthy 
- Container discovery-server Healthy 
- Container discovery-server Healthy 
  Container broker-artemis Healthy 
+ Container discovery-server Healthy 
+ Container config-server Healthy 
+ Container discovery-server Healthy 
+ Container config-server Healthy 
+ Container config-server Healthy 
+ Container discovery-server Healthy 
  Container kafka-init Exited 
  Container kafka-init Exited 
+ Container auth-server Healthy 
  Container auth-server Healthy 
  Container eft-banco-xyz-cuentas-service-1 Starting 
- Container auth-server Healthy 
  Container eft-banco-xyz-clientes-service-1 Starting 
  Container auth-server Healthy 
  Container api-gateway Starting 
@@ -84,31 +84,31 @@ Fecha: 2026-10-10T13:30:44.5640666-03:00
  Container eft-banco-xyz-clientes-service-1 Started 
  Container api-gateway Started 
  Container api-gateway Waiting 
- Container api-gateway Waiting 
- Container api-gateway Waiting 
- Container api-gateway Waiting 
  Container kafka-init Waiting 
  Container config-server Waiting 
  Container discovery-server Waiting 
  Container auth-server Waiting 
  Container broker-artemis Waiting 
- Container auth-server Healthy 
+ Container api-gateway Waiting 
+ Container api-gateway Waiting 
+ Container api-gateway Waiting 
  Container kafka-init Exited 
  Container config-server Healthy 
- Container broker-artemis Healthy 
  Container discovery-server Healthy 
- Container api-gateway Healthy 
+ Container auth-server Healthy 
+ Container broker-artemis Healthy 
  Container api-gateway Healthy 
  Container eft-banco-xyz-pagos-service-1 Starting 
+ Container api-gateway Healthy 
+ Container bff-cajero Starting 
+ Container api-gateway Healthy 
  Container bff-movil Starting 
  Container api-gateway Healthy 
  Container bff-web Starting 
- Container api-gateway Healthy 
- Container bff-cajero Starting 
- Container bff-movil Started 
  Container eft-banco-xyz-pagos-service-1 Started 
- Container bff-web Started 
  Container bff-cajero Started 
+ Container bff-movil Started 
+ Container bff-web Started 
    codigo de salida de 'docker compose up': 0
 
 --- Esperando a que todos reporten healthy ---
@@ -119,16 +119,16 @@ Fecha: 2026-10-10T13:30:44.5640666-03:00
 NAME                               IMAGE                              COMMAND                  SERVICE            CREATED          STATUS                    PORTS
 api-gateway                        banco-xyz/api-gateway:1.0.0        "java -XX:MaxRAMPercÔÇª"   api-gateway        56 seconds ago   Up 33 seconds (healthy)   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
 auth-server                        banco-xyz/auth-server:1.0.0        "java -XX:MaxRAMPercÔÇª"   auth-server        56 seconds ago   Up 44 seconds (healthy)   0.0.0.0:9000->9000/tcp, [::]:9000->9000/tcp
-bff-cajero                         banco-xyz/bff-cajero:1.0.0         "java -XX:MaxRAMPercÔÇª"   bff-cajero         56 seconds ago   Up 16 seconds (healthy)   0.0.0.0:8093->8093/tcp, [::]:8093->8093/tcp
-bff-movil                          banco-xyz/bff-movil:1.0.0          "java -XX:MaxRAMPercÔÇª"   bff-movil          56 seconds ago   Up 17 seconds (healthy)   0.0.0.0:8092->8092/tcp, [::]:8092->8092/tcp
+bff-cajero                         banco-xyz/bff-cajero:1.0.0         "java -XX:MaxRAMPercÔÇª"   bff-cajero         56 seconds ago   Up 17 seconds (healthy)   0.0.0.0:8093->8093/tcp, [::]:8093->8093/tcp
+bff-movil                          banco-xyz/bff-movil:1.0.0          "java -XX:MaxRAMPercÔÇª"   bff-movil          56 seconds ago   Up 16 seconds (healthy)   0.0.0.0:8092->8092/tcp, [::]:8092->8092/tcp
 bff-web                            banco-xyz/bff-web:1.0.0            "java -XX:MaxRAMPercÔÇª"   bff-web            56 seconds ago   Up 16 seconds (healthy)   0.0.0.0:8091->8091/tcp, [::]:8091->8091/tcp
-broker-artemis                     banco-xyz/broker-artemis:1.0.0     "java -XX:MaxRAMPercÔÇª"   broker-artemis     57 seconds ago   Up 54 seconds (healthy)   0.0.0.0:61617->61617/tcp, [::]:61617->61617/tcp
-config-server                      banco-xyz/config-server:1.0.0      "java -XX:MaxRAMPercÔÇª"   config-server      57 seconds ago   Up 55 seconds (healthy)   0.0.0.0:8888->8888/tcp, [::]:8888->8888/tcp
+broker-artemis                     banco-xyz/broker-artemis:1.0.0     "java -XX:MaxRAMPercÔÇª"   broker-artemis     57 seconds ago   Up 55 seconds (healthy)   0.0.0.0:61617->61617/tcp, [::]:61617->61617/tcp
+config-server                      banco-xyz/config-server:1.0.0      "java -XX:MaxRAMPercÔÇª"   config-server      56 seconds ago   Up 55 seconds (healthy)   0.0.0.0:8888->8888/tcp, [::]:8888->8888/tcp
 discovery-server                   banco-xyz/discovery-server:1.0.0   "java -XX:MaxRAMPercÔÇª"   discovery-server   57 seconds ago   Up 55 seconds (healthy)   0.0.0.0:8761->8761/tcp, [::]:8761->8761/tcp
 eft-banco-xyz-clientes-service-1   banco-xyz/clientes-service:1.0.0   "java -XX:MaxRAMPercÔÇª"   clientes-service   56 seconds ago   Up 33 seconds (healthy)   
 eft-banco-xyz-cuentas-service-1    banco-xyz/cuentas-service:1.0.0    "java -XX:MaxRAMPercÔÇª"   cuentas-service    56 seconds ago   Up 33 seconds (healthy)   
 eft-banco-xyz-pagos-service-1      banco-xyz/pagos-service:1.0.0      "java -XX:MaxRAMPercÔÇª"   pagos-service      56 seconds ago   Up 17 seconds (healthy)   
-kafka                              apache/kafka:3.8.1                 "/__cacert_entrypoinÔÇª"   kafka              57 seconds ago   Up 55 seconds (healthy)   0.0.0.0:9092->9092/tcp, [::]:9092->9092/tcp
+kafka                              apache/kafka:3.8.1                 "/__cacert_entrypoinÔÇª"   kafka              57 seconds ago   Up 56 seconds (healthy)   0.0.0.0:9092->9092/tcp, [::]:9092->9092/tcp
 
 --- El contenedor de un solo uso que crea los topicos ---
    codigo de salida de kafka-init: 0  (0 = los dos topicos quedaron creados)
@@ -138,11 +138,11 @@ kafka-init  | Created topic banco.transacciones-completadas.
 kafka-init  | WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
 kafka-init  | Created topic banco.alertas-seguridad.
 kafka-init  | >> kafka-init: topicos creados
-kafka-init  | Topic: banco.transacciones-completadas	TopicId: _ClB61jPSp-DP5UJXWn_BQ	PartitionCount: 3	ReplicationFactor: 1	Configs: 
+kafka-init  | Topic: banco.transacciones-completadas	TopicId: oXuwEd1dRBiYqfPcuNWabA	PartitionCount: 3	ReplicationFactor: 1	Configs: 
 kafka-init  | 	Topic: banco.transacciones-completadas	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
 kafka-init  | 	Topic: banco.transacciones-completadas	Partition: 1	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
 kafka-init  | 	Topic: banco.transacciones-completadas	Partition: 2	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
-kafka-init  | Topic: banco.alertas-seguridad	TopicId: cYnNEN8FS4CdgG0Hamk7Kw	PartitionCount: 3	ReplicationFactor: 1	Configs: 
+kafka-init  | Topic: banco.alertas-seguridad	TopicId: COjWK-k4Riqyo7ZZbNaaXA	PartitionCount: 3	ReplicationFactor: 1	Configs: 
 kafka-init  | 	Topic: banco.alertas-seguridad	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
 kafka-init  | 	Topic: banco.alertas-seguridad	Partition: 1	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
 kafka-init  | 	Topic: banco.alertas-seguridad	Partition: 2	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
@@ -150,19 +150,19 @@ kafka-init  | >> kafka-init: listo
 
 --- La red propia del sistema ---
 NETWORK ID     NAME                  DRIVER    SCOPE
-e99ff62ab1ce   eft-banco-xyz_banco   bridge    local
-config-server 172.19.0.4/16
-discovery-server 172.19.0.2/16
-bff-web 172.19.0.12/16
-bff-cajero 172.19.0.13/16
-eft-banco-xyz-clientes-service-1 172.19.0.8/16
-broker-artemis 172.19.0.5/16
-bff-movil 172.19.0.10/16
-auth-server 172.19.0.7/16
-eft-banco-xyz-pagos-service-1 172.19.0.11/16
-api-gateway 172.19.0.9/16
-kafka 172.19.0.3/16
+36e5feaa0319   eft-banco-xyz_banco   bridge    local
 eft-banco-xyz-cuentas-service-1 172.19.0.6/16
+eft-banco-xyz-clientes-service-1 172.19.0.8/16
+auth-server 172.19.0.7/16
+api-gateway 172.19.0.9/16
+broker-artemis 172.19.0.3/16
+bff-web 172.19.0.13/16
+discovery-server 172.19.0.4/16
+bff-cajero 172.19.0.11/16
+eft-banco-xyz-pagos-service-1 172.19.0.10/16
+kafka 172.19.0.2/16
+bff-movil 172.19.0.12/16
+config-server 172.19.0.5/16
 
 
 --- Resolucion por nombre dentro de la red ---
@@ -179,9 +179,18 @@ Estar healthy no es lo mismo que ser alcanzable por el gateway: el gateway
 enruta con su copia del registro de Eureka, y hasta refrescarla responde
 503. Se pregunta por una ruta de cada microservicio hasta que conteste 200.
 
-   cuentas-service    enrutando tras 1s
-   pagos-service      enrutando tras 17s
+   cuentas-service    enrutando tras 3s
+   pagos-service      enrutando tras 1s
    clientes-service   enrutando tras 1s
+
+--- La cadena pagos-service -> cuentas-service, lista ---
+Que el gateway alcance a pagos-service no implica que pagos-service alcance
+a cuentas-service: esa llamada es servicio a servicio, con su propio
+balanceador sobre Eureka, y converge despues. La ficha de la cuenta es la
+sonda exacta, porque la compone pagos-service llamando a cuentas-service:
+mientras esa pata no este lista responde origenDatosCuenta=DEGRADADO.
+
+   origenDatosCuenta=SERVICIO tras 1s: la cadena interna ya resuelve
 
 --- Servicios registrados en Eureka ---
    API-GATEWAY : 1 instancia(s)

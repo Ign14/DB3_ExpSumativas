@@ -19,9 +19,9 @@
         "edad": 40,
         "tipoCuentaPrincipal": "prestamo",
         "saldoReferencial": 5000,
-        "operacionesRegistradas": 1,
+        "operacionesRegistradas": 3,
         "alertasRegistradas": 1,
-        "ultimaOperacion": "RETIRO de 250 el 2026-10-10"
+        "ultimaOperacion": "TRANSFERENCIA de 300 el 2026-10-10"
     },
     "historialCompleto": [
         {
@@ -289,13 +289,27 @@
             "tipoMovimiento": "retiro",
             "monto": 250,
             "descripcion": "Retiro por canal cajero"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2026-10-10",
+            "tipoMovimiento": "deposito",
+            "monto": 1200,
+            "descripcion": "Abono de sueldo"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2026-10-10",
+            "tipoMovimiento": "pago",
+            "monto": 300,
+            "descripcion": "Pago de arriendo hacia la cuenta 102"
         }
     ],
     "resumen": {
         "cuentaId": 101,
-        "totalMovimientos": 38,
-        "totalDepositos": 20000,
-        "totalEgresos": 51750,
+        "totalMovimientos": 40,
+        "totalDepositos": 21200,
+        "totalEgresos": 52050,
         "ultimaFecha": "2026-10-10"
     }
 }
@@ -311,14 +325,14 @@
             "monto": 250
         },
         {
-            "fecha": "2024-12-19",
-            "tipo": "compra",
-            "monto": 1500
+            "fecha": "2026-10-10",
+            "tipo": "deposito",
+            "monto": 1200
         },
         {
-            "fecha": "2024-11-28",
-            "tipo": "compra",
-            "monto": 1000
+            "fecha": "2026-10-10",
+            "tipo": "pago",
+            "monto": 300
         }
     ]
 }
@@ -330,8 +344,8 @@
 }
 
 --- Tamano de la respuesta por canal, para la misma cuenta ---
-   web            4669 caracteres
-   movil           216 caracteres
+   web            4914 caracteres
+   movil           215 caracteres
    cajero           39 caracteres
 
 --- Retiro por el canal cajero: una sola llamada ---
@@ -344,6 +358,7 @@
     "fechaMovimiento": "2026-10-10",
     "movimientoRegistrado": true
 }
+   HTTP 200 EN 0.519812s
 
 --- Panel administrativo, exclusivo del canal web ---
 {

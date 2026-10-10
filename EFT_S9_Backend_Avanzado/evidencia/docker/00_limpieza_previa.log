@@ -2,11 +2,11 @@
 ==============================================================
   00 - LIMPIEZA PREVIA
 ==============================================================
-Fecha: 2026-10-10T13:30:36.8814216-03:00
+Fecha: 2026-10-10T14:38:24.2447197-03:00
 
 --- Contenedores presentes antes de empezar ---
-movimientos-service  |  d3527f2fc6e1  |  Exited (255) 22 hours ago
-cuentas-service  |  d98cbe778283  |  Exited (255) 22 hours ago
+movimientos-service  |  d3527f2fc6e1  |  Exited (255) 23 hours ago
+cuentas-service  |  d98cbe778283  |  Exited (255) 23 hours ago
 bancoxyz-postgres  |  postgres:16-alpine  |  Exited (255) 4 days ago
 
 --- Bajando cualquier orquestacion previa de este proyecto ---
@@ -15,6 +15,6 @@ bancoxyz-postgres  |  postgres:16-alpine  |  Exited (255) 4 days ago
    ninguno: los once nombres fijos de este compose estan libres
 
 --- Estado despues de la limpieza ---
-movimientos-service  |  d3527f2fc6e1  |  Exited (255) 22 hours ago
-cuentas-service  |  d98cbe778283  |  Exited (255) 22 hours ago
+movimientos-service  |  d3527f2fc6e1  |  Exited (255) 24 hours ago
+cuentas-service  |  d98cbe778283  |  Exited (255) 24 hours ago
 bancoxyz-postgres  |  postgres:16-alpine  |  Exited (255) 4 days ago

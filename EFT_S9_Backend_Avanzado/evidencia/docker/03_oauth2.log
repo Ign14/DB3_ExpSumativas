@@ -5,7 +5,7 @@
 
 --- Emision de token por client_credentials (canal web) ---
 {
-    "access_token": "eyJraWQiOiI1NjljYzhkNC0xMjZlLTQ4YjctYmY1Ni0zMDhhNjM3NzBiODAiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJiYW5jby13ZWItY2xpZW50IiwiYXVkIjoiYmFuY28td2ViLWNsaWVudCIsIm5iZiI6MTc5MTY0OTkyMSwic2NvcGUiOlsiY3VlbnRhcy5yZWFkIiwibW92aW1pZW50b3Mud3JpdGUiLCJjbGllbnRlcy53cml0ZSIsIm1vdmltaWVudG9zLnJlYWQiLCJjdWVudGFzLndyaXRlIiwiY2xpZW50ZXMucmVhZCJdLCJpc3MiOiJodHRwOi8vYXV0aC1zZXJ2ZXI6OTAwMCIsImV4cCI6MTc5MTY1MTcyMSwiaWF0IjoxNzkxNjQ5OTIxLCJqdGkiOiJmNDZiMTNmOC1jMGE3LTQ5ZjUtYTdmNC03MWM0OGQ0Zjc1OTAifQ.VIc2C3cZl-wNrH0B2VDW2I7r_3iXBdd3gO_Eu6H_grlTeoI3fZaN7E491cL-DMpowclNDmkZN-OLMeC7MBtN4bMpRGeuUKXnLNBXx0QiLBnljvEyjRJ3sL3ePFJCZ48Lpr6vQs7KPWtisgTyI0fi0hvWJB0pxbfSzqD4pDPuQ9arO9yUcu3RD4cM9-C0Ze_OPHZ5qQLKtOt9wk0QWr8OlBOWI-rsUZI290R9XLAWIdnY8t1hgKUFxFgK0tvfkyvY1CQrgFyHsATqqraO7Fpxnm_-aKjXxfJr4QrOluyqe4odUG2_DJBzIUSpUMYCQPtXgn2OpsitR4-B6GrJex7itw",
+    "access_token": "eyJraWQiOiJkMjMwMjYwMC1iOTdlLTQ2MmMtYjMwNy0wNjQxNjUwNTMzYTMiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJiYW5jby13ZWItY2xpZW50IiwiYXVkIjoiYmFuY28td2ViLWNsaWVudCIsIm5iZiI6MTc5MTY1Mzk3NSwic2NvcGUiOlsiY3VlbnRhcy5yZWFkIiwibW92aW1pZW50b3Mud3JpdGUiLCJjbGllbnRlcy53cml0ZSIsIm1vdmltaWVudG9zLnJlYWQiLCJjdWVudGFzLndyaXRlIiwiY2xpZW50ZXMucmVhZCJdLCJpc3MiOiJodHRwOi8vYXV0aC1zZXJ2ZXI6OTAwMCIsImV4cCI6MTc5MTY1NTc3NSwiaWF0IjoxNzkxNjUzOTc1LCJqdGkiOiJkYTZkOTQ4ZS0yODcwLTQxYjgtYmJiOC05M2NlYTU3ODc5YTcifQ.d2RouWh1RFviYn8XkAFluoCp3Tq7SI6ndbMh8bTnOGtcgjdNIU-f9MeSKzo1vnHenfLETuruAah8qkqu6cPqE8hesEHCx9_SX9KcLDs4fwt4jzoNwM-M7KjxrBHn5ZipEQSoO34HoxNai4Cg_uhZrTJTCjDYG8BdlESyOmHMJ9k8-X_NcBvaauuHH36Nqcam6MKFx-9qOOtnnoqQIq1wNCVwqIN9Ouke1m3Y0FknnkO4COklFrL-DW3O66rvx4ndIfF5OuaLhSGFI5Z_Wqry8YTeXrOSnxq4zcY6KM7gA5-BOn0Rj4_qXEoaKnISjfILhr1tRhCyJ9TRHdQFYMECiw",
     "scope": "cuentas.read movimientos.write clientes.write movimientos.read cuentas.write clientes.read",
     "token_type": "Bearer",
     "expires_in": 1799
@@ -14,11 +14,11 @@
 --- Contenido del token del canal web ---
 {
   "aud": "banco-web-client",
-  "exp": 1791651721,
-  "iat": 1791649921,
+  "exp": 1791655774,
+  "iat": 1791653974,
   "iss": "http://auth-server:9000",
-  "jti": "c799df54-e00a-40e3-bc16-c93050a325c1",
-  "nbf": 1791649921,
+  "jti": "78abb19c-a38e-4bcf-bda3-21eda0c60b4e",
+  "nbf": 1791653974,
   "scope": [
     "cuentas.read",
     "movimientos.write",
@@ -36,8 +36,8 @@
         {
             "kty": "RSA",
             "e": "AQAB",
-            "kid": "569cc8d4-126e-48b7-bf56-308a63770b80",
-            "n": "neO1m5cqnD-Tl8JupzTmLE4_S6ewyOv9R6Go0fuobHBTPiS7G2UO1CDz2Lm2m0mZaAderCD4h68FSaNMFn1uv1d6dn8RnrDtJGTSBvua5ZwWnMLoffbKzUmro18PFEtoo8JU3Iaa228jFO5gu0SnomRN66CwJH7fuIc4iYhOtK2IwBY1kI0frxP_KOWG1QGYauWGml4BrYHgHAXOdySqwa8lSzrXhiMGrkv5NqXkg1y1fO8npRudiyjJwog8rTCYCCai_oU67AUU6qId3aZ6VSdrSjv2tMbk4gGpDms1rfSmIjACJaidbVdXXVX3MLqnu_axb2TQvrhXQZ0QoNhSkw"
+            "kid": "d2302600-b97e-462c-b307-0641650533a3",
+            "n": "wfHkxL0Q6ltZ2auNqurvH85_YINl_6lph8uriULQ0CRvmJpAvC-L7MSVwylSH8KW01oZ0O68ASpIaNqciEK3nRUuCTAh5sPl-mVukGKKSFlZ8QYtvJzNL0mHilCsB6kifmTk2iF4EFwLgiQ00IX-qVEGRXiyCkx3HQMq5CSL_HmCij56d-pfrX83DXlleDCbBMJYVjNz8-8CeweCO52m_zRdJKYH83xFvWY79iium2wNiur34Kr_tKFR1n1sKUDUqYb2tTXS7RzmMF6ZbFxe19s8AiYRFaJRMi27-rrKWXJv7pjeijHTGpoSdeYZS3iVxXZKdJA3EsRtqBZb1eDcYw"
         }
     ]
 }

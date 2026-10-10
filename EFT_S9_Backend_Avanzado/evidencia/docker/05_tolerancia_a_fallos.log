@@ -5,7 +5,7 @@
 
 --- La ficha con cuentas-service arriba ---
    origenDatosCuenta: SERVICIO
-   cuenta: {"cuentaId": 101, "nombreTitular": "John Doe", "edad": 40, "tipoCuenta": "prestamo", "saldo": 4750}
+   cuenta: {"cuentaId": 101, "nombreTitular": "John Doe", "edad": 40, "tipoCuenta": "prestamo", "saldo": 5650}
 
 --- Se detiene el contenedor de cuentas-service ---
  Container eft-banco-xyz-cuentas-service-1 Stopping 
@@ -13,7 +13,7 @@
 
 --- Seis peticiones: el circuito se abre y la respuesta se degrada ---
    peticion 1: origenDatosCuenta=DEGRADADO  circuito=CLOSED
-   peticion 2: origenDatosCuenta=DEGRADADO  circuito=OPEN
+   peticion 2: origenDatosCuenta=DEGRADADO  circuito=CLOSED
    peticion 3: origenDatosCuenta=DEGRADADO  circuito=OPEN
    peticion 4: origenDatosCuenta=DEGRADADO  circuito=OPEN
    peticion 5: origenDatosCuenta=DEGRADADO  circuito=OPEN
@@ -22,7 +22,7 @@
 --- La respuesta degradada sigue sirviendo el historial ---
    origenDatosCuenta: DEGRADADO
    cuenta: None
-   movimientos entregados: 38
+   movimientos entregados: 40
 
 --- Una transferencia con la dependencia caida se rechaza, no se degrada ---
    POST /api/pagos/transferencia/101 -> HTTP 500
@@ -30,27 +30,27 @@
 
 --- La apertura del circuito salio al topico de alertas ---
 
-2026-10-10T16:32:41.535Z ERROR 1 --- [clientes-service] [ntainer#1-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: ALERTA ALTA DEPENDENCIA_DEGRADADA sobre la cuenta null - El circuito 
+2026-10-10T17:40:10.037Z ERROR 1 --- [clientes-service] [ntainer#1-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: ALERTA ALTA DEPENDENCIA_DEGRADADA sobre la cuenta null - El circuito 
 hacia cuentas se abrio: las llamadas se responden degradadas sin intentar la dependencia.
 
 --- Se vuelve a levantar el contenedor ---
- Container discovery-server Waiting 
- Container config-server Waiting 
  Container kafka Waiting 
+ Container config-server Waiting 
+ Container discovery-server Waiting 
+ Container discovery-server Healthy 
  Container kafka Healthy 
  Container kafka-init Starting 
- Container discovery-server Healthy 
  Container config-server Healthy 
  Container kafka-init Started 
+ Container config-server Waiting 
  Container discovery-server Waiting 
  Container auth-server Waiting 
  Container broker-artemis Waiting 
  Container kafka-init Waiting 
- Container config-server Waiting 
- Container broker-artemis Healthy 
- Container config-server Healthy 
- Container discovery-server Healthy 
  Container auth-server Healthy 
+ Container discovery-server Healthy 
+ Container config-server Healthy 
+ Container broker-artemis Healthy 
  Container kafka-init Exited 
  Container eft-banco-xyz-cuentas-service-1 Starting 
  Container eft-banco-xyz-cuentas-service-1 Started 
@@ -66,8 +66,8 @@ hacia cuentas se abrio: las llamadas se responden degradadas sin intentar la dep
    peticion 8: origenDatosCuenta=SERVICIO   circuito=CLOSED
 
 --- Transiciones registradas por Resilience4j ---
-   2026-10-10T16:32:41 CLOSED_TO_OPEN
-   2026-10-10T16:32:51 OPEN_TO_HALF_OPEN
-   2026-10-10T16:33:46 HALF_OPEN_TO_CLOSED
+   2026-10-10T17:40:10 CLOSED_TO_OPEN
+   2026-10-10T17:40:20 OPEN_TO_HALF_OPEN
+   2026-10-10T17:41:15 HALF_OPEN_TO_CLOSED
 
 

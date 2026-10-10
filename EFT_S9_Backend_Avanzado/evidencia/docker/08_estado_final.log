@@ -2,22 +2,22 @@
 ==============================================================
   08 - ESTADO FINAL DE LA ORQUESTACION
 ==============================================================
-Fecha: 2026-10-10T13:36:01.3166328-03:00
+Fecha: 2026-10-10T14:43:30.0337600-03:00
 
 --- Contenedores ---
 NAME                               IMAGE                              COMMAND                  SERVICE            CREATED         STATUS                   PORTS
-api-gateway                        banco-xyz/api-gateway:1.0.0        "java -XX:MaxRAMPercÔÇª"   api-gateway        5 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
-auth-server                        banco-xyz/auth-server:1.0.0        "java -XX:MaxRAMPercÔÇª"   auth-server        5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:9000->9000/tcp, [::]:9000->9000/tcp
-bff-cajero                         banco-xyz/bff-cajero:1.0.0         "java -XX:MaxRAMPercÔÇª"   bff-cajero         5 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8093->8093/tcp, [::]:8093->8093/tcp
-bff-movil                          banco-xyz/bff-movil:1.0.0          "java -XX:MaxRAMPercÔÇª"   bff-movil          5 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8092->8092/tcp, [::]:8092->8092/tcp
-bff-web                            banco-xyz/bff-web:1.0.0            "java -XX:MaxRAMPercÔÇª"   bff-web            5 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8091->8091/tcp, [::]:8091->8091/tcp
-broker-artemis                     banco-xyz/broker-artemis:1.0.0     "java -XX:MaxRAMPercÔÇª"   broker-artemis     5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:61617->61617/tcp, [::]:61617->61617/tcp
-config-server                      banco-xyz/config-server:1.0.0      "java -XX:MaxRAMPercÔÇª"   config-server      5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:8888->8888/tcp, [::]:8888->8888/tcp
-discovery-server                   banco-xyz/discovery-server:1.0.0   "java -XX:MaxRAMPercÔÇª"   discovery-server   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:8761->8761/tcp, [::]:8761->8761/tcp
-eft-banco-xyz-clientes-service-1   banco-xyz/clientes-service:1.0.0   "java -XX:MaxRAMPercÔÇª"   clientes-service   5 minutes ago   Up 4 minutes (healthy)   
-eft-banco-xyz-cuentas-service-1    banco-xyz/cuentas-service:1.0.0    "java -XX:MaxRAMPercÔÇª"   cuentas-service    5 minutes ago   Up 3 minutes (healthy)   
-eft-banco-xyz-pagos-service-1      banco-xyz/pagos-service:1.0.0      "java -XX:MaxRAMPercÔÇª"   pagos-service      5 minutes ago   Up 4 minutes (healthy)   
-kafka                              apache/kafka:3.8.1                 "/__cacert_entrypoinÔÇª"   kafka              5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:9092->9092/tcp, [::]:9092->9092/tcp
+api-gateway                        banco-xyz/api-gateway:1.0.0        "java -XX:MaxRAMPercÔÇª"   api-gateway        4 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
+auth-server                        banco-xyz/auth-server:1.0.0        "java -XX:MaxRAMPercÔÇª"   auth-server        4 minutes ago   Up 4 minutes (healthy)   0.0.0.0:9000->9000/tcp, [::]:9000->9000/tcp
+bff-cajero                         banco-xyz/bff-cajero:1.0.0         "java -XX:MaxRAMPercÔÇª"   bff-cajero         4 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8093->8093/tcp, [::]:8093->8093/tcp
+bff-movil                          banco-xyz/bff-movil:1.0.0          "java -XX:MaxRAMPercÔÇª"   bff-movil          4 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8092->8092/tcp, [::]:8092->8092/tcp
+bff-web                            banco-xyz/bff-web:1.0.0            "java -XX:MaxRAMPercÔÇª"   bff-web            4 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8091->8091/tcp, [::]:8091->8091/tcp
+broker-artemis                     banco-xyz/broker-artemis:1.0.0     "java -XX:MaxRAMPercÔÇª"   broker-artemis     4 minutes ago   Up 4 minutes (healthy)   0.0.0.0:61617->61617/tcp, [::]:61617->61617/tcp
+config-server                      banco-xyz/config-server:1.0.0      "java -XX:MaxRAMPercÔÇª"   config-server      4 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8888->8888/tcp, [::]:8888->8888/tcp
+discovery-server                   banco-xyz/discovery-server:1.0.0   "java -XX:MaxRAMPercÔÇª"   discovery-server   4 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8761->8761/tcp, [::]:8761->8761/tcp
+eft-banco-xyz-clientes-service-1   banco-xyz/clientes-service:1.0.0   "java -XX:MaxRAMPercÔÇª"   clientes-service   4 minutes ago   Up 4 minutes (healthy)   
+eft-banco-xyz-cuentas-service-1    banco-xyz/cuentas-service:1.0.0    "java -XX:MaxRAMPercÔÇª"   cuentas-service    4 minutes ago   Up 3 minutes (healthy)   
+eft-banco-xyz-pagos-service-1      banco-xyz/pagos-service:1.0.0      "java -XX:MaxRAMPercÔÇª"   pagos-service      4 minutes ago   Up 4 minutes (healthy)   
+kafka                              apache/kafka:3.8.1                 "/__cacert_entrypoinÔÇª"   kafka              4 minutes ago   Up 4 minutes (healthy)   0.0.0.0:9092->9092/tcp, [::]:9092->9092/tcp
 
 --- Salud de cada componente, consultada dentro de la red ---
    config-server        {"status":"UP","groups":["liveness","readiness"]}
@@ -41,16 +41,16 @@ kafka                              apache/kafka:3.8.1                 "/__cacert
 
 --- Imagenes del sistema ---
 REPOSITORIO                      ID / TAMANO
-banco-xyz/config-server          bc8bb95b0d34  641MB
-banco-xyz/discovery-server       6bec708de2e2  693MB
-banco-xyz/auth-server            dbd7fe37e083  678MB
-banco-xyz/api-gateway            1587eade0526  689MB
-banco-xyz/cuentas-service        577477f70187  794MB
-banco-xyz/pagos-service          0ef18de76327  802MB
-banco-xyz/clientes-service       fcd7ee536644  744MB
-banco-xyz/bff-web                0b22576b989c  575MB
-banco-xyz/bff-movil              e2e075f4b3c0  575MB
-banco-xyz/bff-cajero             cf481cd3ffa1  575MB
-banco-xyz/broker-artemis         30646e6c7969  651MB
+banco-xyz/config-server          f419de734f64  641MB
+banco-xyz/discovery-server       bf183bdc0e5f  693MB
+banco-xyz/auth-server            69a92a864faf  678MB
+banco-xyz/api-gateway            22065a69578a  689MB
+banco-xyz/cuentas-service        8cc07e148fe9  794MB
+banco-xyz/pagos-service          b82a43777c09  802MB
+banco-xyz/clientes-service       946bdb06cde6  744MB
+banco-xyz/bff-web                b5ab5a9c1de7  575MB
+banco-xyz/bff-movil              326a4c0b9ae9  575MB
+banco-xyz/bff-cajero             06a83e10c251  575MB
+banco-xyz/broker-artemis         395ab25cc79e  651MB
 
    11 de 11 imagenes del proyecto presentes
