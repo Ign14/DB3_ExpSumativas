@@ -182,9 +182,13 @@ services:
           --create --if-not-exists --topic banco.alertas-seguridad \
           --partitions 3 --replication-factor 1
         echo ">> kafka-init: topicos creados"
+        # Un --describe por topico: kafka-topics.sh acepta --topic una sola vez
+        # y con dos termina en MultipleArgumentsForOptionException.
         /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --describe \
-          --topic banco.transacciones-completadas \
+          --topic banco.transacciones-completadas
+        /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --describe \
           --topic banco.alertas-seguridad
+        echo ">> kafka-init: listo"
     networks: [banco]
 
   auth-server:
