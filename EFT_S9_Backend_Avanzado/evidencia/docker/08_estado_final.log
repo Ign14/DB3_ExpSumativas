@@ -1,0 +1,56 @@
+﻿
+==============================================================
+  08 - ESTADO FINAL DE LA ORQUESTACION
+==============================================================
+Fecha: 2026-10-09T21:53:59.8168475-03:00
+
+--- Contenedores ---
+NAME                               IMAGE                              COMMAND                  SERVICE            CREATED         STATUS                   PORTS
+api-gateway                        banco-xyz/api-gateway:1.0.0        "java -XX:MaxRAMPercÔÇª"   api-gateway        5 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
+auth-server                        banco-xyz/auth-server:1.0.0        "java -XX:MaxRAMPercÔÇª"   auth-server        5 minutes ago   Up 4 minutes (healthy)   0.0.0.0:9000->9000/tcp, [::]:9000->9000/tcp
+bff-cajero                         banco-xyz/bff-cajero:1.0.0         "java -XX:MaxRAMPercÔÇª"   bff-cajero         5 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8093->8093/tcp, [::]:8093->8093/tcp
+bff-movil                          banco-xyz/bff-movil:1.0.0          "java -XX:MaxRAMPercÔÇª"   bff-movil          5 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8092->8092/tcp, [::]:8092->8092/tcp
+bff-web                            banco-xyz/bff-web:1.0.0            "java -XX:MaxRAMPercÔÇª"   bff-web            5 minutes ago   Up 4 minutes (healthy)   0.0.0.0:8091->8091/tcp, [::]:8091->8091/tcp
+broker-artemis                     banco-xyz/broker-artemis:1.0.0     "java -XX:MaxRAMPercÔÇª"   broker-artemis     5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:61617->61617/tcp, [::]:61617->61617/tcp
+config-server                      banco-xyz/config-server:1.0.0      "java -XX:MaxRAMPercÔÇª"   config-server      5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:8888->8888/tcp, [::]:8888->8888/tcp
+discovery-server                   banco-xyz/discovery-server:1.0.0   "java -XX:MaxRAMPercÔÇª"   discovery-server   5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:8761->8761/tcp, [::]:8761->8761/tcp
+eft-banco-xyz-clientes-service-1   banco-xyz/clientes-service:1.0.0   "java -XX:MaxRAMPercÔÇª"   clientes-service   5 minutes ago   Up 4 minutes (healthy)   
+eft-banco-xyz-cuentas-service-1    banco-xyz/cuentas-service:1.0.0    "java -XX:MaxRAMPercÔÇª"   cuentas-service    5 minutes ago   Up 3 minutes (healthy)   
+eft-banco-xyz-pagos-service-1      banco-xyz/pagos-service:1.0.0      "java -XX:MaxRAMPercÔÇª"   pagos-service      5 minutes ago   Up 4 minutes (healthy)   
+kafka                              apache/kafka:3.8.1                 "/__cacert_entrypoinÔÇª"   kafka              5 minutes ago   Up 5 minutes (healthy)   0.0.0.0:9092->9092/tcp, [::]:9092->9092/tcp
+
+--- Salud de cada componente, consultada dentro de la red ---
+   config-server        {"status":"UP","groups":["liveness","readiness"]}
+   discovery-server     {"status":"UP","groups":["liveness","readiness"]}
+   auth-server          {"status":"UP","groups":["liveness","readiness"]}
+   api-gateway          {"status":"UP","groups":["liveness","readiness"]}
+   cuentas-service      {"status":"UP","groups":["liveness","readiness"]}
+   pagos-service        {"status":"UP","groups":["liveness","readiness"]}
+   clientes-service     {"status":"UP","groups":["liveness","readiness"]}
+   broker-artemis       {"status":"UP","groups":["liveness","readiness"]}
+   bff-web              {"status":"UP","groups":["liveness","readiness"]}
+   bff-movil            {"status":"UP","groups":["liveness","readiness"]}
+   bff-cajero           {"status":"UP","groups":["liveness","readiness"]}
+
+--- Registro final de Eureka ---
+   API-GATEWAY : 1 instancia(s)
+   AUTH-SERVER : 1 instancia(s)
+   CLIENTES-SERVICE : 1 instancia(s)
+   CUENTAS-SERVICE : 1 instancia(s)
+   PAGOS-SERVICE : 2 instancia(s)
+
+--- Imagenes del sistema ---
+REPOSITORIO                      ID / TAMANO
+banco-xyz/config-server          0898dd07ee88  641MB
+banco-xyz/discovery-server       742382c02566  693MB
+banco-xyz/auth-server            7f2a7d61d2d0  678MB
+banco-xyz/api-gateway            2d25cc7a0de5  689MB
+banco-xyz/cuentas-service        23bb283764f1  794MB
+banco-xyz/pagos-service          7b3e34cb0726  802MB
+banco-xyz/clientes-service       9f36a17ae986  744MB
+banco-xyz/bff-web                7d7cb3f7a41a  575MB
+banco-xyz/bff-movil              2a03e2abca97  575MB
+banco-xyz/bff-cajero             05c8af419a47  575MB
+banco-xyz/broker-artemis         6ba7b2a2ccbd  651MB
+
+   11 de 11 imagenes del proyecto presentes

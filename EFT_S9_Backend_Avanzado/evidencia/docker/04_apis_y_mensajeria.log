@@ -1,0 +1,176 @@
+﻿
+==============================================================
+  04 - LOS TRES MICROSERVICIOS, JMS Y KAFKA SOBRE CONTENEDORES
+==============================================================
+
+--- Gestion de cuentas ---
+{
+    "cuentaId": 101,
+    "nombreTitular": "John Doe",
+    "edad": 40,
+    "tipoCuenta": "prestamo",
+    "saldo": 5000
+}
+
+--- Gestion de clientes (antes de operar) ---
+{
+    "clienteId": 101,
+    "nombre": "John Doe",
+    "segmento": "establecido",
+    "edad": 40,
+    "tipoCuentaPrincipal": "prestamo",
+    "saldoReferencial": 5000,
+    "operacionesRegistradas": 0,
+    "alertasRegistradas": 0,
+    "ultimaOperacion": null
+}
+
+--- Reporte de transacciones diarias (salida del proceso batch 1) ---
+{
+    "timestamp": "2026-10-10T00:49:56.633+00:00",
+    "path": "/api/transacciones-diarias/resumen",
+    "status": 503,
+    "error": "Service Unavailable",
+    "requestId": "17d5a906-21"
+}
+
+--- Estado antes del retiro ---
+   saldo de la cuenta 101: 5000
+   movimientos en el historial: 
+
+--- Retiro de 250 por el canal cajero (viaja por la cola JMS) ---
+{
+    "cuentaId": 101,
+    "montoSolicitado": 250,
+    "saldoResultante": 4750,
+    "aprobado": true,
+    "motivoRechazo": null,
+    "eventoId": "15ef1236-1772-4986-a71e-e50976f826c2",
+    "eventoPublicado": true
+}
+
+--- Estado despues: el saldo bajo en un contenedor y el historial subio en otro ---
+   saldo:       5000 -> 4750
+   movimientos:  -> 
+
+--- Deposito por el canal web (Kafka) ---
+(sin respuesta)
+
+--- Transferencia de la cuenta 101 a la 102 (Kafka) ---
+(sin respuesta)
+
+--- Intento de retiro sobre el limite: genera alerta, no transaccion ---
+{
+    "cuentaId": 101,
+    "montoSolicitado": 900000,
+    "saldoResultante": null,
+    "aprobado": false,
+    "motivoRechazo": "El monto supera el limite de 500000 por operacion.",
+    "eventoId": null,
+    "eventoPublicado": false
+}
+
+--- Perfil del cliente 101: la actividad la trajo Kafka ---
+{
+    "clienteId": 101,
+    "nombre": "John Doe",
+    "segmento": "establecido",
+    "edad": 40,
+    "tipoCuentaPrincipal": "prestamo",
+    "saldoReferencial": 5000,
+    "operacionesRegistradas": 1,
+    "alertasRegistradas": 1,
+    "ultimaOperacion": "RETIRO de 250 el 2026-10-10"
+}
+
+--- Perfil del cliente 102: recibio el abono de la transferencia ---
+{
+    "clienteId": 102,
+    "nombre": "Sin nombre registrado",
+    "segmento": "preferente",
+    "edad": 40,
+    "tipoCuentaPrincipal": "ahorro",
+    "saldoReferencial": 10000,
+    "operacionesRegistradas": 0,
+    "alertasRegistradas": 0,
+    "ultimaOperacion": null
+}
+
+--- Topicos de Kafka en el broker ---
+Topic: banco.alertas-seguridad	TopicId: 4h7DYccJRaypBLfSdz244w	PartitionCount: 3	ReplicationFactor: 1	Configs: 
+	Topic: banco.alertas-seguridad	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: banco.alertas-seguridad	Partition: 1	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: banco.alertas-seguridad	Partition: 2	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+Topic: banco.transacciones-completadas	TopicId: XRbkA6QKTRChm07Q8D7pDA	PartitionCount: 3	ReplicationFactor: 1	Configs: 
+	Topic: banco.transacciones-completadas	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: banco.transacciones-completadas	Partition: 1	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: banco.transacciones-completadas	Partition: 2	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+Topic: __consumer_offsets	TopicId: gs7QQ1v3QzCutFk_uy2H2g	PartitionCount: 50	ReplicationFactor: 1	Configs: compression.type=producer,cleanup.policy=compact,segment.bytes=104857600
+	Topic: __consumer_offsets	Partition: 0	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 1	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 2	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 3	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 4	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 5	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 6	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 7	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 8	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 9	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 10	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 11	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 12	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 13	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 14	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 15	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 16	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 17	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 18	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 19	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 20	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 21	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 22	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 23	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 24	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 25	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 26	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 27	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 28	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 29	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 30	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 31	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 32	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 33	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 34	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 35	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 36	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 37	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 38	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 39	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 40	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 41	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 42	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 43	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 44	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 45	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 46	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 47	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 48	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+	Topic: __consumer_offsets	Partition: 49	Leader: 1	Replicas: 1	Isr: 1	Elr: 	LastKnownElr: 
+
+--- Lo que publicaron y consumieron los contenedores ---
+-- cuentas-service (productor)
+
+2026-10-10T00:49:56.863Z  INFO 1 --- [cuentas-service] [nio-8081-exec-1] c.d.b.c.mensajeria.PublicadorRetiros     : >> cuentas-service: evento 15ef1236-1772-4986-a71e-e50976f826c2 publicado en la cola 
+banco.retiros (cuenta 101, monto 250)
+2026-10-10T00:49:57.320Z  INFO 1 --- [cuentas-service] [nio-8081-exec-1] c.d.b.c.m.PublicadorEventosKafka         : >> cuentas-service: evento 15ef1236-1772-4986-a71e-e50976f826c2 publicado en el topico 
+banco.transacciones-completadas (RETIRO de 250 en la cuenta 101)
+-- pagos-service (consumidor JMS y productor Kafka)
+2026-10-10T00:49:56.875Z  INFO 1 --- [pagos-service] [ntContainer#0-1] c.d.b.p.mensajeria.ConsumidorRetiros     : >> pagos-service: evento 15ef1236-1772-4986-a71e-e50976f826c2 consumido, retiro de 250 
+agregado al historial de la cuenta 101
+-- clientes-service (consumidor Kafka)
+2026-10-10T00:49:57.332Z  INFO 1 --- [clientes-service] [ntainer#0-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: evento 15ef1236-1772-4986-a71e-e50976f826c2 de Kafka anotado - RETIRO 
+sobre cuenta origen 101 y destino null
+2026-10-10T00:50:08.991Z  WARN 1 --- [clientes-service] [ntainer#1-0-C-1] c.d.b.c.mensajeria.ConsumidorEventos     : >> clientes-service: alerta RETIRO_SOBRE_LIMITE (MEDIA) sobre la cuenta 101 - Intento de 
+retiro por 900000 sobre el limite de 500000 desde el canal cajero
+
+

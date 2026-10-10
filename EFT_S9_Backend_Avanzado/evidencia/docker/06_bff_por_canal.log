@@ -1,0 +1,356 @@
+﻿
+==============================================================
+  06 - PATRON BFF: UN BACKEND POR CANAL, EN CONTENEDORES
+==============================================================
+
+--- Canal WEB ---
+{
+    "cuenta": {
+        "cuentaId": 101,
+        "nombreTitular": "John Doe",
+        "edad": 40,
+        "tipoCuenta": "prestamo",
+        "saldo": 5000
+    },
+    "perfil": {
+        "clienteId": 101,
+        "nombre": "John Doe",
+        "segmento": "establecido",
+        "edad": 40,
+        "tipoCuentaPrincipal": "prestamo",
+        "saldoReferencial": 5000,
+        "operacionesRegistradas": 1,
+        "alertasRegistradas": 1,
+        "ultimaOperacion": "RETIRO de 250 el 2026-10-10"
+    },
+    "historialCompleto": [
+        {
+            "cuentaId": 101,
+            "fecha": "2024-02-01",
+            "tipoMovimiento": "retiro",
+            "monto": 1500,
+            "descripcion": "Sin descripcion"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-02-04",
+            "tipoMovimiento": "retiro",
+            "monto": 2000,
+            "descripcion": "Ingreso mensual"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-02-07",
+            "tipoMovimiento": "compra",
+            "monto": 2500,
+            "descripcion": "Sin descripcion"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-02-09",
+            "tipoMovimiento": "deposito",
+            "monto": 2000,
+            "descripcion": "Retiro parcial"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-02-12",
+            "tipoMovimiento": "retiro",
+            "monto": 2500,
+            "descripcion": "Retiro parcial"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-02-25",
+            "tipoMovimiento": "deposito",
+            "monto": 1000,
+            "descripcion": "Sin descripcion"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-02-25",
+            "tipoMovimiento": "compra",
+            "monto": 3000,
+            "descripcion": "Retiro parcial"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-03-05",
+            "tipoMovimiento": "compra",
+            "monto": 1500,
+            "descripcion": "Retiro parcial"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-03-15",
+            "tipoMovimiento": "retiro",
+            "monto": 3000,
+            "descripcion": "Ingreso extra"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-03-21",
+            "tipoMovimiento": "compra",
+            "monto": 2500,
+            "descripcion": "Ingreso extra"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-03-24",
+            "tipoMovimiento": "deposito",
+            "monto": 2000,
+            "descripcion": "Ingreso navide??o"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-03-24",
+            "tipoMovimiento": "deposito",
+            "monto": 1500,
+            "descripcion": "Retiro parcial"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-03-27",
+            "tipoMovimiento": "compra",
+            "monto": 2000,
+            "descripcion": "Ingreso navide??o"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-04-16",
+            "tipoMovimiento": "compra",
+            "monto": 2000,
+            "descripcion": "Sin descripcion"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-04-28",
+            "tipoMovimiento": "deposito",
+            "monto": 1000,
+            "descripcion": "Ingreso de fin de a??o"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-04-30",
+            "tipoMovimiento": "compra",
+            "monto": 2500,
+            "descripcion": "Ingreso navide??o"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-05-03",
+            "tipoMovimiento": "compra",
+            "monto": 2500,
+            "descripcion": "Retiro parcial"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-05-09",
+            "tipoMovimiento": "retiro",
+            "monto": 1500,
+            "descripcion": "Ingreso extra"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-05-12",
+            "tipoMovimiento": "deposito",
+            "monto": 1000,
+            "descripcion": "Sin descripcion"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-05-18",
+            "tipoMovimiento": "retiro",
+            "monto": 2000,
+            "descripcion": "Sin descripcion"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-06-11",
+            "tipoMovimiento": "retiro",
+            "monto": 2500,
+            "descripcion": "Ingreso navide??o"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-06-17",
+            "tipoMovimiento": "retiro",
+            "monto": 1500,
+            "descripcion": "Ingreso navide??o"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-06-19",
+            "tipoMovimiento": "deposito",
+            "monto": 1500,
+            "descripcion": "Ingreso mensual"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-06-28",
+            "tipoMovimiento": "pago",
+            "monto": 2000,
+            "descripcion": "Sin descripcion"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-06-29",
+            "tipoMovimiento": "deposito",
+            "monto": 1000,
+            "descripcion": "Ingreso navide??o"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-06-30",
+            "tipoMovimiento": "compra",
+            "monto": 1000,
+            "descripcion": "Ingreso navide??o"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-07-07",
+            "tipoMovimiento": "compra",
+            "monto": 1000,
+            "descripcion": "Retiro parcial"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-07-18",
+            "tipoMovimiento": "deposito",
+            "monto": 2500,
+            "descripcion": "Ingreso extra"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-07-23",
+            "tipoMovimiento": "retiro",
+            "monto": 2500,
+            "descripcion": "Sin descripcion"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-08-27",
+            "tipoMovimiento": "deposito",
+            "monto": 2500,
+            "descripcion": "Ingreso mensual"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-10-19",
+            "tipoMovimiento": "deposito",
+            "monto": 1000,
+            "descripcion": "Ingreso navide??o"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-10-28",
+            "tipoMovimiento": "retiro",
+            "monto": 3000,
+            "descripcion": "Ingreso navide??o"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-10-29",
+            "tipoMovimiento": "compra",
+            "monto": 2500,
+            "descripcion": "Ingreso navide??o"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-11-05",
+            "tipoMovimiento": "compra",
+            "monto": 2000,
+            "descripcion": "Sin descripcion"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-11-08",
+            "tipoMovimiento": "deposito",
+            "monto": 3000,
+            "descripcion": "Sin descripcion"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-11-28",
+            "tipoMovimiento": "compra",
+            "monto": 1000,
+            "descripcion": "Ingreso de fin de a??o"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2024-12-19",
+            "tipoMovimiento": "compra",
+            "monto": 1500,
+            "descripcion": "Retiro parcial"
+        },
+        {
+            "cuentaId": 101,
+            "fecha": "2026-10-10",
+            "tipoMovimiento": "retiro",
+            "monto": 250,
+            "descripcion": "Retiro por canal cajero"
+        }
+    ],
+    "resumen": {
+        "cuentaId": 101,
+        "totalMovimientos": 38,
+        "totalDepositos": 20000,
+        "totalEgresos": 51750,
+        "ultimaFecha": "2026-10-10"
+    }
+}
+
+--- Canal MOVIL ---
+{
+    "saldo": 5000,
+    "tipoCuenta": "prestamo",
+    "ultimosMovimientos": [
+        {
+            "fecha": "2026-10-10",
+            "tipo": "retiro",
+            "monto": 250
+        },
+        {
+            "fecha": "2024-12-19",
+            "tipo": "compra",
+            "monto": 1500
+        },
+        {
+            "fecha": "2024-11-28",
+            "tipo": "compra",
+            "monto": 1000
+        }
+    ]
+}
+
+--- Canal CAJERO ---
+{
+    "cuentaId": 101,
+    "saldoDisponible": 5000
+}
+
+--- Tamano de la respuesta por canal, para la misma cuenta ---
+   web            4669 caracteres
+   movil           216 caracteres
+   cajero           39 caracteres
+
+--- Retiro por el canal cajero: una sola llamada ---
+{
+    "cuentaId": 101,
+    "montoSolicitado": 150,
+    "saldoResultante": 4850,
+    "aprobado": true,
+    "motivoRechazo": null,
+    "fechaMovimiento": "2026-10-10",
+    "movimientoRegistrado": true
+}
+
+--- Panel administrativo, exclusivo del canal web ---
+{
+    "cantidadTotal": 392,
+    "montoTotal": 529400,
+    "cantidadCreditos": 176,
+    "cantidadDebitos": 216,
+    "montoCreditos": 244500,
+    "montoDebitos": 284900
+}

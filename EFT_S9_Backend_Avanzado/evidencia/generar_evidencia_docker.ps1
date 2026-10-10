@@ -103,6 +103,18 @@ function PostJson($url, $token, $cuerpo) {
     if ($r) { $r | python -m json.tool } else { '(sin respuesta)' }
 }
 
+# Que un contenedor este healthy no basta para pedirle algo POR EL GATEWAY. El
+# gateway enruta con la copia del registro de Eureka que tiene en memoria, y
+# hasta que la refresca responde 503. Dormir un numero fijo de segundos funciona
+# hasta que la maquina esta mas cargada; por eso se pregunta hasta que conteste.
+function EsperarGateway($url, $token, $intentos = 60) {
+    for ($i = 1; $i -le $intentos; $i++) {
+        if ((Codigo $url $token) -eq '200') { return $i }
+        Start-Sleep -Seconds 1
+    }
+    return -1
+}
+
 function Token($clientId, $secreto, $scopes) {
     $r = curl.exe -s -u "${clientId}:${secreto}" -d "grant_type=client_credentials" `
         --data-urlencode "scope=$scopes" "$Auth/oauth2/token"
@@ -263,6 +275,25 @@ Write-Host '>> 02 levantando la orquestacion'
         "   http://${n}:${p}/actuator/health -> HTTP $r"
     }
 
+    Paso 'El gateway enrutando hacia cada microservicio'
+    'Estar healthy no es lo mismo que ser alcanzable por el gateway: el gateway'
+    'enruta con su copia del registro de Eureka, y hasta refrescarla responde'
+    '503. Se pregunta por una ruta de cada microservicio hasta que conteste 200.'
+    ''
+    $tkSonda = Token 'banco-web-client' 'banco-web-secret' `
+        'cuentas.read movimientos.read clientes.read'
+    foreach ($par in @(
+            @('cuentas-service',  "$Gw/api/cuentas/101"),
+            @('pagos-service',    "$Gw/api/movimientos/101/resumen"),
+            @('clientes-service', "$Gw/api/clientes/101"))) {
+        $s = EsperarGateway $par[1] $tkSonda
+        if ($s -ge 0) { '   {0,-18} enrutando tras {1}s' -f $par[0], $s }
+        else {
+            '   {0,-18} !! el gateway sigue sin enrutar' -f $par[0]
+            $script:Orquestado = $false
+        }
+    }
+
     Paso 'Servicios registrados en Eureka'
     cmd /c "docker compose exec -T api-gateway curl -s -u ${EurekaUser}:${EurekaPass} -H ""Accept: application/json"" http://discovery-server:8761/eureka/apps 2>&1" |
         python -c "import sys,json;
@@ -277,7 +308,7 @@ apps=[apps] if isinstance(apps,dict) else apps;
 # donde mirar.
 if (-not $Orquestado) {
     Write-Host ''
-    Write-Host '!! La orquestacion no llego a healthy. Se detiene aca.' -ForegroundColor Red
+    Write-Host '!! La orquestacion no quedo utilizable. Se detiene aca.' -ForegroundColor Red
     Write-Host "   El diagnostico esta en $Salida\02_orquestacion.log"
     Write-Host '   Lo mas comun: un contenedor muerto por falta de memoria'
     Write-Host '   (Docker Desktop -> Settings -> Resources, al menos 8 GB).'
@@ -530,22 +561,41 @@ apps=d['applications'].get('application',[]);
 apps=[apps] if isinstance(apps,dict) else apps;
 [print('  ',a['name'],':',len(a['instance'] if isinstance(a['instance'],list) else [a['instance']]),'instancia(s)') for a in sorted(apps,key=lambda x:x['name'])]"
 
+    # Se cuenta el DELTA y no el acumulado. El log de acceso de cada contenedor
+    # arranca con el contenedor, y la replica original ya venia atendiendo
+    # peticiones de los pasos anteriores: sumar los acumulados daria un total
+    # mayor que las treinta que se acaban de enviar, y el log se leeria como si
+    # las cuentas no cuadraran.
+    function ContarAccesos() {
+        $c = @{}
+        foreach ($id in (cmd /c "docker compose ps -q cuentas-service 2>&1")) {
+            if ($id) {
+                $c[$id] = (cmd /c "docker logs $id 2>&1" |
+                    Select-String 'GET /cuentas/101' | Measure-Object).Count
+            }
+        }
+        return $c
+    }
+
+    $antes = ContarAccesos
+
     Paso 'Treinta peticiones por el gateway, repartidas entre las replicas'
     for ($i = 1; $i -le 30; $i++) {
         Codigo "$Gw/api/cuentas/101" $TkWeb | Out-Null
     }
     Start-Sleep -Seconds 3
-    'Peticiones atendidas por cada replica, contadas en su propio log de acceso:'
+    $despues = ContarAccesos
+
+    'De esas treinta, cuantas atendio cada replica, segun su propio log de acceso:'
     $total = 0
-    foreach ($id in (cmd /c "docker compose ps -q cuentas-service 2>&1")) {
-        if (-not $id) { continue }
+    foreach ($id in $despues.Keys) {
         $nombre = cmd /c "docker inspect --format `"{{.Name}}`" $id 2>&1"
         $nombre = "$nombre".TrimStart('/')
-        $n = (cmd /c "docker logs $id 2>&1" | Select-String 'GET /cuentas/101' | Measure-Object).Count
+        $n = $despues[$id] - $(if ($antes.ContainsKey($id)) { $antes[$id] } else { 0 })
         $total += $n
         '   {0,-45} {1} peticiones' -f $nombre, $n
     }
-    "   total repartido entre las replicas: $total"
+    "   total repartido entre las replicas: $total  (de 30 enviadas)"
     ''
     'El reparto lo hace el balanceador del gateway sobre el registro de Eureka.'
     'No hubo que tocar la configuracion de ningun componente: basto levantar la'

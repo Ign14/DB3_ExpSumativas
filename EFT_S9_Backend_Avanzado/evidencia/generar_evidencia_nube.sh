@@ -63,6 +63,20 @@ meta() {
         "http://169.254.169.254/latest/meta-data/$ruta" --max-time 5 2>/dev/null || echo "(no disponible)"
 }
 
+# Que un contenedor este healthy no basta para pedirle algo POR EL GATEWAY: el
+# gateway enruta con la copia del registro de Eureka que tiene en memoria, y
+# hasta refrescarla responde 503. Dormir un numero fijo de segundos funciona
+# hasta que la maquina esta mas cargada; por eso se pregunta hasta que conteste.
+esperar_gateway() {
+    local url="$1" tk="$2" intentos="${3:-60}" i
+    for ((i = 1; i <= intentos; i++)); do
+        [[ "$(codigo "$url" "$tk")" == "200" ]] && { echo "$i"; return 0; }
+        sleep 1
+    done
+    echo "-1"
+    return 1
+}
+
 esperar_sanos() {
     local intentos="${1:-40}" i sanos total
     for ((i = 1; i <= intentos; i++)); do
@@ -133,6 +147,25 @@ echo ">> 02 construyendo las imagenes en la instancia (tarda varios minutos)"
 
     paso "Esperando a que todos reporten healthy"
     esperar_sanos 45 || echo "   !! no todos llegaron a healthy"
+
+    paso "El gateway enrutando hacia cada microservicio"
+    echo "Estar healthy no es lo mismo que ser alcanzable por el gateway: el"
+    echo "gateway enruta con su copia del registro de Eureka, y hasta refrescarla"
+    echo "responde 503. Se pregunta por una ruta de cada microservicio hasta que"
+    echo "conteste 200."
+    echo
+    TK_SONDA=$(token banco-web-client banco-web-secret "cuentas.read movimientos.read clientes.read")
+    for par in "cuentas-service|$GW/api/cuentas/101" \
+               "pagos-service|$GW/api/movimientos/101/resumen" \
+               "clientes-service|$GW/api/clientes/101"; do
+        nombre="${par%%|*}"; ruta="${par#*|}"
+        s=$(esperar_gateway "$ruta" "$TK_SONDA")
+        if [[ "$s" == "-1" ]]; then
+            printf "   %-18s !! el gateway sigue sin enrutar\n" "$nombre"
+        else
+            printf "   %-18s enrutando tras %ss\n" "$nombre" "$s"
+        fi
+    done
 
     paso "docker compose ps"
     $COMPOSE ps 2>&1
@@ -371,15 +404,28 @@ print('   instancias:', len(inst))
 for i in inst:
     print('     -', i['instanceId'], i['status'])" 2>/dev/null
 
+    # Se mide el DELTA y no el acumulado: el log de acceso empieza con el
+    # contenedor, y la replica original ya venia atendiendo peticiones de los
+    # pasos anteriores. Sumar acumulados daria mas de treinta y el log se
+    # leeria como si las cuentas no cuadraran.
+    declare -A ANTES
+    for c in $($COMPOSE ps -q cuentas-service); do
+        ANTES[$c]=$(docker logs "$c" 2>&1 | grep -c "GET /cuentas/101")
+    done
+
     paso "Treinta peticiones por el gateway, repartidas entre las replicas"
     for i in $(seq 1 30); do codigo "$GW/api/cuentas/101" "$TK_WEB" > /dev/null; done
     sleep 3
-    echo "Peticiones atendidas por cada replica, contadas en sus logs de acceso:"
+    echo "De esas treinta, cuantas atendio cada replica segun su log de acceso:"
+    total=0
     for c in $($COMPOSE ps -q cuentas-service); do
         nombre=$(docker inspect --format '{{.Name}}' "$c" | sed 's|^/||')
-        n=$(docker logs "$c" 2>&1 | grep -c "GET /cuentas/101")
+        ahora=$(docker logs "$c" 2>&1 | grep -c "GET /cuentas/101")
+        n=$(( ahora - ${ANTES[$c]:-0} ))
+        total=$(( total + n ))
         printf "   %-45s %s peticiones\n" "$nombre" "$n"
     done
+    echo "   total repartido entre las replicas: $total  (de 30 enviadas)"
     echo
     echo "   El reparto lo hace el balanceador del gateway sobre el registro de"
     echo "   Eureka. No hubo que tocar configuracion de ningun componente: basto"
