@@ -1096,27 +1096,31 @@ echo "grupo $SG abierto para $MI_IP"
 ```
 
 **La AMI.** Amazon Linux 2023, que es una de las imágenes provistas por Amazon
-—las únicas que el laboratorio permite—:
-
-```bash
-export AMI=$(aws ssm get-parameter \
-  --name /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64 \
-  --query 'Parameter.Value' --output text)
-echo "AMI $AMI"
-```
-
-Si el laboratorio no diera acceso a Systems Manager, el mismo identificador sale
-preguntándole a EC2:
+—las únicas que el laboratorio permite—. La receta habitual es preguntarle a
+Systems Manager por el identificador de la última versión, pero **en el Learner
+Lab ese parámetro no está disponible** y la llamada devuelve `ParameterNotFound`:
+el laboratorio no habilita SSM. El identificador sale igual preguntándole a EC2,
+que sí está:
 
 ```bash
 export AMI=$(aws ec2 describe-images --owners amazon \
   --filters 'Name=name,Values=al2023-ami-2023.*-kernel-6.1-x86_64' \
             'Name=state,Values=available' \
   --query 'sort_by(Images,&CreationDate)[-1].ImageId' --output text)
+echo "AMI $AMI"
 ```
 
+En una cuenta propia, con SSM disponible, el equivalente de una línea es
+`aws ssm get-parameter --name /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64 --query Parameter.Value --output text`.
+
 **La instancia**, con un `user-data` que deja Docker y el plugin de Compose
-instalados antes de que usted entre:
+instalados antes de que usted entre.
+
+Desde Git Bash en Windows, el comando va precedido de `MSYS_NO_PATHCONV=1`. Sin
+eso, MSYS ve que `/dev/xvda` empieza con una barra, lo toma por una ruta POSIX y
+lo traduce a una ruta de Windows: la llamada falla con
+`Invalid device name C:/Program Files/Git/dev/xvda`. No es un problema de AWS
+sino de la capa de compatibilidad, y sólo aparece en Git Bash.
 
 ```bash
 cat > arranque.sh <<'SCRIPT'
@@ -1133,7 +1137,7 @@ chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
 echo "listo" > /home/ec2-user/ARRANQUE_COMPLETO
 SCRIPT
 
-export INSTANCIA=$(aws ec2 run-instances \
+export INSTANCIA=$(MSYS_NO_PATHCONV=1 aws ec2 run-instances \
   --image-id $AMI \
   --instance-type t3.large \
   --key-name vockey \
@@ -1157,6 +1161,12 @@ del `build`.
 
 Conviene anotar el identificador de la instancia en algún lado. Es lo único que
 hace falta para apagarla si algo sale mal y se pierde la terminal.
+
+Y conviene comprobar que `$INSTANCIA` quedó con contenido antes de seguir. Si el
+lanzamiento falló, la variable queda vacía, y un `describe-instances
+--instance-ids` sin valor no da error: consulta **todas** las instancias de la
+cuenta y devuelve la primera. En un laboratorio compartido con otros ejercicios,
+eso significa terminar apuntando a una instancia ajena.
 
 ### 11.3 Subir el proyecto
 
