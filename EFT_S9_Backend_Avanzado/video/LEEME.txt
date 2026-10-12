@@ -1,23 +1,27 @@
-El video de la presentación va en esta carpeta.
+El video de la presentación no está en esta carpeta: está publicado en Kaltura,
+la plataforma de video del AVA, y se entrega como enlace en el formulario de la
+actividad.
 
-Formato:  MP4
-Duración: entre 5 y 7 minutos
-Contenido: grabación de pantalla con la webcam visible mientras se presenta
+Se hizo así porque un MP4 de seis minutos pesa más que todo el resto de la
+entrega junta, y porque Kaltura es donde el AVA espera encontrarlo.
 
-Nombre sugerido del archivo:
-    EFT_S9_Presentacion_Ignacio_Mino_Astorga.mp4
+Datos del video:
 
-El guion, con los tiempos, lo que mostrar en pantalla y qué dejar preparado
-antes de grabar, está en:
+    Formato   MP4
+    Duración  entre 5 y 7 minutos
+    Contenido grabación de pantalla con la webcam visible
 
-    informe/guion_video.md
-
-Los cuatro puntos que la presentación tiene que cubrir:
+Lo que la presentación cubre, en orden:
 
   1. Resumen ejecutivo del proyecto
   2. Resultados obtenidos y comparación con el sistema legacy
   3. Desafíos enfrentados y soluciones implementadas
   4. Propuestas de mejora y próximos pasos
 
-El instructivo de Kaltura para grabar y subir está en el AVA:
+El guion está en dos versiones:
+
+    informe/guion_video.md            completo, con cada frase y los tiempos
+    informe/guion_video_resumido.pdf  para imprimir y tener al lado al grabar
+
+El instructivo de Kaltura, en el AVA:
     https://ava.duoc.cl/bbcswebdav/xid-3577107_1
